@@ -20,7 +20,6 @@ Here's an example of serializing a User resource to JSON API.
       attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
     },
     books: {
-      ref: '_id',
       attributes: ['title', 'ISBN']
     }
   }).then(function (users) {
