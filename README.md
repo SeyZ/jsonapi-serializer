@@ -1,4 +1,6 @@
 # JSON API Serializer
+[![Build Status](https://travis-ci.org/SeyZ/jsonapi-serializer.svg?branch=master)](https://travis-ci.org/SeyZ/jsonapi-serializer)
+
 A Node.js framework agnostic library for serializing your data to [JSON
 API](http://jsonapi.org) (1.0 compliant).
 
