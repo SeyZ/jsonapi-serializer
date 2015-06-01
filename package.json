@@ -12,5 +12,8 @@
     "bluebird": "^2.9.27",
     "inflected": "^1.1.6",
     "lodash": "^3.9.3"
+  },
+  "devDependencies": {
+    "chai": "^2.3.0"
   }
 }
