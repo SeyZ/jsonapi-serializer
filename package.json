@@ -1,0 +1,16 @@
+{
+  "name": "jsonapi-serializer",
+  "version": "1.0.0",
+  "description": "JSON API serializer",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Sandro Munda <sandro@munda.me>",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^2.9.27",
+    "inflected": "^1.1.6",
+    "lodash": "^3.9.3"
+  }
+}
