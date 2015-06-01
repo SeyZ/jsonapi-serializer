@@ -4,7 +4,7 @@
   "description": "JSON API serializer",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
@@ -14,6 +14,7 @@
     "lodash": "^3.9.3"
   },
   "devDependencies": {
-    "chai": "^2.3.0"
+    "chai": "^2.3.0",
+    "mocha": "^2.2.5"
   }
 }
