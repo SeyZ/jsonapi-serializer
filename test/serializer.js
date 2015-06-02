@@ -5,6 +5,22 @@ var expect = require('chai').expect;
 
 var JsonApiSerializer = require('../lib/serializer');
 
+describe('Options', function () {
+  describe('apiEndpointValue', function () {
+    it('should override the apiEndpoint url', function (done) {
+      new JsonApiSerializer('users', [], {
+        apiEndpoint: 'http://localhost:3000/api',
+        apiEndpointValue: 'http://localhost:3000/override'
+      }).then(function (json) {
+        expect(json).to.have.property('links');
+        expect(json.links).to.have.property('self')
+          .equal('http://localhost:3000/override');
+        done(null, json);
+      });
+    });
+  });
+});
+
 describe('JSON API Serializer', function () {
   describe('Flat data', function () {
     it('should be set into the `data.attributes`', function (done) {
