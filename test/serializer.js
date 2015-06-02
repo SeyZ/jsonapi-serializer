@@ -19,17 +19,40 @@ describe('Options', function () {
       });
     });
   });
+
+  describe('id', function () {
+    it('should override the id field', function (done) {
+      var dataSet = [{
+        _id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }, {
+        _id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        id: '_id',
+        attributes: ['firstName', 'lastName']
+      }).then(function (json) {
+        expect(json.data[0].id).equal('54735750e16638ba1eee59cb');
+        done(null, json);
+      });
+    });
+  });
 });
 
 describe('JSON API Serializer', function () {
   describe('Flat data', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
-        _id: '54735750e16638ba1eee59cb',
+        id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
       }, {
-        _id: '5490212e69e49d0c4f9fc6b4',
+        id: '5490212e69e49d0c4f9fc6b4',
         firstName: 'Lawrence',
         lastName: 'Bennett'
       }];
@@ -60,7 +83,7 @@ describe('JSON API Serializer', function () {
   describe('Embedded data without relationships', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
-        _id: '54735750e16638ba1eee59cb',
+        id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
         address: {
@@ -69,7 +92,7 @@ describe('JSON API Serializer', function () {
           country: 'USA'
         },
       }, {
-        _id: '5490212e69e49d0c4f9fc6b4',
+        id: '5490212e69e49d0c4f9fc6b4',
         firstName: 'Lawrence',
         lastName: 'Bennett',
         address: {
@@ -102,20 +125,21 @@ describe('JSON API Serializer', function () {
   describe('Embedded data with relationships', function () {
     it('should be set into the `data.relationships` and `included`', function (done) {
       var dataSet = [{
-        _id: '54735750e16638ba1eee59cb',
+        id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
         address: {
-          _id: '54735722e16620ba1eee36af',
+          id: '54735722e16620ba1eee36af',
           addressLine1: '406 Madison Court',
           zipCode: '49426',
           country: 'USA'
         },
       }, {
-        _id: '5490143e69e49d0c8f9fc6bc',
+        id: '5490143e69e49d0c8f9fc6bc',
         firstName: 'Lawrence',
         lastName: 'Bennett',
         address: {
+          id: '54735697e16624ba1eee36bf',
           addressLine1: '361 Shady Lane',
           zipCode: '23185',
           country: 'USA'
@@ -126,7 +150,7 @@ describe('JSON API Serializer', function () {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
-          ref: '_id',
+          ref: 'id',
           attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
         }
       }).then(function (json) {
@@ -160,7 +184,7 @@ describe('JSON API Serializer', function () {
   describe('Embedded array of data without relationships', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
-        _id: '54735750e16638ba1eee59cb',
+        id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
         books: [{
@@ -171,7 +195,7 @@ describe('JSON API Serializer', function () {
           ISBN: '978-1451648546'
         }]
       }, {
-        _id: '5490143e69e49d0c8f9fc6bc',
+        id: '5490143e69e49d0c8f9fc6bc',
         firstName: 'Lawrence',
         lastName: 'Bennett',
         books: [{
@@ -207,28 +231,28 @@ describe('JSON API Serializer', function () {
   describe('Embedded array of data with relationships', function () {
     it('should be set into the `data.relationships` and `included`', function (done) {
       var dataSet = [{
-        _id: '54735750e16638ba1eee59cb',
+        id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
         books: [{
-          _id: '52735730e16632ba1eee62dd',
+          id: '52735730e16632ba1eee62dd',
           title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
           ISBN: '978-0062301239'
         }, {
-          _id: '52735780e16610ba1eee15cd',
+          id: '52735780e16610ba1eee15cd',
           title: 'Steve Jobs',
           ISBN: '978-1451648546'
         }]
       }, {
-        _id: '5490143e69e49d0c8f9fc6bc',
+        id: '5490143e69e49d0c8f9fc6bc',
         firstName: 'Lawrence',
         lastName: 'Bennett',
         books: [{
-          _id: '52735718e16610ba1eee15cd',
+          id: '52735718e16610ba1eee15cd',
           title: 'Zero to One: Notes on Startups, or How to Build the Future',
           ISBN: '978-0804139298'
         }, {
-          _id: '52735671e16610ba1eee15ff',
+          id: '52735671e16610ba1eee15ff',
           title: 'Einstein: His Life and Universe',
           ISBN: '978-0743264747'
         }]
@@ -238,7 +262,7 @@ describe('JSON API Serializer', function () {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
-          ref: '_id',
+          ref: 'id',
           attributes: ['title', 'ISBN']
         }
       }).then(function (json) {
