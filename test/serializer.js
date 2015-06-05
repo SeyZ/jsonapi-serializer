@@ -45,7 +45,7 @@ describe('Options', function () {
 });
 
 describe('JSON API Serializer', function () {
-  describe('Flat data', function () {
+  describe('Flat data collection', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -80,7 +80,38 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded data without relationships', function () {
+  describe('Flat data resource', function () {
+    it('should be set into the `data.attributes`', function (done) {
+      var resource = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      new JsonApiSerializer('users', resource, {
+        apiEndpoint: 'http://localhost:3000/api',
+        attributes: ['firstName', 'lastName'],
+      }).then(function (json) {
+        expect(json).to.have.property('data').and.to.be.instanceof(Object);
+
+        expect(json.data).to.have.property('id')
+          .equal('54735750e16638ba1eee59cb');
+
+        expect(json.data).to.have.property('type').equal('users');
+
+        expect(json.data).to.have.property('attributes').that.is
+          .an('object')
+          .eql({
+            firstName: 'Sandro',
+            lastName: 'Munda',
+          });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Embedded data collection without relationships', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -122,7 +153,7 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded data with relationships', function () {
+  describe('Embedded data collection with relationships', function () {
     it('should be set into the `data.relationships` and `included`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -181,7 +212,7 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded array of data without relationships', function () {
+  describe('Embedded array of data collection without relationships', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -228,7 +259,7 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded array of data with relationships', function () {
+  describe('Embedded array of data collection with relationships', function () {
     it('should be set into the `data.relationships` and `included`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -300,5 +331,4 @@ describe('JSON API Serializer', function () {
       });
     });
   });
-
 });
