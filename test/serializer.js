@@ -66,7 +66,7 @@ describe('JSON API Serializer', function () {
         expect(json.data[0]).to.have.property('id')
           .equal('54735750e16638ba1eee59cb');
 
-        expect(json.data[0]).to.have.property('type').equal('users');
+        expect(json.data[0]).to.have.property('type').equal('user');
 
         expect(json.data[0]).to.have.property('attributes').that.is
           .an('object')
@@ -97,7 +97,7 @@ describe('JSON API Serializer', function () {
         expect(json.data).to.have.property('id')
           .equal('54735750e16638ba1eee59cb');
 
-        expect(json.data).to.have.property('type').equal('users');
+        expect(json.data).to.have.property('type').equal('user');
 
         expect(json.data).to.have.property('attributes').that.is
           .an('object')
@@ -190,7 +190,7 @@ describe('JSON API Serializer', function () {
         expect(json.included[0]).to.have.property('id')
           .equal('54735722e16620ba1eee36af');
 
-        expect(json.included[0]).to.have.property('type').equal('addresses');
+        expect(json.included[0]).to.have.property('type').equal('address');
 
         expect(json.included[0]).to.have.property('attributes').to.be
           .an('object').eql({
@@ -204,7 +204,7 @@ describe('JSON API Serializer', function () {
 
         expect(json.data[0].relationships.address.data).eql({
           id: '54735722e16620ba1eee36af',
-          type: 'addresses'
+          type: 'address'
         });
 
         done(null, json);
@@ -300,7 +300,7 @@ describe('JSON API Serializer', function () {
         expect(json.included[0]).to.have.property('id')
           .equal('52735730e16632ba1eee62dd');
 
-        expect(json.included[0]).to.have.property('type').equal('books');
+        expect(json.included[0]).to.have.property('type').equal('book');
 
         expect(json.included[0].attributes).to.be.eql({
           title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
@@ -310,7 +310,7 @@ describe('JSON API Serializer', function () {
         expect(json.included[1]).to.have.property('id')
           .equal('52735780e16610ba1eee15cd');
 
-        expect(json.included[1]).to.have.property('type').equal('books');
+        expect(json.included[1]).to.have.property('type').equal('book');
 
         expect(json.included[1].attributes).to.be.eql({
           title: 'Steve Jobs',
@@ -322,9 +322,9 @@ describe('JSON API Serializer', function () {
 
         expect(json.data[0].relationships.books.data).to.be.an('array')
           .eql([{
-            type: 'books', 'id': '52735730e16632ba1eee62dd'
+            type: 'book', 'id': '52735730e16632ba1eee62dd'
           }, {
-            type: 'books', 'id': '52735780e16610ba1eee15cd'
+            type: 'book', 'id': '52735780e16610ba1eee15cd'
           }]);
 
         done(null, json);
