@@ -66,13 +66,13 @@ describe('JSON API Serializer', function () {
         expect(json.data[0]).to.have.property('id')
           .equal('54735750e16638ba1eee59cb');
 
-        expect(json.data[0]).to.have.property('type').equal('user');
+        expect(json.data[0]).to.have.property('type').equal('users');
 
         expect(json.data[0]).to.have.property('attributes').that.is
           .an('object')
           .eql({
-            firstName: 'Sandro',
-            lastName: 'Munda',
+            'first-name': 'Sandro',
+            'last-name': 'Munda',
           });
 
         done(null, json);
@@ -97,13 +97,13 @@ describe('JSON API Serializer', function () {
         expect(json.data).to.have.property('id')
           .equal('54735750e16638ba1eee59cb');
 
-        expect(json.data).to.have.property('type').equal('user');
+        expect(json.data).to.have.property('type').equal('users');
 
         expect(json.data).to.have.property('attributes').that.is
           .an('object')
           .eql({
-            firstName: 'Sandro',
-            lastName: 'Munda',
+            'first-name': 'Sandro',
+            'last-name': 'Munda',
           });
 
         done(null, json);
@@ -190,7 +190,7 @@ describe('JSON API Serializer', function () {
         expect(json.included[0]).to.have.property('id')
           .equal('54735722e16620ba1eee36af');
 
-        expect(json.included[0]).to.have.property('type').equal('address');
+        expect(json.included[0]).to.have.property('type').equal('addresses');
 
         expect(json.included[0]).to.have.property('attributes').to.be
           .an('object').eql({
@@ -204,7 +204,7 @@ describe('JSON API Serializer', function () {
 
         expect(json.data[0].relationships.address.data).eql({
           id: '54735722e16620ba1eee36af',
-          type: 'address'
+          type: 'addresses'
         });
 
         done(null, json);
@@ -220,10 +220,10 @@ describe('JSON API Serializer', function () {
         lastName: 'Munda',
         books: [{
           title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-          ISBN: '978-0062301239'
+          isbn: '978-0062301239'
         }, {
           title: 'Steve Jobs',
-          ISBN: '978-1451648546'
+          isbn: '978-1451648546'
         }]
       }, {
         id: '5490143e69e49d0c8f9fc6bc',
@@ -231,10 +231,10 @@ describe('JSON API Serializer', function () {
         lastName: 'Bennett',
         books: [{
           title: 'Zero to One: Notes on Startups, or How to Build the Future',
-          ISBN: '978-0804139298'
+          isbn: '978-0804139298'
         }, {
           title: 'Einstein: His Life and Universe',
-          ISBN: '978-0743264747'
+          isbn: '978-0743264747'
         }]
       }];
 
@@ -242,17 +242,17 @@ describe('JSON API Serializer', function () {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
-          attributes: ['title', 'ISBN']
+          attributes: ['title', 'isbn']
         }
       }).then(function (json) {
         expect(json.data[0].attributes).to.have.property('books')
           .that.is.an('array')
           .eql([{
             title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-            ISBN: '978-0062301239'
+            isbn: '978-0062301239'
           }, {
             title: 'Steve Jobs',
-            ISBN: '978-1451648546'
+            isbn: '978-1451648546'
           }]);
         done(null, json);
       });
@@ -268,11 +268,11 @@ describe('JSON API Serializer', function () {
         books: [{
           id: '52735730e16632ba1eee62dd',
           title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-          ISBN: '978-0062301239'
+          isbn: '978-0062301239'
         }, {
           id: '52735780e16610ba1eee15cd',
           title: 'Steve Jobs',
-          ISBN: '978-1451648546'
+          isbn: '978-1451648546'
         }]
       }, {
         id: '5490143e69e49d0c8f9fc6bc',
@@ -281,11 +281,11 @@ describe('JSON API Serializer', function () {
         books: [{
           id: '52735718e16610ba1eee15cd',
           title: 'Zero to One: Notes on Startups, or How to Build the Future',
-          ISBN: '978-0804139298'
+          isbn: '978-0804139298'
         }, {
           id: '52735671e16610ba1eee15ff',
           title: 'Einstein: His Life and Universe',
-          ISBN: '978-0743264747'
+          isbn: '978-0743264747'
         }]
       }];
 
@@ -294,27 +294,27 @@ describe('JSON API Serializer', function () {
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           ref: 'id',
-          attributes: ['title', 'ISBN']
+          attributes: ['title', 'isbn']
         }
       }).then(function (json) {
         expect(json.included[0]).to.have.property('id')
           .equal('52735730e16632ba1eee62dd');
 
-        expect(json.included[0]).to.have.property('type').equal('book');
+        expect(json.included[0]).to.have.property('type').equal('books');
 
         expect(json.included[0].attributes).to.be.eql({
           title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-          ISBN: '978-0062301239'
+          isbn: '978-0062301239'
         });
 
         expect(json.included[1]).to.have.property('id')
           .equal('52735780e16610ba1eee15cd');
 
-        expect(json.included[1]).to.have.property('type').equal('book');
+        expect(json.included[1]).to.have.property('type').equal('books');
 
         expect(json.included[1].attributes).to.be.eql({
           title: 'Steve Jobs',
-          ISBN: '978-1451648546'
+          isbn: '978-1451648546'
         });
 
         expect(json.data[0].relationships).to.have.property('books').that.is
@@ -322,9 +322,9 @@ describe('JSON API Serializer', function () {
 
         expect(json.data[0].relationships.books.data).to.be.an('array')
           .eql([{
-            type: 'book', 'id': '52735730e16632ba1eee62dd'
+            type: 'books', 'id': '52735730e16632ba1eee62dd'
           }, {
-            type: 'book', 'id': '52735780e16610ba1eee15cd'
+            type: 'books', 'id': '52735780e16610ba1eee15cd'
           }]);
 
         done(null, json);
