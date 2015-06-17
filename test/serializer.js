@@ -111,7 +111,7 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded data collection without relationships', function () {
+  describe('Nested document', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -153,66 +153,7 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded data collection with relationships', function () {
-    it('should be set into the `data.relationships` and `included`', function (done) {
-      var dataSet = [{
-        id: '54735750e16638ba1eee59cb',
-        firstName: 'Sandro',
-        lastName: 'Munda',
-        address: {
-          id: '54735722e16620ba1eee36af',
-          addressLine1: '406 Madison Court',
-          zipCode: '49426',
-          country: 'USA'
-        },
-      }, {
-        id: '5490143e69e49d0c8f9fc6bc',
-        firstName: 'Lawrence',
-        lastName: 'Bennett',
-        address: {
-          id: '54735697e16624ba1eee36bf',
-          addressLine1: '361 Shady Lane',
-          zipCode: '23185',
-          country: 'USA'
-        }
-      }];
-
-      new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
-        attributes: ['firstName', 'lastName', 'address'],
-        address: {
-          ref: 'id',
-          attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
-        }
-      }).then(function (json) {
-        expect(json.included).to.have.length(2);
-
-        expect(json.included[0]).to.have.property('id')
-          .equal('54735722e16620ba1eee36af');
-
-        expect(json.included[0]).to.have.property('type').equal('addresses');
-
-        expect(json.included[0]).to.have.property('attributes').to.be
-          .an('object').eql({
-            addressLine1: '406 Madison Court',
-            zipCode: '49426',
-            country: 'USA'
-          });
-
-        expect(json.data[0].relationships).to.have.property('address').that.is
-          .an('object');
-
-        expect(json.data[0].relationships.address.data).eql({
-          id: '54735722e16620ba1eee36af',
-          type: 'addresses'
-        });
-
-        done(null, json);
-      });
-    });
-  });
-
-  describe('Embedded array of data collection without relationships', function () {
+  describe('Nested documents', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -259,7 +200,66 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Embedded array of data collection with relationships', function () {
+  describe('Compound document', function () {
+    it('should be set into the `data.relationships` and `included`', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          id: '54735697e16624ba1eee36bf',
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
+        }
+      }).then(function (json) {
+        expect(json.included).to.have.length(2);
+
+        expect(json.included[0]).to.have.property('id')
+          .equal('54735722e16620ba1eee36af');
+
+        expect(json.included[0]).to.have.property('type').equal('addresses');
+
+        expect(json.included[0]).to.have.property('attributes').to.be
+          .an('object').eql({
+            'address-line1': '406 Madison Court',
+            'zip-code': '49426',
+            'country': 'USA'
+          });
+
+        expect(json.data[0].relationships).to.have.property('address').that.is
+          .an('object');
+
+        expect(json.data[0].relationships.address.data).eql({
+          id: '54735722e16620ba1eee36af',
+          type: 'addresses'
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Compound documents', function () {
     it('should be set into the `data.relationships` and `included`', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
@@ -326,6 +326,175 @@ describe('JSON API Serializer', function () {
           }, {
             type: 'books', 'id': '52735780e16610ba1eee15cd'
           }]);
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Multiple compound documents (array -> object)', function () {
+    it('should be set into the `data.relationships` and `included`', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [{
+          id: '52735730e16632ba1eee62dd',
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239',
+          author: {
+            id: '2934f384bb824a7cb7b238b8dc194a22',
+            firstName: 'Ashlee',
+            lastName: 'Vance'
+          }
+        }, {
+          id: '52735780e16610ba1eee15cd',
+          title: 'Steve Jobs',
+          isbn: '978-1451648546',
+          author: {
+            id: '5ed95269a8334d8a970a2bd9fa599288',
+            firstName: 'Walter',
+            lastName: 'Isaacson'
+          }
+        }]
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        attributes: ['firstName', 'lastName', 'books'],
+        books: {
+          ref: 'id',
+          attributes: ['title', 'isbn', 'author'],
+          author: {
+            ref: 'id',
+            attributes: ['firstName', 'lastName']
+          }
+        }
+      }).then(function (json) {
+        expect(json.included).to.include({
+          type: 'books',
+          id: '52735730e16632ba1eee62dd',
+          attributes: {
+            title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+            isbn: '978-0062301239'
+          },
+          relationships: {
+            author: {
+              data: { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' }
+            }
+          }
+        });
+
+        expect(json.included).to.include({
+          type: 'books',
+          id: '52735780e16610ba1eee15cd',
+          attributes: {
+            title: 'Steve Jobs',
+            isbn: '978-1451648546'
+          },
+          relationships: {
+            author: {
+              data: {
+                id: '5ed95269a8334d8a970a2bd9fa599288',
+                type: 'authors'
+              }
+            }
+          }
+        });
+
+        expect(json.included).to.include({
+          id: '2934f384bb824a7cb7b238b8dc194a22',
+          type: 'authors',
+          attributes: {
+            'first-name': 'Ashlee',
+            'last-name': 'Vance'
+          }
+        });
+
+        expect(json.included).to.include({
+          id: '5ed95269a8334d8a970a2bd9fa599288',
+          type: 'authors',
+          attributes: {
+            'first-name': 'Walter',
+            'last-name': 'Isaacson'
+          }
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Multiple compound documents (array -> array)', function () {
+    it('should be set into the `data.relationships` and `included`', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [{
+          id: '52735730e16632ba1eee62dd',
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239',
+          authors: [{
+            id: '2934f384bb824a7cb7b238b8dc194a22',
+            firstName: 'Ashlee',
+            lastName: 'Vance'
+          }, {
+            id: '5ed95269a8334d8a970a2bd9fa599288',
+            firstName: 'Walter',
+            lastName: 'Isaacson'
+          }]
+        }]
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        attributes: ['firstName', 'lastName', 'books'],
+        books: {
+          ref: 'id',
+          attributes: ['title', 'isbn', 'authors'],
+          authors: {
+            ref: 'id',
+            attributes: ['firstName', 'lastName']
+          }
+        }
+      }).then(function (json) {
+        expect(json.included).to.include({
+          type: 'books',
+          id: '52735730e16632ba1eee62dd',
+          attributes: {
+            title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+            isbn: '978-0062301239'
+          },
+          relationships: {
+            authors: {
+              data: [
+                { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' },
+                { id: '5ed95269a8334d8a970a2bd9fa599288', type: 'authors' },
+              ]
+            }
+          }
+        });
+
+        expect(json.included).to.include({
+          id: '2934f384bb824a7cb7b238b8dc194a22',
+          type: 'authors',
+          attributes: {
+            'first-name': 'Ashlee',
+            'last-name': 'Vance'
+          },
+          relationships: {}
+        });
+
+        expect(json.included).to.include({
+          id: '5ed95269a8334d8a970a2bd9fa599288',
+          type: 'authors',
+          attributes: {
+            'first-name': 'Walter',
+            'last-name': 'Isaacson'
+          },
+          relationships: {}
+        });
 
         done(null, json);
       });
