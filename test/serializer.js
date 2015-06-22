@@ -564,4 +564,49 @@ describe('JSON API Serializer', function () {
       });
     });
   });
+
+
+  describe('Multiple compound documents (object -> array)', function () {
+    it('should be set into the `data.relationships` and `included`', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '5cd95269a8334d8a970a2bd9fa599278',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA',
+          neighbours: [{
+            id: '5490143e69e49d0c8f9fc6bc',
+            firstName: 'Lawrence',
+            lastName: 'Bennett'
+          }]
+        }
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['addressLine1', 'zipCode', 'country', 'neighbours'],
+          neighbours: {
+            ref: 'id',
+            attributes: ['firstName', 'lastName'],
+          }
+        }
+      }).then(function (json) {
+        console.log(require('util').inspect(json, { depth: null }));
+
+        expect(json.included).to.include({
+          id: '2934f384bb824a7cb7b238b8dc194a22',
+          type: 'authors',
+          attributes: { 'first-name': 'Ashlee', 'last-name': 'Vance' }
+        });
+
+        done(null, json);
+      });
+    });
+  });
 });
