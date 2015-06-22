@@ -9,19 +9,15 @@ API](http://jsonapi.org) (1.0 compliant).
 
 ## Documentation
 
-**JSONAPISerializer**(type, data, opts) serializes the *data* (can be an object or an array) following the rules defined in *opts*.
+**JSONAPISerializer(type, data, opts)** serializes the *data* (can be an object or an array) following the rules defined in *opts*.
 
-**opts**:
-
-- *apiEndpoint*: Specify the *self* attribute in the links. 
-```
-"links": {
-  "self": "http://example.com/posts",
-}
-```
-- *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
-  - *ref*: If present, it's considered as a [compount document](http://jsonapi.org/format/#document-compound-documents).
-  - *attributes*: An array of attributes to show.
+- type: The resource type.
+- data: An object to serialize.
+- opts
+    - *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
+        - *ref*: If present, it's considered as a [compount document](http://jsonapi.org/format/#document-compound-documents).
+        - *attributes*: An array of attributes to show.
+        - *links*: An object that describes the links. Values can be *string* or a *function* (see examples below)
 
 
 ## Example
@@ -32,7 +28,7 @@ API](http://jsonapi.org) (1.0 compliant).
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
-  apiEndpoint: 'http://localhost:3000/api/users',
+  links: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName']
 }).then(function (users) {  
   // `users` here are JSON API compliant. 
@@ -50,15 +46,15 @@ The result will be something like:
     "type": "users",
     "id": "1",
     "attributes": {
-      "firstName": "Sandro",
-      "lastName": "Munda"
+      "first-name": "Sandro",
+      "last-name": "Munda"
     }
   }, {
     "type": "users",
     "id": "2",
     "attributes": {
-      "firstName": "John",
-      "lastName": "Doe"
+      "first-name": "John",
+      "last-name": "Doe"
     },
   }]
 }
@@ -69,7 +65,7 @@ The result will be something like:
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
-  apiEndpoint: 'http://localhost:3000/api/users',
+  links: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName', 'address'],
   address: {
     attributes: ['addressLine1', 'zipCode', 'city']
@@ -90,11 +86,11 @@ The result will be something like:
     "type": "users",
     "id": "1",
     "attributes": {
-      "firstName": "Sandro",
-      "lastName": "Munda",
+      "first-name": "Sandro",
+      "last-name": "Munda",
       "address": {
-        "addressLine1": "630 Central Avenue",
-        "zipCode": 24012,
+        "address-line1": "630 Central Avenue",
+        "zip-code": 24012,
         "city": "Roanoke"
       }
     }
@@ -102,11 +98,11 @@ The result will be something like:
     "type": "users",
     "id": "2",
     "attributes": {
-      "firstName": "John",
-      "lastName": "Doe",
+      "first-name": "John",
+      "last-name": "Doe",
       "address": {
-        "addressLine1": "400 State Street",
-        "zipCode": 33702,
+        "address-line1": "400 State Street",
+        "zip-code": 33702,
         "city": "Saint Petersburg"
       }
     }
@@ -124,7 +120,13 @@ new JSONAPISerializer('users', data, {
   attributes: ['firstName', 'lastName', 'books'],
   books: {
     ref: '_id',
-    attributes: ['title', 'ISBN']
+    attributes: ['title', 'isbn'],
+    links: {
+      self: 'http://example.com/books/1/relationships/author',
+      related: function (book) {
+        return 'http://example.com/posts/' + post.id + '/author';
+      }
+    }
   }
 }).then(function (users) {  
   // `users` here are JSON API compliant. 
@@ -142,8 +144,8 @@ The result will be something like:
     "type": "users",
     "id": "1",
     "attributes": {
-      "firstName": "Sandro",
-      "lastName": "Munda"
+      "first-name": "Sandro",
+      "last-name": "Munda"
     },
     "relationships": {
       "books": {
@@ -157,8 +159,8 @@ The result will be something like:
     "type": "users",
     "id": "2",
     "attributes": {
-      "firstName": "John",
-      "lastName": "Doe"
+      "first-name": "John",
+      "last-name": "Doe"
     },
     "relationships": {
       "books": {
