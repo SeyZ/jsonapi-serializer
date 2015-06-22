@@ -546,8 +546,7 @@ describe('JSON API Serializer', function () {
           attributes: {
             'first-name': 'Ashlee',
             'last-name': 'Vance'
-          },
-          relationships: {}
+          }
         });
 
         expect(json.included).to.include({
@@ -556,8 +555,7 @@ describe('JSON API Serializer', function () {
           attributes: {
             'first-name': 'Walter',
             'last-name': 'Isaacson'
-          },
-          relationships: {}
+          }
         });
 
         done(null, json);
@@ -597,12 +595,25 @@ describe('JSON API Serializer', function () {
           }
         }
       }).then(function (json) {
-        console.log(require('util').inspect(json, { depth: null }));
+        expect(json.included).to.include({
+          id: '5cd95269a8334d8a970a2bd9fa599278',
+          type: 'addresses',
+          attributes: {
+            'address-line1': '406 Madison Court',
+            'zip-code': '49426',
+            country: 'USA'
+          },
+          relationships: {
+            neighbours: {
+              data: [{ type: 'neighbours', id: '5490143e69e49d0c8f9fc6bc' }]
+            }
+          }
+        });
 
         expect(json.included).to.include({
-          id: '2934f384bb824a7cb7b238b8dc194a22',
-          type: 'authors',
-          attributes: { 'first-name': 'Ashlee', 'last-name': 'Vance' }
+          type: 'neighbours',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
         });
 
         done(null, json);
