@@ -116,7 +116,7 @@ The result will be something like:
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
-  apiEndpoint: 'http://localhost:3000/api/users',
+  links: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName', 'books'],
   books: {
     ref: '_id',
