@@ -17,7 +17,8 @@ API](http://jsonapi.org) (1.0 compliant).
     - *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
         - *ref*: If present, it's considered as a [compount document](http://jsonapi.org/format/#document-compound-documents).
         - *attributes*: An array of attributes to show.
-        - *links*: An object that describes the links. Values can be *string* or a *function* (see examples below)
+        - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
+        - *links*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
 
 
 ## Example
@@ -28,10 +29,15 @@ API](http://jsonapi.org) (1.0 compliant).
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
-  links: { self: 'http://localhost:3000/api/users' },
+  topLevelLinks: { self: 'http://localhost:3000/api/users' },
+  links: {
+    self: function (user) {
+      return 'http://localhost:3000/api/users/' + user.id
+    }
+  },
   attributes: ['firstName', 'lastName']
-}).then(function (users) {  
-  // `users` here are JSON API compliant. 
+}).then(function (users) {
+  // `users` here are JSON API compliant.
 });
 ```
 
@@ -48,7 +54,8 @@ The result will be something like:
     "attributes": {
       "first-name": "Sandro",
       "last-name": "Munda"
-    }
+    },
+    "links": "http://localhost:3000/api/users/1"
   }, {
     "type": "users",
     "id": "2",
@@ -56,6 +63,7 @@ The result will be something like:
       "first-name": "John",
       "last-name": "Doe"
     },
+    "links": "http://localhost:3000/api/users/2"
   }]
 }
 ```
@@ -65,13 +73,13 @@ The result will be something like:
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
-  links: { self: 'http://localhost:3000/api/users' },
+  topLevelLinks: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName', 'address'],
   address: {
     attributes: ['addressLine1', 'zipCode', 'city']
   }
-}).then(function (users) {  
-  // `users` here are JSON API compliant. 
+}).then(function (users) {
+  // `users` here are JSON API compliant.
 });
 ```
 
@@ -116,7 +124,7 @@ The result will be something like:
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
-  links: { self: 'http://localhost:3000/api/users' },
+  topLevelLinks: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName', 'books'],
   books: {
     ref: '_id',
@@ -128,8 +136,8 @@ new JSONAPISerializer('users', data, {
       }
     }
   }
-}).then(function (users) {  
-  // `users` here are JSON API compliant. 
+}).then(function (users) {
+  // `users` here are JSON API compliant.
 });
 ```
 
