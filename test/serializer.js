@@ -42,6 +42,70 @@ describe('Options', function () {
       });
     });
   });
+
+  describe('ref', function () {
+    it('should returns the result of the passed function', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        id: 'id',
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: function (collection, field) {
+            return collection.id + field.country + field.zipCode;
+          },
+          attributes: ['addressLine1', 'country', 'zipCode']
+        }
+      }).then(function (json) {
+        expect(json).to.have.property('data').with.length(2);
+
+        expect(json.data[0]).to.have.property('relationships');
+
+        expect(json.data[0].relationships).to.be.an('object').eql({
+          address: {
+            data: {
+              id: '54735750e16638ba1eee59cbUSA49426',
+              type: 'addresses'
+            }
+          }
+        });
+
+        expect(json).to.have.property('included').to.be.an('array').with
+          .length(2);
+
+        expect(json.included[0]).to.be.an('object').eql({
+          id: '54735750e16638ba1eee59cbUSA49426',
+          type: 'addresses',
+          attributes: {
+            'address-line1': '406 Madison Court',
+            country: 'USA',
+            'zip-code': '49426'
+          }
+        });
+
+        done(null, json);
+      });
+    });
+  });
 });
 
 describe('JSON API Serializer', function () {
