@@ -6,19 +6,6 @@ var expect = require('chai').expect;
 var JsonApiSerializer = require('../lib/serializer');
 
 describe('Options', function () {
-  describe('apiEndpointValue', function () {
-    it('should override the apiEndpoint url', function (done) {
-      new JsonApiSerializer('users', [], {
-        apiEndpoint: 'http://localhost:3000/api',
-        apiEndpointValue: 'http://localhost:3000/override'
-      }).then(function (json) {
-        expect(json).to.have.property('links');
-        expect(json.links).to.have.property('self')
-          .equal('http://localhost:3000/override');
-        done(null, json);
-      });
-    });
-  });
 
   describe('id', function () {
     it('should override the id field', function (done) {
@@ -614,6 +601,240 @@ describe('JSON API Serializer', function () {
           type: 'neighbours',
           id: '5490143e69e49d0c8f9fc6bc',
           attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Top level links', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        links: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName'],
+      }).then(function (json) {
+        expect(json).to.have.property('links').eql({
+          self: 'http://localhost:3000/api/users'
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Top level links', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        links: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName'],
+      }).then(function (json) {
+        expect(json).to.have.property('links').eql({
+          self: 'http://localhost:3000/api/users'
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Links inside an array compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        addresses: [{
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }],
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        addresses: [{
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }]
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        links: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'addresses'],
+        addresses: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          links: {
+            self: 'http://localhost:4000/users/1/relationships/addresses',
+            related: 'http://localhost:4000/users/1/addresses'
+          }
+        }
+      }).then(function (json) {
+        expect(json.included[0]).to.have.property('links');
+        expect(json.included[0].links).eql({
+          self: 'http://localhost:4000/users/1/relationships/addresses',
+          related: 'http://localhost:4000/users/1/addresses'
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Links (Function) inside an array compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        addresses: [{
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }],
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        addresses: [{
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }]
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        links: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'addresses'],
+        addresses: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          links: {
+            self: function (object) {
+              return 'http://localhost:4000/addresses/' + object.zipCode;
+            }
+          }
+        }
+      }).then(function (json) {
+        expect(json.included[0]).to.have.property('links');
+        expect(json.included[0].links).eql({
+          self: 'http://localhost:4000/addresses/49426'
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Links inside an object compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        links: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          links: {
+            self: 'http://localhost:4000/users/1/relationships/addresses',
+            related: 'http://localhost:4000/users/1/addresses'
+          }
+        }
+      }).then(function (json) {
+        expect(json.included[0]).to.have.property('links');
+        expect(json.included[0].links).eql({
+          self: 'http://localhost:4000/users/1/relationships/addresses',
+          related: 'http://localhost:4000/users/1/addresses'
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Links (Function) inside an object compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        links: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          links: {
+            self: function (object) {
+              return 'http://localhost:4000/addresses/' + object.zipCode;
+            }
+          }
+        }
+      }).then(function (json) {
+        expect(json.included[0]).to.have.property('links');
+        expect(json.included[0].links).eql({
+          self: 'http://localhost:4000/addresses/49426'
         });
 
         done(null, json);
