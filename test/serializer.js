@@ -662,16 +662,79 @@ describe('JSON API Serializer', function () {
         id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
+      }, {
+        id: '5490212e69e49d0c4f9fc6b4',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
       }];
 
       new JsonApiSerializer('users', dataSet, {
         topLevellinks: {
           self: 'http://localhost:3000/api/users'
         },
+        links: {
+          self: 'http://localhost:3000/api/datalinks'
+        },
         attributes: ['firstName', 'lastName'],
       }).then(function (json) {
-        expect(json).to.have.property('links').eql({
+        expect(json.data).to.include({
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: { self: 'http://localhost:3000/api/datalinks' }
+        });
+
+        expect(json.data).to.include({
+          type: 'users',
+          id: '5490212e69e49d0c4f9fc6b4',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+          links: { self: 'http://localhost:3000/api/datalinks' }
+        });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('Links (Function) inside data', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }, {
+        id: '5490212e69e49d0c4f9fc6b4',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        topLevellinks: {
           self: 'http://localhost:3000/api/users'
+        },
+        links: {
+          self: function (user) {
+            return 'http://localhost:3000/api/datalinks/' + user.id;
+          }
+        },
+        attributes: ['firstName', 'lastName'],
+      }).then(function (json) {
+        expect(json.data).to.include({
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: {
+            self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb'
+          }
+        });
+
+        expect(json.data).to.include({
+          type: 'users',
+          id: '5490212e69e49d0c4f9fc6b4',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+          links: {
+            self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4'
+          }
         });
 
         done(null, json);
