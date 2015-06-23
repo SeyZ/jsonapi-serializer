@@ -617,7 +617,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         attributes: ['firstName', 'lastName'],
@@ -640,7 +640,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: function (users) {
             return 'http://localhost:3000/api/users/' + users[0].firstName;
           }
@@ -669,7 +669,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         links: {
@@ -709,7 +709,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         links: {
@@ -765,7 +765,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         attributes: ['firstName', 'lastName', 'addresses'],
@@ -812,7 +812,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         attributes: ['firstName', 'lastName', 'addresses'],
@@ -859,7 +859,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         attributes: ['firstName', 'lastName', 'address'],
@@ -906,7 +906,7 @@ describe('JSON API Serializer', function () {
       }];
 
       new JsonApiSerializer('users', dataSet, {
-        topLevellinks: {
+        topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         attributes: ['firstName', 'lastName', 'address'],
