@@ -929,4 +929,42 @@ describe('JSON API Serializer', function () {
       });
     });
   });
+
+  describe('Duplicate compound document', function () {
+    it('should not have duplicated entries into included', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }
+      }];
+
+      new JsonApiSerializer('users', dataSet, {
+        apiEndpoint: 'http://localhost:3000/api',
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['addressLine1', 'zipCode', 'country']
+        }
+      }).then(function (json) {
+        expect(json.included).to.have.length(1);
+        done(null, json);
+      });
+    });
+  });
 });
