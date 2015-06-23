@@ -18,7 +18,8 @@ API](http://jsonapi.org) (1.0 compliant).
         - *ref*: If present, it's considered as a [compount document](http://jsonapi.org/format/#document-compound-documents).
         - *attributes*: An array of attributes to show.
         - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
-        - *links*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
+        - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
+        - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
 
 
 ## Example
@@ -30,7 +31,7 @@ var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
   topLevelLinks: { self: 'http://localhost:3000/api/users' },
-  links: {
+  dataLinks: {
     self: function (user) {
       return 'http://localhost:3000/api/users/' + user.id
     }
@@ -129,10 +130,14 @@ new JSONAPISerializer('users', data, {
   books: {
     ref: '_id',
     attributes: ['title', 'isbn'],
-    links: {
-      self: 'http://example.com/books/1/relationships/author',
+    relationshipLinks: {
+      "self": "http://example.com/relationships/books",
+      "related": "http://example.com/books"
+    },
+    includedLinks: {
+      self: 'http://example.com/relationships/author',
       related: function (book) {
-        return 'http://example.com/posts/' + post.id + '/author';
+        return 'http://example.com/books/' + book.id + '/author';
       }
     }
   }
@@ -160,7 +165,11 @@ The result will be something like:
         "data": [
           { "type": "books", "id": "1" },
           { "type": "books", "id": "2" }
-        ]
+        ],
+        "links": {
+          "self": "http://example.com/relationships/books",
+          "related": "http://example.com/books"
+        }
       }
     }
   }, {
@@ -173,9 +182,12 @@ The result will be something like:
     "relationships": {
       "books": {
         "data": [
-          { "type": "books", "id": "1" },
-          { "type": "books", "id": "2" }
-        ]
+          { "type": "books", "id": "3" }
+        ],
+        "links": {
+          "self": "http://example.com/relationships/books",
+          "related": "http://example.com/books"
+        }
       }
     }
   }],
@@ -185,21 +197,33 @@ The result will be something like:
   	"attributes": {
   	  "title": "La Vida Estilista",
   	  "isbn": "9992266589"
-  	}
+  	},
+    "links": {
+      self: 'http://example.com/relationships/author',
+      related: 'http://example.com/books/1/author'
+    }
   }, {
    "type": "books",
    "id": "2",
    "attributes": {
   	  "title": "La Maria Cebra",
   	  "isbn": "9992264446"
-  	}
+  	},
+    "links": {
+      self: 'http://example.com/relationships/author',
+      related: 'http://example.com/books/2/author'
+    }
   }, {
    "type": "books",
    "id": "3",
    "attributes": {
   	  "title": "El Salero Cangrejo",
   	  "isbn": "9992209739"
-  	}
+  	},
+    "links": {
+      self: 'http://example.com/relationships/author',
+      related: 'http://example.com/books/3/author'
+    }
   }]
 }
 ```

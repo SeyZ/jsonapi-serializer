@@ -672,7 +672,7 @@ describe('JSON API Serializer', function () {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
-        links: {
+        dataLinks: {
           self: 'http://localhost:3000/api/datalinks'
         },
         attributes: ['firstName', 'lastName'],
@@ -712,7 +712,7 @@ describe('JSON API Serializer', function () {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
-        links: {
+        dataLinks: {
           self: function (user) {
             return 'http://localhost:3000/api/datalinks/' + user.id;
           }
@@ -772,15 +772,19 @@ describe('JSON API Serializer', function () {
         addresses: {
           ref: 'zipCode',
           attributes: ['addressLine1', 'country'],
-          links: {
-            self: 'http://localhost:4000/users/1/relationships/addresses',
+          includedLinks: {
+            self: 'http://localhost:4000/users/1/includedlinks'
+          },
+          relationshipLinks: {
             related: 'http://localhost:4000/users/1/addresses'
           }
         }
       }).then(function (json) {
         expect(json.included[0]).to.have.property('links');
         expect(json.included[0].links).eql({
-          self: 'http://localhost:4000/users/1/relationships/addresses',
+          self: 'http://localhost:4000/users/1/includedlinks'
+        });
+        expect(json.data[0].relationships.addresses.links).eql({
           related: 'http://localhost:4000/users/1/addresses'
         });
 
@@ -819,9 +823,14 @@ describe('JSON API Serializer', function () {
         addresses: {
           ref: 'zipCode',
           attributes: ['addressLine1', 'country'],
-          links: {
+          includedLinks: {
             self: function (object) {
               return 'http://localhost:4000/addresses/' + object.zipCode;
+            }
+          },
+          relationshipLinks: {
+            related: function (object) {
+              return 'http://localhost:4000/addresses/' + object[0].zipCode;
             }
           }
         }
@@ -829,6 +838,9 @@ describe('JSON API Serializer', function () {
         expect(json.included[0]).to.have.property('links');
         expect(json.included[0].links).eql({
           self: 'http://localhost:4000/addresses/49426'
+        });
+        expect(json.data[0].relationships.addresses.links).eql({
+          related: 'http://localhost:4000/addresses/49426'
         });
 
         done(null, json);
@@ -866,7 +878,7 @@ describe('JSON API Serializer', function () {
         address: {
           ref: 'zipCode',
           attributes: ['addressLine1', 'country'],
-          links: {
+          includedLinks: {
             self: 'http://localhost:4000/users/1/relationships/addresses',
             related: 'http://localhost:4000/users/1/addresses'
           }
@@ -913,7 +925,7 @@ describe('JSON API Serializer', function () {
         address: {
           ref: 'zipCode',
           attributes: ['addressLine1', 'country'],
-          links: {
+          includedLinks: {
             self: function (object) {
               return 'http://localhost:4000/addresses/' + object.zipCode;
             }
