@@ -36,13 +36,12 @@ describe('Options', function () {
         id: '1',
         firstName: 'Sandro',
         lastName: 'Munda',
-      }
+      };
 
       new JsonApiSerializer('user', dataSet, {
         attributes: ['firstName', 'lastName'],
         pluralizeType: false
       }).then(function (json) {
-        console.log(json);
         expect(json.data.type).equal('user');
 
         // Confirm it response the same with a truthy setting
@@ -50,15 +49,11 @@ describe('Options', function () {
           attributes: ['firstName', 'lastName'],
           pluralizeType: true
         }).then(function (json) {
-          console.log(json);
           expect(json.data.type).equal('users');
           done(null, json);
         });
-
       });
-
     });
-
   });
 
   describe('ref', function () {
