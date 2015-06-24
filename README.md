@@ -16,6 +16,7 @@ API](http://jsonapi.org) (1.0 compliant).
 - opts
     - *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
         - *ref*: If present, it's considered as a [compound document](http://jsonapi.org/format/#document-compound-documents).
+        - *included*: A boolean to push or not the relationships into the included array. Default: true.
         - *attributes*: An array of attributes to show.
         - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
         - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
