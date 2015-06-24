@@ -8,6 +8,7 @@
   },
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
+  "repository": "SeyZ/jsonapi-serializer",
   "dependencies": {
     "bluebird": "^2.9.27",
     "inflection": "^1.7.1",
