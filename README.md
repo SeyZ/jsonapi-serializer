@@ -24,6 +24,8 @@ API](http://jsonapi.org) (1.0 compliant).
 
 ## Example
 
+[Express example](https://github.com/SeyZ/jsonapi-serializer/tree/master/examples/express)
+
 ### Simple usage
 
 ```
