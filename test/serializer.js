@@ -56,6 +56,46 @@ describe('Options', function () {
     });
   });
 
+  describe('included', function () {
+    it('should include or not the compount documents', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          id: '54735697e16624ba1eee36bf',
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }
+      }];
+
+      new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          attributes: ['addressLine1', 'zipCode', 'country']
+        }
+      }).then(function (json) {
+        expect(json.data[0]).to.have.property('relationships');
+        expect(json.data[1]).to.have.property('relationships');
+        expect(json).to.not.have.property('included');
+        done(null, json);
+      });
+    });
+  });
+
   describe('ref', function () {
     it('should returns the result of the passed function', function (done) {
       var dataSet = [{
