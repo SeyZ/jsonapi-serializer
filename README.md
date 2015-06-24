@@ -15,20 +15,38 @@ API](http://jsonapi.org) (1.0 compliant).
 - data: An object to serialize.
 - opts
     - *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
-        - *ref*: If present, it's considered as a [compount document](http://jsonapi.org/format/#document-compound-documents).
+        - *ref*: If present, it's considered as a [compound document](http://jsonapi.org/format/#document-compound-documents).
         - *attributes*: An array of attributes to show.
         - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
         - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
         - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
 
 
-## Example
+## Examples
 
-[Express example](https://github.com/SeyZ/jsonapi-serializer/tree/master/examples/express)
+- [Express example](https://github.com/SeyZ/jsonapi-serializer/tree/master/examples/express)
+- [Simple](#simple-usage)
+- [Nested resource](#nested-resource)
+- [Compound document](#compound-document)
 
+<a name="simple-usage"/>
 ### Simple usage
 
+```javascript
+// Sample data object
+var data = [{
+    id: 1,
+    firstName: 'Sandro',
+    lastName: 'Munda'
+  },{
+    id: 2,
+    firstName: 'John',
+    lastName: 'Doe'
+  }
+}];
 ```
+
+```javascript
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
@@ -46,7 +64,7 @@ new JSONAPISerializer('users', data, {
 
 The result will be something like:
 
-```
+```javascript
 {
   "links": {
     "self": "http://localhost:3000/api/users"
@@ -71,8 +89,9 @@ The result will be something like:
 }
 ```
 
+<a name="nested-resource"/>
 ### Nested resource
-```
+```javascript
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
@@ -88,7 +107,7 @@ new JSONAPISerializer('users', data, {
 
 The result will be something like:
 
-```
+```javascript
 {
   "links": {
     "self": "http://localhost:3000/api/users"
@@ -121,9 +140,10 @@ The result will be something like:
 }
 ```
 
-### Compount document
+<a name="compound-document"/>
+### Compound document
 
-```
+```javascript
 var JSONAPISerializer = require('jsonapi-serializer');
 
 new JSONAPISerializer('users', data, {
@@ -150,7 +170,7 @@ new JSONAPISerializer('users', data, {
 
 The result will be something like:
 
-```
+```javascript
 {
   "links": {
     "self": "http://localhost:3000/api/users"
