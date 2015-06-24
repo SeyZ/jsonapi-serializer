@@ -30,6 +30,32 @@ describe('Options', function () {
     });
   });
 
+  describe('pluralizeType', function () {
+    it('should allow type to not be pluralized', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName'],
+        pluralizeType: false
+      }).then(function (json) {
+        expect(json.data.type).equal('user');
+
+        // Confirm it response the same with a truthy setting
+        new JsonApiSerializer('user', dataSet, {
+          attributes: ['firstName', 'lastName'],
+          pluralizeType: true
+        }).then(function (json) {
+          expect(json.data.type).equal('users');
+          done(null, json);
+        });
+      });
+    });
+  });
+
   describe('ref', function () {
     it('should returns the result of the passed function', function (done) {
       var dataSet = [{
