@@ -779,7 +779,7 @@ describe('JSON API Serializer', function () {
           self: 'http://localhost:3000/api/users'
         },
         dataLinks: {
-          self: function (user) {
+          self: function (currentResult, user) {
             return 'http://localhost:3000/api/datalinks/' + user.id;
           }
         },
@@ -895,7 +895,7 @@ describe('JSON API Serializer', function () {
             }
           },
           relationshipLinks: {
-            related: function (object) {
+            related: function (currentResult, object) {
               return 'http://localhost:4000/addresses/' + object[0].zipCode;
             }
           }
