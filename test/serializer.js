@@ -779,7 +779,7 @@ describe('JSON API Serializer', function () {
           self: 'http://localhost:3000/api/users'
         },
         dataLinks: {
-          self: function (currentResult, user) {
+          self: function (dataSet, user) {
             return 'http://localhost:3000/api/datalinks/' + user.id;
           }
         },
@@ -890,13 +890,13 @@ describe('JSON API Serializer', function () {
           ref: 'zipCode',
           attributes: ['addressLine1', 'country'],
           includedLinks: {
-            self: function (object) {
-              return 'http://localhost:4000/addresses/' + object.zipCode;
+            self: function (record, current) {
+              return 'http://localhost:4000/addresses/' + current.zipCode;
             }
           },
           relationshipLinks: {
-            related: function (currentResult, object) {
-              return 'http://localhost:4000/addresses/' + object[0].zipCode;
+            related: function (record, current) {
+              return 'http://localhost:4000/addresses/' + current[0].zipCode;
             }
           }
         }
@@ -992,8 +992,8 @@ describe('JSON API Serializer', function () {
           ref: 'zipCode',
           attributes: ['addressLine1', 'country'],
           includedLinks: {
-            self: function (object) {
-              return 'http://localhost:4000/addresses/' + object.zipCode;
+            self: function (record, current) {
+              return 'http://localhost:4000/addresses/' + current.zipCode;
             }
           }
         }
