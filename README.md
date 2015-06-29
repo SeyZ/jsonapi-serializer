@@ -21,6 +21,7 @@ API](http://jsonapi.org) (1.0 compliant).
         - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
         - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
         - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
+        - *keyForAttribute*: A function that maps the attribute (passed as an argument) to the key. Attributes are dasherized by default.
 
 
 ## Examples

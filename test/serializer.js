@@ -96,6 +96,32 @@ describe('Options', function () {
     });
   });
 
+  describe('keyForAttribute', function () {
+    it('should serialize attribute in underscore', function (done) {
+      var inflection = require('inflection');
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName'],
+        pluralizeType: false,
+        keyForAttribute: function (attribute) {
+          return inflection.underscore(attribute);
+        }
+      }).then(function (json) {
+        expect(json.data.type).equal('user');
+        expect(json.data).to.have.property('attributes').that.is
+          .an('object')
+          .eql({ 'first_name': 'Sandro', 'last_name': 'Munda' });
+
+        done(null, json);
+      });
+    });
+  });
+
   describe('ref', function () {
     it('should returns the result of the passed function', function (done) {
       var dataSet = [{
