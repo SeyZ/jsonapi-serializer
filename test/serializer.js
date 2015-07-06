@@ -56,6 +56,26 @@ describe('Options', function () {
     });
   });
 
+  describe('typeForAttribute', function () {
+    it('should set the type according to the func return', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName'],
+        typeForAttribute: function (attribute) {
+          return attribute + '_foo';
+        }
+      }).then(function (json) {
+        expect(json.data.type).equal('user_foo');
+        done(null, json);
+      });
+    });
+  });
+
   describe('included', function () {
     it('should include or not the compount documents', function (done) {
       var dataSet = [{

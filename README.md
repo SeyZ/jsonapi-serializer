@@ -22,6 +22,8 @@ API](http://jsonapi.org) (1.0 compliant).
         - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
         - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
         - *keyForAttribute*: A function that maps the attribute (passed as an argument) to the key. Attributes are dasherized by default.
+        - *pluralizeType*: A boolean to indicate if the type must be pluralized or not. Default: true.
+        - *typeForAttribute*: A function that maps the attribute (passed as an argument) to the type you want to override. Option *pluralizeType* ignored if set.
 
 
 ## Examples
