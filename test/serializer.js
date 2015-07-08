@@ -36,20 +36,54 @@ describe('Options', function () {
         id: '1',
         firstName: 'Sandro',
         lastName: 'Munda',
+        pets: [
+          {
+            id: '54735697e16624ba1eee36bf',
+            type: 'pet',
+            animal: 'dog',
+            name: 'Spot',
+            age: 5
+          },
+          {
+            id: '54735697e16624ba1eee36be',
+            type: 'pet',
+            animal: 'cat',
+            name: 'Snowball 2',
+            age: 13
+          }
+        ]
       };
 
       new JsonApiSerializer('user', dataSet, {
-        attributes: ['firstName', 'lastName'],
+        attributes: ['firstName', 'lastName', 'pets'],
+        pets: {
+          ref: 'id',
+          resourceType: 'pet',
+          included: false,
+          attributes: ['animal', 'name', 'age']
+        },
         pluralizeType: false
       }).then(function (json) {
         expect(json.data.type).equal('user');
+        json.data.relationships.pets.data.forEach(function(pet) {
+          expect(pet.type).equal('pet');
+        });
 
         // Confirm it response the same with a truthy setting
         new JsonApiSerializer('user', dataSet, {
-          attributes: ['firstName', 'lastName'],
+          attributes: ['firstName', 'lastName', 'pets'],
+          pets: {
+            ref: 'id',
+            resourceType: 'pet',
+            included: false,
+            attributes: ['animal', 'name', 'age']
+          },
           pluralizeType: true
         }).then(function (json) {
           expect(json.data.type).equal('users');
+          json.data.relationships.pets.data.forEach(function(pet) {
+            expect(pet.type).equal('pets');
+          });
           done(null, json);
         });
       });
