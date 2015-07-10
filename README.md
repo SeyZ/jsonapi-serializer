@@ -161,9 +161,8 @@ new JSONAPISerializer('users', data, {
       "related": "http://example.com/books"
     },
     includedLinks: {
-      self: 'http://example.com/relationships/author',
-      related: function (book) {
-        return 'http://example.com/books/' + book.id + '/author';
+      self: function (book) {
+        return 'http://example.com/books/' + book.id;
       }
     }
   }
@@ -225,8 +224,7 @@ The result will be something like:
   	  "isbn": "9992266589"
   	},
     "links": {
-      self: 'http://example.com/relationships/author',
-      related: 'http://example.com/books/1/author'
+      self: 'http://example.com/books/1'
     }
   }, {
    "type": "books",
@@ -236,8 +234,7 @@ The result will be something like:
   	  "isbn": "9992264446"
   	},
     "links": {
-      self: 'http://example.com/relationships/author',
-      related: 'http://example.com/books/2/author'
+      self: 'http://example.com/books/2'
     }
   }, {
    "type": "books",
@@ -247,8 +244,7 @@ The result will be something like:
   	  "isbn": "9992209739"
   	},
     "links": {
-      self: 'http://example.com/relationships/author',
-      related: 'http://example.com/books/3/author'
+      self: 'http://example.com/books/3'
     }
   }]
 }
