@@ -224,7 +224,7 @@ The result will be something like:
   	  "isbn": "9992266589"
   	},
     "links": {
-      self: 'http://example.com/books/1'
+      "self": "http://example.com/books/1"
     }
   }, {
    "type": "books",
@@ -234,7 +234,7 @@ The result will be something like:
   	  "isbn": "9992264446"
   	},
     "links": {
-      self: 'http://example.com/books/2'
+     "self": "http://example.com/books/2"
     }
   }, {
    "type": "books",
@@ -244,7 +244,7 @@ The result will be something like:
   	  "isbn": "9992209739"
   	},
     "links": {
-      self: 'http://example.com/books/3'
+      "self": "http://example.com/books/3"
     }
   }]
 }
