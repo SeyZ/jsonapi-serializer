@@ -46,8 +46,7 @@ var data = [{
     id: 2,
     firstName: 'John',
     lastName: 'Doe'
-  }
-}];
+  }];
 ```
 
 ```javascript
