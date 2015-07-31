@@ -19,14 +19,14 @@ describe('Options', function () {
         lastName: 'Bennett'
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         id: '_id',
         attributes: ['firstName', 'lastName']
-      }).then(function (json) {
-        expect(json.data[0].id).equal('54735750e16638ba1eee59cb');
-        done(null, json);
       });
+
+      expect(json.data[0].id).equal('54735750e16638ba1eee59cb');
+      done(null, json);
     });
   });
 
@@ -38,21 +38,21 @@ describe('Options', function () {
         lastName: 'Munda',
       };
 
-      new JsonApiSerializer('user', dataSet, {
+      var json = new JsonApiSerializer('user', dataSet, {
         attributes: ['firstName', 'lastName'],
         pluralizeType: false
-      }).then(function (json) {
-        expect(json.data.type).equal('user');
-
-        // Confirm it response the same with a truthy setting
-        new JsonApiSerializer('user', dataSet, {
-          attributes: ['firstName', 'lastName'],
-          pluralizeType: true
-        }).then(function (json) {
-          expect(json.data.type).equal('users');
-          done(null, json);
-        });
       });
+
+      expect(json.data.type).equal('user');
+
+      // Confirm it response the same with a truthy setting
+      json = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName'],
+        pluralizeType: true
+      });
+
+      expect(json.data.type).equal('users');
+      done(null, json);
     });
   });
 
@@ -64,15 +64,15 @@ describe('Options', function () {
         lastName: 'Munda',
       };
 
-      new JsonApiSerializer('user', dataSet, {
+      var json = new JsonApiSerializer('user', dataSet, {
         attributes: ['firstName', 'lastName'],
         typeForAttribute: function (attribute) {
           return attribute + '_foo';
         }
-      }).then(function (json) {
-        expect(json.data.type).equal('user_foo');
-        done(null, json);
       });
+
+      expect(json.data.type).equal('user_foo');
+      done(null, json);
     });
   });
 
@@ -100,19 +100,19 @@ describe('Options', function () {
         }
       }];
 
-      new JsonApiSerializer('user', dataSet, {
+      var json = new JsonApiSerializer('user', dataSet, {
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
           included: false,
           attributes: ['addressLine1', 'zipCode', 'country']
         }
-      }).then(function (json) {
-        expect(json.data[0]).to.have.property('relationships');
-        expect(json.data[1]).to.have.property('relationships');
-        expect(json).to.not.have.property('included');
-        done(null, json);
       });
+
+      expect(json.data[0]).to.have.property('relationships');
+      expect(json.data[1]).to.have.property('relationships');
+      expect(json).to.not.have.property('included');
+      done(null, json);
     });
   });
 
@@ -125,20 +125,20 @@ describe('Options', function () {
         lastName: 'Munda',
       };
 
-      new JsonApiSerializer('user', dataSet, {
+      var json = new JsonApiSerializer('user', dataSet, {
         attributes: ['firstName', 'lastName'],
         pluralizeType: false,
         keyForAttribute: function (attribute) {
           return inflection.underscore(attribute);
         }
-      }).then(function (json) {
-        expect(json.data.type).equal('user');
-        expect(json.data).to.have.property('attributes').that.is
-          .an('object')
-          .eql({ 'first_name': 'Sandro', 'last_name': 'Munda' });
-
-        done(null, json);
       });
+
+      expect(json.data.type).equal('user');
+      expect(json.data).to.have.property('attributes').that.is
+        .an('object')
+        .eql({ 'first_name': 'Sandro', 'last_name': 'Munda' });
+
+      done(null, json);
     });
   });
 
@@ -164,7 +164,7 @@ describe('Options', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         id: 'id',
         attributes: ['firstName', 'lastName', 'address'],
@@ -174,35 +174,35 @@ describe('Options', function () {
           },
           attributes: ['addressLine1', 'country', 'zipCode']
         }
-      }).then(function (json) {
-        expect(json).to.have.property('data').with.length(2);
-
-        expect(json.data[0]).to.have.property('relationships');
-
-        expect(json.data[0].relationships).to.be.an('object').eql({
-          address: {
-            data: {
-              id: '54735750e16638ba1eee59cbUSA49426',
-              type: 'addresses'
-            }
-          }
-        });
-
-        expect(json).to.have.property('included').to.be.an('array').with
-          .length(2);
-
-        expect(json.included[0]).to.be.an('object').eql({
-          id: '54735750e16638ba1eee59cbUSA49426',
-          type: 'addresses',
-          attributes: {
-            'address-line1': '406 Madison Court',
-            country: 'USA',
-            'zip-code': '49426'
-          }
-        });
-
-        done(null, json);
       });
+
+      expect(json).to.have.property('data').with.length(2);
+
+      expect(json.data[0]).to.have.property('relationships');
+
+      expect(json.data[0].relationships).to.be.an('object').eql({
+        address: {
+          data: {
+            id: '54735750e16638ba1eee59cbUSA49426',
+            type: 'addresses'
+          }
+        }
+      });
+
+      expect(json).to.have.property('included').to.be.an('array').with
+        .length(2);
+
+      expect(json.included[0]).to.be.an('object').eql({
+        id: '54735750e16638ba1eee59cbUSA49426',
+        type: 'addresses',
+        attributes: {
+          'address-line1': '406 Madison Court',
+          country: 'USA',
+          'zip-code': '49426'
+        }
+      });
+
+      done(null, json);
     });
   });
 });
@@ -220,26 +220,26 @@ describe('JSON API Serializer', function () {
         lastName: 'Bennett'
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName'],
-      }).then(function (json) {
-        expect(json).to.have.property('data').with.length(2);
-
-        expect(json.data[0]).to.have.property('id')
-          .equal('54735750e16638ba1eee59cb');
-
-        expect(json.data[0]).to.have.property('type').equal('users');
-
-        expect(json.data[0]).to.have.property('attributes').that.is
-          .an('object')
-          .eql({
-            'first-name': 'Sandro',
-            'last-name': 'Munda',
-          });
-
-        done(null, json);
       });
+
+      expect(json).to.have.property('data').with.length(2);
+
+      expect(json.data[0]).to.have.property('id')
+        .equal('54735750e16638ba1eee59cb');
+
+      expect(json.data[0]).to.have.property('type').equal('users');
+
+      expect(json.data[0]).to.have.property('attributes').that.is
+        .an('object')
+        .eql({
+          'first-name': 'Sandro',
+          'last-name': 'Munda',
+        });
+
+      done(null, json);
     });
   });
 
@@ -251,26 +251,26 @@ describe('JSON API Serializer', function () {
         lastName: 'Munda',
       };
 
-      new JsonApiSerializer('users', resource, {
+      var json = new JsonApiSerializer('users', resource, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName'],
-      }).then(function (json) {
-        expect(json).to.have.property('data').and.to.be.instanceof(Object);
-
-        expect(json.data).to.have.property('id')
-          .equal('54735750e16638ba1eee59cb');
-
-        expect(json.data).to.have.property('type').equal('users');
-
-        expect(json.data).to.have.property('attributes').that.is
-          .an('object')
-          .eql({
-            'first-name': 'Sandro',
-            'last-name': 'Munda',
-          });
-
-        done(null, json);
       });
+
+      expect(json).to.have.property('data').and.to.be.instanceof(Object);
+
+      expect(json.data).to.have.property('id')
+        .equal('54735750e16638ba1eee59cb');
+
+      expect(json.data).to.have.property('type').equal('users');
+
+      expect(json.data).to.have.property('attributes').that.is
+        .an('object')
+        .eql({
+          'first-name': 'Sandro',
+          'last-name': 'Munda',
+        });
+
+      done(null, json);
     });
   });
 
@@ -296,23 +296,23 @@ describe('JSON API Serializer', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           attributes: ['addressLine1', 'zipCode', 'country']
         }
-      }).then(function (json) {
-        expect(json.data[0].attributes).to.have.property('address')
-          .that.is.an('object')
-          .eql({
-            addressLine1: '406 Madison Court',
-            zipCode: '49426',
-            country: 'USA'
-          });
-
-        done(null, json);
       });
+
+      expect(json.data[0].attributes).to.have.property('address')
+        .that.is.an('object')
+        .eql({
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        });
+
+      done(null, json);
     });
   });
 
@@ -342,24 +342,24 @@ describe('JSON API Serializer', function () {
         }]
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           attributes: ['title', 'isbn']
         }
-      }).then(function (json) {
-        expect(json.data[0].attributes).to.have.property('books')
-          .that.is.an('array')
-          .eql([{
-            title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-            isbn: '978-0062301239'
-          }, {
-            title: 'Steve Jobs',
-            isbn: '978-1451648546'
-          }]);
-        done(null, json);
       });
+
+      expect(json.data[0].attributes).to.have.property('books')
+        .that.is.an('array')
+        .eql([{
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239'
+        }, {
+          title: 'Steve Jobs',
+          isbn: '978-1451648546'
+        }]);
+      done(null, json);
     });
   });
 
@@ -387,38 +387,38 @@ describe('JSON API Serializer', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
           attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
         }
-      }).then(function (json) {
-        expect(json.included).to.have.length(2);
+      });
 
-        expect(json.included[0]).to.have.property('id')
-          .equal('54735722e16620ba1eee36af');
+      expect(json.included).to.have.length(2);
 
-        expect(json.included[0]).to.have.property('type').equal('addresses');
+      expect(json.included[0]).to.have.property('id')
+        .equal('54735722e16620ba1eee36af');
 
-        expect(json.included[0]).to.have.property('attributes').to.be
-          .an('object').eql({
-            'address-line1': '406 Madison Court',
-            'zip-code': '49426',
-            'country': 'USA'
-          });
+      expect(json.included[0]).to.have.property('type').equal('addresses');
 
-        expect(json.data[0].relationships).to.have.property('address').that.is
-          .an('object');
-
-        expect(json.data[0].relationships.address.data).eql({
-          id: '54735722e16620ba1eee36af',
-          type: 'addresses'
+      expect(json.included[0]).to.have.property('attributes').to.be
+        .an('object').eql({
+          'address-line1': '406 Madison Court',
+          'zip-code': '49426',
+          'country': 'USA'
         });
 
-        done(null, json);
+      expect(json.data[0].relationships).to.have.property('address').that.is
+        .an('object');
+
+      expect(json.data[0].relationships.address.data).eql({
+        id: '54735722e16620ba1eee36af',
+        type: 'addresses'
       });
+
+      done(null, json);
     });
   });
 
@@ -452,46 +452,46 @@ describe('JSON API Serializer', function () {
         }]
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           ref: 'id',
           attributes: ['title', 'isbn']
         }
-      }).then(function (json) {
-        expect(json.included[0]).to.have.property('id')
-          .equal('52735730e16632ba1eee62dd');
-
-        expect(json.included[0]).to.have.property('type').equal('books');
-
-        expect(json.included[0].attributes).to.be.eql({
-          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-          isbn: '978-0062301239'
-        });
-
-        expect(json.included[1]).to.have.property('id')
-          .equal('52735780e16610ba1eee15cd');
-
-        expect(json.included[1]).to.have.property('type').equal('books');
-
-        expect(json.included[1].attributes).to.be.eql({
-          title: 'Steve Jobs',
-          isbn: '978-1451648546'
-        });
-
-        expect(json.data[0].relationships).to.have.property('books').that.is
-          .an('object');
-
-        expect(json.data[0].relationships.books.data).to.be.an('array')
-          .eql([{
-            type: 'books', 'id': '52735730e16632ba1eee62dd'
-          }, {
-            type: 'books', 'id': '52735780e16610ba1eee15cd'
-          }]);
-
-        done(null, json);
       });
+
+      expect(json.included[0]).to.have.property('id')
+        .equal('52735730e16632ba1eee62dd');
+
+      expect(json.included[0]).to.have.property('type').equal('books');
+
+      expect(json.included[0].attributes).to.be.eql({
+        title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+        isbn: '978-0062301239'
+      });
+
+      expect(json.included[1]).to.have.property('id')
+        .equal('52735780e16610ba1eee15cd');
+
+      expect(json.included[1]).to.have.property('type').equal('books');
+
+      expect(json.included[1].attributes).to.be.eql({
+        title: 'Steve Jobs',
+        isbn: '978-1451648546'
+      });
+
+      expect(json.data[0].relationships).to.have.property('books').that.is
+        .an('object');
+
+      expect(json.data[0].relationships.books.data).to.be.an('array')
+        .eql([{
+          type: 'books', 'id': '52735730e16632ba1eee62dd'
+        }, {
+          type: 'books', 'id': '52735780e16610ba1eee15cd'
+        }]);
+
+      done(null, json);
     });
   });
 
@@ -522,7 +522,7 @@ describe('JSON API Serializer', function () {
         }]
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
@@ -533,58 +533,58 @@ describe('JSON API Serializer', function () {
             attributes: ['firstName', 'lastName']
           }
         }
-      }).then(function (json) {
-        expect(json.included).to.include({
-          type: 'books',
-          id: '52735730e16632ba1eee62dd',
-          attributes: {
-            title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-            isbn: '978-0062301239'
-          },
-          relationships: {
-            author: {
-              data: { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' }
-            }
-          }
-        });
-
-        expect(json.included).to.include({
-          type: 'books',
-          id: '52735780e16610ba1eee15cd',
-          attributes: {
-            title: 'Steve Jobs',
-            isbn: '978-1451648546'
-          },
-          relationships: {
-            author: {
-              data: {
-                id: '5ed95269a8334d8a970a2bd9fa599288',
-                type: 'authors'
-              }
-            }
-          }
-        });
-
-        expect(json.included).to.include({
-          id: '2934f384bb824a7cb7b238b8dc194a22',
-          type: 'authors',
-          attributes: {
-            'first-name': 'Ashlee',
-            'last-name': 'Vance'
-          }
-        });
-
-        expect(json.included).to.include({
-          id: '5ed95269a8334d8a970a2bd9fa599288',
-          type: 'authors',
-          attributes: {
-            'first-name': 'Walter',
-            'last-name': 'Isaacson'
-          }
-        });
-
-        done(null, json);
       });
+
+      expect(json.included).to.include({
+        type: 'books',
+        id: '52735730e16632ba1eee62dd',
+        attributes: {
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239'
+        },
+        relationships: {
+          author: {
+            data: { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' }
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        type: 'books',
+        id: '52735780e16610ba1eee15cd',
+        attributes: {
+          title: 'Steve Jobs',
+          isbn: '978-1451648546'
+        },
+        relationships: {
+          author: {
+            data: {
+              id: '5ed95269a8334d8a970a2bd9fa599288',
+              type: 'authors'
+            }
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '2934f384bb824a7cb7b238b8dc194a22',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Ashlee',
+          'last-name': 'Vance'
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '5ed95269a8334d8a970a2bd9fa599288',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Walter',
+          'last-name': 'Isaacson'
+        }
+      });
+
+      done(null, json);
     });
   });
 
@@ -610,7 +610,7 @@ describe('JSON API Serializer', function () {
         }]
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
@@ -621,44 +621,44 @@ describe('JSON API Serializer', function () {
             attributes: ['firstName', 'lastName']
           }
         }
-      }).then(function (json) {
-        expect(json.included).to.include({
-          type: 'books',
-          id: '52735730e16632ba1eee62dd',
-          attributes: {
-            title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
-            isbn: '978-0062301239'
-          },
-          relationships: {
-            authors: {
-              data: [
-                { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' },
-                { id: '5ed95269a8334d8a970a2bd9fa599288', type: 'authors' },
-              ]
-            }
-          }
-        });
-
-        expect(json.included).to.include({
-          id: '2934f384bb824a7cb7b238b8dc194a22',
-          type: 'authors',
-          attributes: {
-            'first-name': 'Ashlee',
-            'last-name': 'Vance'
-          }
-        });
-
-        expect(json.included).to.include({
-          id: '5ed95269a8334d8a970a2bd9fa599288',
-          type: 'authors',
-          attributes: {
-            'first-name': 'Walter',
-            'last-name': 'Isaacson'
-          }
-        });
-
-        done(null, json);
       });
+
+      expect(json.included).to.include({
+        type: 'books',
+        id: '52735730e16632ba1eee62dd',
+        attributes: {
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239'
+        },
+        relationships: {
+          authors: {
+            data: [
+              { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' },
+              { id: '5ed95269a8334d8a970a2bd9fa599288', type: 'authors' },
+            ]
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '2934f384bb824a7cb7b238b8dc194a22',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Ashlee',
+          'last-name': 'Vance'
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '5ed95269a8334d8a970a2bd9fa599288',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Walter',
+          'last-name': 'Isaacson'
+        }
+      });
+
+      done(null, json);
     });
   });
 
@@ -682,7 +682,7 @@ describe('JSON API Serializer', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
@@ -693,30 +693,30 @@ describe('JSON API Serializer', function () {
             attributes: ['firstName', 'lastName'],
           }
         }
-      }).then(function (json) {
-        expect(json.included).to.include({
-          id: '5cd95269a8334d8a970a2bd9fa599278',
-          type: 'addresses',
-          attributes: {
-            'address-line1': '406 Madison Court',
-            'zip-code': '49426',
-            country: 'USA'
-          },
-          relationships: {
-            neighbours: {
-              data: [{ type: 'neighbours', id: '5490143e69e49d0c8f9fc6bc' }]
-            }
-          }
-        });
-
-        expect(json.included).to.include({
-          type: 'neighbours',
-          id: '5490143e69e49d0c8f9fc6bc',
-          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
-        });
-
-        done(null, json);
       });
+
+      expect(json.included).to.include({
+        id: '5cd95269a8334d8a970a2bd9fa599278',
+        type: 'addresses',
+        attributes: {
+          'address-line1': '406 Madison Court',
+          'zip-code': '49426',
+          country: 'USA'
+        },
+        relationships: {
+          neighbours: {
+            data: [{ type: 'neighbours', id: '5490143e69e49d0c8f9fc6bc' }]
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        type: 'neighbours',
+        id: '5490143e69e49d0c8f9fc6bc',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+      });
+
+      done(null, json);
     });
   });
 
@@ -728,18 +728,18 @@ describe('JSON API Serializer', function () {
         lastName: 'Munda',
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
         attributes: ['firstName', 'lastName'],
-      }).then(function (json) {
-        expect(json).to.have.property('links').eql({
-          self: 'http://localhost:3000/api/users'
-        });
-
-        done(null, json);
       });
+
+      expect(json).to.have.property('links').eql({
+        self: 'http://localhost:3000/api/users'
+      });
+
+      done(null, json);
     });
   });
 
@@ -751,20 +751,20 @@ describe('JSON API Serializer', function () {
         lastName: 'Munda',
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: function (users) {
             return 'http://localhost:3000/api/users/' + users[0].firstName;
           }
         },
         attributes: ['firstName', 'lastName'],
-      }).then(function (json) {
-        expect(json).to.have.property('links').eql({
-          self: 'http://localhost:3000/api/users/Sandro'
-        });
-
-        done(null, json);
       });
+
+      expect(json).to.have.property('links').eql({
+        self: 'http://localhost:3000/api/users/Sandro'
+      });
+
+      done(null, json);
     });
   });
 
@@ -780,7 +780,7 @@ describe('JSON API Serializer', function () {
         lastName: 'Bennett'
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
@@ -788,23 +788,23 @@ describe('JSON API Serializer', function () {
           self: 'http://localhost:3000/api/datalinks'
         },
         attributes: ['firstName', 'lastName'],
-      }).then(function (json) {
-        expect(json.data).to.include({
-          type: 'users',
-          id: '54735750e16638ba1eee59cb',
-          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-          links: { self: 'http://localhost:3000/api/datalinks' }
-        });
-
-        expect(json.data).to.include({
-          type: 'users',
-          id: '5490212e69e49d0c4f9fc6b4',
-          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
-          links: { self: 'http://localhost:3000/api/datalinks' }
-        });
-
-        done(null, json);
       });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '54735750e16638ba1eee59cb',
+        attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        links: { self: 'http://localhost:3000/api/datalinks' }
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '5490212e69e49d0c4f9fc6b4',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        links: { self: 'http://localhost:3000/api/datalinks' }
+      });
+
+      done(null, json);
     });
   });
 
@@ -820,7 +820,7 @@ describe('JSON API Serializer', function () {
         lastName: 'Bennett'
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
@@ -830,27 +830,27 @@ describe('JSON API Serializer', function () {
           }
         },
         attributes: ['firstName', 'lastName'],
-      }).then(function (json) {
-        expect(json.data).to.include({
-          type: 'users',
-          id: '54735750e16638ba1eee59cb',
-          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-          links: {
-            self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb'
-          }
-        });
-
-        expect(json.data).to.include({
-          type: 'users',
-          id: '5490212e69e49d0c4f9fc6b4',
-          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
-          links: {
-            self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4'
-          }
-        });
-
-        done(null, json);
       });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '54735750e16638ba1eee59cb',
+        attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        links: {
+          self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb'
+        }
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '5490212e69e49d0c4f9fc6b4',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        links: {
+          self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4'
+        }
+      });
+
+      done(null, json);
     });
   });
 
@@ -876,7 +876,7 @@ describe('JSON API Serializer', function () {
         }]
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
@@ -891,17 +891,17 @@ describe('JSON API Serializer', function () {
             related: 'http://localhost:4000/users/1/addresses'
           }
         }
-      }).then(function (json) {
-        expect(json.included[0]).to.have.property('links');
-        expect(json.included[0].links).eql({
-          self: 'http://localhost:4000/users/1/includedlinks'
-        });
-        expect(json.data[0].relationships.addresses.links).eql({
-          related: 'http://localhost:4000/users/1/addresses'
-        });
-
-        done(null, json);
       });
+
+      expect(json.included[0]).to.have.property('links');
+      expect(json.included[0].links).eql({
+        self: 'http://localhost:4000/users/1/includedlinks'
+      });
+      expect(json.data[0].relationships.addresses.links).eql({
+        related: 'http://localhost:4000/users/1/addresses'
+      });
+
+      done(null, json);
     });
   });
 
@@ -927,7 +927,7 @@ describe('JSON API Serializer', function () {
         }]
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
@@ -946,17 +946,17 @@ describe('JSON API Serializer', function () {
             }
           }
         }
-      }).then(function (json) {
-        expect(json.included[0]).to.have.property('links');
-        expect(json.included[0].links).eql({
-          self: 'http://localhost:4000/addresses/49426'
-        });
-        expect(json.data[0].relationships.addresses.links).eql({
-          related: 'http://localhost:4000/addresses/49426'
-        });
-
-        done(null, json);
       });
+
+      expect(json.included[0]).to.have.property('links');
+      expect(json.included[0].links).eql({
+        self: 'http://localhost:4000/addresses/49426'
+      });
+      expect(json.data[0].relationships.addresses.links).eql({
+        related: 'http://localhost:4000/addresses/49426'
+      });
+
+      done(null, json);
     });
   });
 
@@ -982,7 +982,7 @@ describe('JSON API Serializer', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
@@ -995,15 +995,15 @@ describe('JSON API Serializer', function () {
             related: 'http://localhost:4000/users/1/addresses'
           }
         }
-      }).then(function (json) {
-        expect(json.included[0]).to.have.property('links');
-        expect(json.included[0].links).eql({
-          self: 'http://localhost:4000/users/1/relationships/addresses',
-          related: 'http://localhost:4000/users/1/addresses'
-        });
-
-        done(null, json);
       });
+
+      expect(json.included[0]).to.have.property('links');
+      expect(json.included[0].links).eql({
+        self: 'http://localhost:4000/users/1/relationships/addresses',
+        related: 'http://localhost:4000/users/1/addresses'
+      });
+
+      done(null, json);
     });
   });
 
@@ -1029,7 +1029,7 @@ describe('JSON API Serializer', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
@@ -1043,14 +1043,14 @@ describe('JSON API Serializer', function () {
             }
           }
         }
-      }).then(function (json) {
-        expect(json.included[0]).to.have.property('links');
-        expect(json.included[0].links).eql({
-          self: 'http://localhost:4000/addresses/49426'
-        });
-
-        done(null, json);
       });
+
+      expect(json.included[0]).to.have.property('links');
+      expect(json.included[0].links).eql({
+        self: 'http://localhost:4000/addresses/49426'
+      });
+
+      done(null, json);
     });
   });
 
@@ -1078,17 +1078,17 @@ describe('JSON API Serializer', function () {
         }
       }];
 
-      new JsonApiSerializer('users', dataSet, {
+      var json = new JsonApiSerializer('users', dataSet, {
         apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
           attributes: ['addressLine1', 'zipCode', 'country']
         }
-      }).then(function (json) {
-        expect(json.included).to.have.length(1);
-        done(null, json);
       });
+
+      expect(json.included).to.have.length(1);
+      done(null, json);
     });
   });
 });
