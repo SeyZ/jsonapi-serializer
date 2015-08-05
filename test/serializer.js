@@ -743,6 +743,29 @@ describe('JSON API Serializer', function () {
     });
   });
 
+  describe('Top level links (Resource)', function () {
+    it('should be set', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users/54735750e16638ba1eee59cb'
+        },
+        attributes: ['firstName', 'lastName'],
+      });
+
+      expect(json).to.have.property('links').eql({
+        self: 'http://localhost:3000/api/users/54735750e16638ba1eee59cb'
+      });
+
+      done(null, json);
+    });
+  });
+
   describe('Top level links (Function)', function () {
     it('should be set', function (done) {
       var dataSet = [{
