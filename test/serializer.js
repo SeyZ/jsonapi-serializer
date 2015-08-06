@@ -123,10 +123,14 @@ describe('Options', function () {
         id: '1',
         firstName: 'Sandro',
         lastName: 'Munda',
+        books: [{ createdAt: '2015-08-04T06:09:24.864Z' }],
+        address: { zipCode: 42912 }
       };
 
       var json = new JsonApiSerializer('user', dataSet, {
-        attributes: ['firstName', 'lastName'],
+        attributes: ['firstName', 'lastName', 'books', 'address'],
+        books: { attributes: ['createdAt'] },
+        address: { attributes: ['zipCode'] },
         pluralizeType: false,
         keyForAttribute: function (attribute) {
           return inflection.underscore(attribute);
@@ -136,7 +140,14 @@ describe('Options', function () {
       expect(json.data.type).equal('user');
       expect(json.data).to.have.property('attributes').that.is
         .an('object')
-        .eql({ 'first_name': 'Sandro', 'last_name': 'Munda' });
+        .eql({
+          'first_name': 'Sandro',
+          'last_name': 'Munda',
+          books: [{ 'created_at': '2015-08-04T06:09:24.864Z' }],
+          address: { 'zip_code': 42912 }
+        });
+
+      console.log(require('util').inspect(json, { depth: null }));
 
       done(null, json);
     });
@@ -307,8 +318,8 @@ describe('JSON API Serializer', function () {
       expect(json.data[0].attributes).to.have.property('address')
         .that.is.an('object')
         .eql({
-          addressLine1: '406 Madison Court',
-          zipCode: '49426',
+          'address-line1': '406 Madison Court',
+          'zip-code': '49426',
           country: 'USA'
         });
 
