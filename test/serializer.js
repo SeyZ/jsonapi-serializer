@@ -147,8 +147,6 @@ describe('Options', function () {
           address: { 'zip_code': 42912 }
         });
 
-      console.log(require('util').inspect(json, { depth: null }));
-
       done(null, json);
     });
   });
@@ -731,13 +729,36 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('Top level links', function () {
+  describe('Top level links with an array of resources', function () {
     it('should be set', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
         lastName: 'Munda',
       }];
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName'],
+      });
+
+      expect(json).to.have.property('links').eql({
+        self: 'http://localhost:3000/api/users'
+      });
+
+      done(null, json);
+    });
+  });
+
+  describe('Top level links with a single resource', function () {
+    it('should be set', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
 
       var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
