@@ -13541,4 +13541,4 @@ module.exports = function (collectionName, records, opts) {
 },{}],"jsonapi-serializer":[function(require,module,exports){
 module.exports = require('./lib/serializer');
 
-},{"./lib/serializer":2}]},{},[]);
+},{"./lib/serializer":2}]},{},["jsonapi-serializer"]);
