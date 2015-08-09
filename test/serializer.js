@@ -20,7 +20,6 @@ describe('Options', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         id: '_id',
         attributes: ['firstName', 'lastName']
       });
@@ -174,7 +173,6 @@ describe('Options', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         id: 'id',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
@@ -230,7 +228,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName'],
       });
 
@@ -261,7 +258,6 @@ describe('JSON API Serializer', function () {
       };
 
       var json = new JsonApiSerializer('users', resource, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName'],
       });
 
@@ -306,7 +302,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           attributes: ['addressLine1', 'zipCode', 'country']
@@ -352,7 +347,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           attributes: ['title', 'isbn']
@@ -397,7 +391,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
@@ -462,7 +455,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           ref: 'id',
@@ -532,7 +524,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           ref: 'id',
@@ -620,7 +611,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'books'],
         books: {
           ref: 'id',
@@ -692,7 +682,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
@@ -1111,7 +1100,6 @@ describe('JSON API Serializer', function () {
       }];
 
       var json = new JsonApiSerializer('users', dataSet, {
-        apiEndpoint: 'http://localhost:3000/api',
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
