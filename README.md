@@ -52,7 +52,7 @@ var data = [{
 ```javascript
 var JSONAPISerializer = require('jsonapi-serializer');
 
-new JSONAPISerializer('users', data, {
+var users =new JSONAPISerializer('users', data, {
   topLevelLinks: { self: 'http://localhost:3000/api/users' },
   dataLinks: {
     self: function (user) {
@@ -60,9 +60,9 @@ new JSONAPISerializer('users', data, {
     }
   },
   attributes: ['firstName', 'lastName']
-}).then(function (users) {
-  // `users` here are JSON API compliant.
 });
+
+// `users` here are JSON API compliant.
 ```
 
 The result will be something like:
@@ -97,15 +97,15 @@ The result will be something like:
 ```javascript
 var JSONAPISerializer = require('jsonapi-serializer');
 
-new JSONAPISerializer('users', data, {
+var users = new JSONAPISerializer('users', data, {
   topLevelLinks: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName', 'address'],
   address: {
     attributes: ['addressLine1', 'zipCode', 'city']
   }
-}).then(function (users) {
-  // `users` here are JSON API compliant.
 });
+
+// `users` here are JSON API compliant.
 ```
 
 The result will be something like:
@@ -149,7 +149,7 @@ The result will be something like:
 ```javascript
 var JSONAPISerializer = require('jsonapi-serializer');
 
-new JSONAPISerializer('users', data, {
+var users = new JSONAPISerializer('users', data, {
   topLevelLinks: { self: 'http://localhost:3000/api/users' },
   attributes: ['firstName', 'lastName', 'books'],
   books: {
@@ -165,9 +165,9 @@ new JSONAPISerializer('users', data, {
       }
     }
   }
-}).then(function (users) {
-  // `users` here are JSON API compliant.
 });
+
+// `users` here are JSON API compliant.
 ```
 
 The result will be something like:
