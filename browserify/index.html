@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Browserify Test</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+    <script type="text/javascript" src="bundle.js"></script>
+    <script>
+      var JSONAPISerializer = require('jsonapi-serializer');
+
+      var dataSet = [{
+        _id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }, {
+        _id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
+      }];
+
+      var json = new JSONAPISerializer('users', dataSet, {
+        id: '_id',
+        attributes: ['firstName', 'lastName']
+      });
+
+      console.log(json);
+    </script>
+  </head>
+</html>
