@@ -160,7 +160,7 @@ var users = new JSONAPISerializer('users', data, {
       "related": "http://example.com/books"
     },
     includedLinks: {
-      self: function (book) {
+      self: function (dataSet, book) {
         return 'http://example.com/books/' + book.id;
       }
     }
