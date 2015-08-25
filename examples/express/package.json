@@ -11,7 +11,7 @@
     "debug": "~2.1.1",
     "express": "~4.12.2",
     "jade": "~1.9.2",
-    "jsonapi-serializer": "^2.0.0-beta.3",
+    "jsonapi-serializer": "latest",
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0"
   }
