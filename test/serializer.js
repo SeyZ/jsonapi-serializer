@@ -75,6 +75,24 @@ describe('Options', function () {
     });
   });
 
+  describe('meta', function () {
+    it('should set the meta key', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName'],
+        meta: { count: 1 }
+      });
+
+      expect(json.meta.count).equal(1);
+      done(null, json);
+    });
+  });
+
   describe('included', function () {
     it('should include or not the compount documents', function (done) {
       var dataSet = [{
