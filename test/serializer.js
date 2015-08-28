@@ -94,7 +94,7 @@ describe('Options', function () {
   });
 
   describe('included', function () {
-    it('should include or not the compount documents', function (done) {
+    it('should include or not the compound documents', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
@@ -380,6 +380,58 @@ describe('JSON API Serializer', function () {
           title: 'Steve Jobs',
           isbn: '978-1451648546'
         }]);
+      done(null, json);
+    });
+  });
+
+  describe('Nested of nested document', function () {
+    it('should be serialized', function (done) {
+      var inflection = require('inflection');
+      var dataSet = {
+        _id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        foo: {
+          _id: '54735722e16620ba1eee36af',
+          bar: {
+            firstName: 'Lawrence',
+            lastName: 'Bennett'
+          }
+        }
+      };
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        id: '_id',
+        attributes: ['_id', 'firstName', 'lastName', 'foo'],
+        keyForAttribute: function (key) {
+          return inflection.underscore(key);
+        },
+        foo: {
+          attributes: ['bar'],
+          bar: {
+            attributes: ['_id', 'firstName', 'lastName', 'barbar'],
+            barbar: {
+              attributes: ['firstName', 'lastName']
+            }
+          }
+        }
+      });
+
+      expect(json.data).to.have.property('attributes').that.is
+        .an('object')
+        .eql({
+          id: '54735750e16638ba1eee59cb',
+          'first_name': 'Sandro',
+          'last_name': 'Munda',
+          foo: {
+            id: '54735722e16620ba1eee36af',
+            bar: {
+              'first_name': 'Lawrence',
+              'last_name': 'Bennett'
+            }
+          }
+        });
+
       done(null, json);
     });
   });
