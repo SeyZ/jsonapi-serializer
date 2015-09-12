@@ -2,6 +2,7 @@
 /* global describe, it */
 
 var expect = require('chai').expect;
+var _ = require('lodash');
 
 var JsonApiSerializer = require('../lib/serializer');
 
@@ -163,6 +164,30 @@ describe('Options', function () {
           books: [{ 'created_at': '2015-08-04T06:09:24.864Z' }],
           address: { 'zip_code': 42912 }
         });
+
+      done(null, json);
+    });
+
+    it('should ignore primitive array items', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        phoneNumber: ['555-555-5555'],
+        address: { zipCode: 42912 }
+      };
+
+      var json = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName', 'lastName', 'books', 'address', 'phoneNumber'],
+        address: { attributes: ['zipCode'] },
+        pluralizeType: false,
+        keyForAttribute: function (attribute) {
+          return _.camelCase(attribute);
+        }
+      });
+
+      expect(json.data.type).equal('user');
+      expect(json.data.attributes).to.have.property('phoneNumber').that.is.eql(['555-555-5555']);
 
       done(null, json);
     });
