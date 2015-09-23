@@ -255,6 +255,95 @@ describe('Options', function () {
       done(null, json);
     });
   });
+
+  describe('attributeCase', function () {
+    it('should update the key case to dash-case', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+      };
+
+      var jsonDashCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'dash-case'
+      });
+
+      var jsonLispCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'lisp-case'
+      });
+
+      var jsonSpinalCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'spinal-case'
+      });
+      var jsonKababCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'kebab-case'
+      });
+
+      expect(jsonDashCase.data.attributes['first-name']).equal('Sandro');
+      expect(jsonLispCase.data.attributes['first-name']).equal('Sandro');
+      expect(jsonSpinalCase.data.attributes['first-name']).equal('Sandro');
+      expect(jsonKababCase.data.attributes['first-name']).equal('Sandro');
+
+      done(null, jsonDashCase);
+    });
+
+    it('should update the key case to underscore_case', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+      };
+
+      var jsonUnderscoreCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'underscore_case'
+      });
+
+      var jsonSnakeCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'snake_case'
+      });
+
+      expect(jsonUnderscoreCase.data.attributes.first_name).equal('Sandro');
+      expect(jsonSnakeCase.data.attributes.first_name).equal('Sandro');
+
+      done(null, jsonUnderscoreCase);
+    });
+
+    it('should update the key case to CamelCase', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+      };
+
+      var jsonCamelCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'CamelCase'
+      });
+
+      expect(jsonCamelCase.data.attributes.FirstName).equal('Sandro');
+
+      done(null, jsonCamelCase);
+    });
+
+    it('should update the key case to camelCase', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+      };
+
+      var jsonCamelCase = new JsonApiSerializer('user', dataSet, {
+        attributes: ['firstName'],
+        attributeCase: 'camelCase'
+      });
+
+      expect(jsonCamelCase.data.attributes.firstName).equal('Sandro');
+
+      done(null, jsonCamelCase);
+    });
+  });
 });
 
 describe('JSON API Serializer', function () {
