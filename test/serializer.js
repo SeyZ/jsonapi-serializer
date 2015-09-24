@@ -411,6 +411,21 @@ describe('JSON API Serializer', function () {
     });
   });
 
+
+  describe('Null data resource', function () {
+    it('should be returned as NULL', function (done) {
+      var resource = null;
+
+      var json = new JsonApiSerializer('users', resource, {
+        attributes: ['firstName', 'lastName'],
+      });
+
+      expect(json).to.have.property('data').and.to.equal(null);
+
+      done(null, json);
+    });
+  });
+
   describe('Nested document', function () {
     it('should be set into the `data.attributes`', function (done) {
       var dataSet = [{
