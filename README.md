@@ -21,12 +21,8 @@ API](http://jsonapi.org) (1.0 compliant).
         - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
         - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
         - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
-        - *keyForAttribute*: A function that maps the attribute (passed as an argument) to the key.
-        - *pluralizeType*: A boolean to indicate if the type must be pluralized or not. Default: true.
-        - *typeForAttribute*: A function that maps the attribute (passed as an argument) to the type you want to override. Option *pluralizeType* ignored if set.
-        - *meta*: An object to include non-standard meta-information.
-        - *attributeCase*: Changes the attribute case. Defaults to 'dash-case'
-            - dash-case
+         - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: 
+            - dash-case (default)
             - lisp-case
             - spinal-case
             - kebab-case
@@ -34,6 +30,9 @@ API](http://jsonapi.org) (1.0 compliant).
             - snake_case
             - CamelCase
             - camelCase
+        - *pluralizeType*: A boolean to indicate if the type must be pluralized or not. Default: true.
+        - *typeForAttribute*: A function that maps the attribute (passed as an argument) to the type you want to override. Option *pluralizeType* ignored if set.
+        - *meta*: An object to include non-standard meta-information.        
 
 
 
