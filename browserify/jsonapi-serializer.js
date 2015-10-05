@@ -5,24 +5,49 @@ var inflection = require('inflection');
 
 module.exports = function (collectionName, record, payload, opts) {
 
-  function dasherize(attribute) {
-    return inflection.dasherize(inflection.underscore(attribute));
+  function caserize(attribute) {
+    var caseMapping = {
+      'dash-case': inflection.dasherize,
+      'lisp-case': inflection.dasherize,
+      'spinal-case': inflection.dasherize,
+      'kebab-case': inflection.dasherize,
+      'underscore_case': inflection.underscore,
+      'snake_case': inflection.underscore,
+      'CamelCase': inflection.camelize,
+      'camelCase': _.partialRight( inflection.camelize, true)
+    };
+
+    var attributeCase = opts.keyForAttribute || 'dash-case';
+
+    if (_.keys(caseMapping).indexOf(attributeCase) < 0) {
+      attributeCase = 'dash-case';
+    }
+
+    return caseMapping[attributeCase](inflection.underscore(attribute));
   }
 
   function keyForAttribute(attribute) {
     if (_.isPlainObject(attribute)) {
-      return _.mapKeys(attribute, function (value, key) {
-        return keyForAttribute(key);
+      return _.transform(attribute, function (result, value, key) {
+        if (isComplexType(value)) {
+          result[keyForAttribute(key)] = keyForAttribute(value);
+        } else {
+          result[keyForAttribute(key)] = value;
+        }
       });
     } else if (_.isArray(attribute)) {
       return attribute.map(function (attr) {
-        return keyForAttribute(attr);
+        if (isComplexType(attr)) {
+          return keyForAttribute(attr);
+        } else {
+          return attr;
+        }
       });
     } else {
       if (_.isFunction(opts.keyForAttribute)) {
         return opts.keyForAttribute(attribute);
       } else {
-        return dasherize(attribute);
+        return caserize(attribute);
       }
     }
   }
@@ -109,7 +134,6 @@ module.exports = function (collectionName, record, payload, opts) {
             getLinks(current[attribute], opts.relationshipLinks);
         }
       } else {
-        // Embedded without relationships.
         dest.attributes[keyForAttribute(attribute)] =
           keyForAttribute(current[attribute]);
       }
@@ -156,6 +180,10 @@ module.exports = function (collectionName, record, payload, opts) {
 
   this.perform = function () {
     var that = this;
+
+    if( _.isNull( record ) ){
+        return null;
+    }
 
     // Top-level data.
     var data = {
@@ -217,6 +245,10 @@ module.exports = function (collectionName, records, opts) {
 
   if (opts.topLevelLinks) {
     payload.links = getLinks(opts.topLevelLinks);
+  }
+
+  if (opts.meta) {
+    payload.meta = opts.meta;
   }
 
   if (_.isArray(records)) {
