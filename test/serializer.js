@@ -1325,4 +1325,47 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('ignoreRelationshipData on a relationship', function () {
+    it('should not contains the data key', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          id: '54735697e16624ba1eee36bf',
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }
+      }];
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: [],
+          included: false,
+          ignoreRelationshipData: true,
+          relationshipLinks: {
+            related: '/foo/bar'
+          }
+        }
+      });
+
+      expect(json.data[0].relationships.address).to.not.have.key('data');
+      expect(json.data[1].relationships.address).to.not.have.key('data');
+      done(null, json);
+    });
+  });
 });

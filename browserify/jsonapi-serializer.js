@@ -128,7 +128,11 @@ module.exports = function (collectionName, record, payload, opts) {
           data = that.serializeRef(current[attribute], current, attribute, opts);
         }
 
-        dest.relationships[keyForAttribute(attribute)] = { data: data };
+        dest.relationships[keyForAttribute(attribute)] = {};
+        if (!opts.ignoreRelationshipData) {
+          dest.relationships[keyForAttribute(attribute)].data = data;
+        }
+
         if (opts.relationshipLinks) {
           dest.relationships[keyForAttribute(attribute)].links =
             getLinks(current[attribute], opts.relationshipLinks);
