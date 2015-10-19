@@ -1368,4 +1368,81 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('Empty relationships', function () {
+    it('should have a null `data` attribute when relationship is one-to', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {}
+      }];
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: [],
+          included: false,
+          relationshipLinks: {
+            related: '/foo/bar'
+          }
+        }
+      });
+
+      expect(json.data[0].relationships.address.data).to.be.an('object');
+      expect(json.data[1].relationships.address.data).to.equal(null);
+      done(null, json);
+    });
+
+    it('should have an empty array for the `data` attribute when relationship is many-to', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: [{
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }, {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }]
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: []
+      }];
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: [],
+          included: false,
+          relationshipLinks: {
+            related: '/foo/bar'
+          }
+        }
+      });
+      
+      expect(json.data[0].relationships.address.data).to.not.be.empty;
+      expect(json.data[1].relationships.address.data).to.be.empty;
+      done(null, json);
+    });
+  });
 });
