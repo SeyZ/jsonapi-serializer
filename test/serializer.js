@@ -967,7 +967,7 @@ describe('JSON API Serializer', function () {
         topLevelLinks: {
           self: 'http://localhost:3000/api/users'
         },
-        attributes: ['firstName', 'lastName'],
+        attributes: ['firstName', 'lastName']
       });
 
       expect(json).to.have.property('links').eql({
