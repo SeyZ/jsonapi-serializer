@@ -965,13 +965,15 @@ describe('JSON API Serializer', function () {
 
       var json = new JsonApiSerializer('users', dataSet, {
         topLevelLinks: {
-          self: 'http://localhost:3000/api/users'
+          self: function(data){
+            return 'http://localhost:3000/api/users/' + data.id;
+          }
         },
-        attributes: ['firstName', 'lastName'],
+        attributes: ['firstName', 'lastName']
       });
 
       expect(json).to.have.property('links').eql({
-        self: 'http://localhost:3000/api/users'
+        self: 'http://localhost:3000/api/users/' + dataSet.id
       });
 
       done(null, json);
