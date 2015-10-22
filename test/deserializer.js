@@ -66,7 +66,6 @@ describe('JSON API DeSerializer', function () {
       }
     };
     var order = new JsonApiDeSerializer(Order, dataSet);
-    console.log(order)
     expect(order).to.have.property('orderType', 'subscription');
     expect(order).to.have.property('productionState', 0);
     expect(order).to.have.property('paymentState', 0);
@@ -133,6 +132,67 @@ describe('JSON API DeSerializer', function () {
     });
     expect(order.products[2]).to.deep.equal({
       id: 'uuid-string3'
+    });
+  });
+
+  describe('Plain JS Object {} as collection name', function () {
+    it('should return Object with relationships as an Array', function () {
+      var dataSet = {
+        data: {
+          attributes: {
+            'order-type': 'subscription',
+            'production-state': 0,
+            'payment-state': 0,
+            'shipment-state': 0,
+            'created-at': null,
+            'ship-date': null,
+            season: 'FA15'
+          },
+          relationships: {
+            plan: {
+              data: {
+                type: 'plans',
+                id: 'uuid-string'
+              }
+            },
+            products: {
+              data: [{
+                type: 'products',
+                id: 'uuid-string1'
+              }, {
+                type: 'products',
+                id: 'uuid-string2'
+              }, {
+                type: 'products',
+                id: 'uuid-string3'
+              }]
+            }
+          },
+          type: 'orders'
+        }
+      };
+
+      var order = new JsonApiDeSerializer({}, dataSet);
+      expect(order).to.have.property('orderType', 'subscription');
+      expect(order).to.have.property('productionState', 0);
+      expect(order).to.have.property('paymentState', 0);
+      expect(order).to.have.property('shipmentState', 0);
+      expect(order).to.have.property('season', 'FA15');
+      expect(order).to.have.property('plan');
+      expect(order.plan).to.deep.equal({
+        id: 'uuid-string'
+      });
+      expect(order).to.have.property('products');
+      expect(order.products.length).to.equal(3);
+      expect(order.products[0]).to.deep.equal({
+        id: 'uuid-string1'
+      });
+      expect(order.products[1]).to.deep.equal({
+        id: 'uuid-string2'
+      });
+      expect(order.products[2]).to.deep.equal({
+        id: 'uuid-string3'
+      });
     });
   });
 });
