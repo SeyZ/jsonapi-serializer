@@ -35,6 +35,7 @@ describe('JSON API DeSerializer', function () {
       }
     };
     var order = new JsonApiDeSerializer(Order, dataSet);
+    expect(order).to.not.have.property('id');
     expect(order).to.have.property('orderType', 'subscription');
     expect(order).to.have.property('productionState', 0);
     expect(order).to.have.property('paymentState', 0);
@@ -45,6 +46,7 @@ describe('JSON API DeSerializer', function () {
   it('should return Object with many relationships', function () {
     var dataSet = {
       data: {
+        id: 'uuid-id',
         attributes: {
           'order-type': 'subscription',
           'production-state': 0,
@@ -66,6 +68,7 @@ describe('JSON API DeSerializer', function () {
       }
     };
     var order = new JsonApiDeSerializer(Order, dataSet);
+    expect(order).to.have.property('id', 'uuid-id');
     expect(order).to.have.property('orderType', 'subscription');
     expect(order).to.have.property('productionState', 0);
     expect(order).to.have.property('paymentState', 0);
@@ -80,6 +83,7 @@ describe('JSON API DeSerializer', function () {
   it('should return Object with relationships as an Array', function () {
     var dataSet = {
       data: {
+        id: 'uuid-id',
         attributes: {
           'order-type': 'subscription',
           'production-state': 0,
@@ -113,6 +117,7 @@ describe('JSON API DeSerializer', function () {
       }
     };
     var order = new JsonApiDeSerializer(Order, dataSet);
+    expect(order).to.have.property('id', 'uuid-id');
     expect(order).to.have.property('orderType', 'subscription');
     expect(order).to.have.property('productionState', 0);
     expect(order).to.have.property('paymentState', 0);
@@ -139,6 +144,7 @@ describe('JSON API DeSerializer', function () {
     it('should return Object with relationships as an Array', function () {
       var dataSet = {
         data: {
+          id: 'uuid-id',
           attributes: {
             'order-type': 'subscription',
             'production-state': 0,
@@ -173,6 +179,7 @@ describe('JSON API DeSerializer', function () {
       };
 
       var order = new JsonApiDeSerializer({}, dataSet);
+      expect(order).to.have.property('id', 'uuid-id');
       expect(order).to.have.property('orderType', 'subscription');
       expect(order).to.have.property('productionState', 0);
       expect(order).to.have.property('paymentState', 0);
