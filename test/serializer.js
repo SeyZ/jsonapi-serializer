@@ -1031,14 +1031,16 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-        links: { self: 'http://localhost:3000/api/datalinks' }
+        links: { self: 'http://localhost:3000/api/datalinks' },
+        relationships: {}
       });
 
       expect(json.data).to.include({
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
-        links: { self: 'http://localhost:3000/api/datalinks' }
+        links: { self: 'http://localhost:3000/api/datalinks' },
+        relationships: {}
       });
 
       done(null, json);
@@ -1075,7 +1077,8 @@ describe('JSON API Serializer', function () {
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
         links: {
           self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb'
-        }
+        },
+        relationships: {}
       });
 
       expect(json.data).to.include({
@@ -1084,7 +1087,8 @@ describe('JSON API Serializer', function () {
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
         links: {
           self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4'
-        }
+        },
+        relationships: {}
       });
 
       done(null, json);
@@ -1441,10 +1445,75 @@ describe('JSON API Serializer', function () {
           }
         }
       });
-      
+
       expect(json.data[0].relationships.address.data).to.not.be.empty;
       expect(json.data[1].relationships.address.data).to.be.empty;
       done(null, json);
     });
+  });
+});
+
+describe('String Relationships', function () {
+  it('should serialize array of string relationships (foreign keys)', function () {
+    var dataSet = [{
+      id: '54735750e16638ba1eee59cb',
+      firstName: 'Sandro',
+      lastName: 'Munda',
+      address: ['54735722e16620ba1eee36af', '54735722e16620ba1eee36af']
+    }, {
+      id: '5490143e69e49d0c8f9fc6bc',
+      firstName: 'Lawrence',
+      lastName: 'Bennett',
+      address: []
+    }];
+
+    var json = new JsonApiSerializer('users', dataSet, {
+      attributes: ['firstName', 'lastName', 'address'],
+      address: {
+        ref: function (_, item) {
+          return item;
+        },
+        attributes: [],
+        included: false,
+        relationshipLinks: {
+          related: '/foo/bar'
+        }
+      }
+    });
+
+    var ids = json.data.map(function (data) {
+      return data.relationships.address.data.map(function (relationship) {
+        return relationship.id;
+      });
+    });
+    ids = _.flatten(ids);
+    expect(ids.length).to.equal(2);
+    expect(ids).to.include('54735722e16620ba1eee36af');
+    expect(ids).to.include('54735722e16620ba1eee36af');
+  });
+
+  it('should serialize string relationship (foreign key)', function () {
+    var dataSet = {
+      id: '54735750e16638ba1eee59cb',
+      firstName: 'Sandro',
+      lastName: 'Munda',
+      address: '54735722e16620ba1eee36af'
+    };
+
+    var json = new JsonApiSerializer('users', dataSet, {
+      attributes: ['firstName', 'lastName', 'address'],
+      address: {
+        ref: function (_, item) {
+          return item;
+        },
+        attributes: [],
+        included: false,
+        relationshipLinks: {
+          related: '/foo/bar'
+        }
+      }
+    });
+
+    expect(json.data.relationships.address.data.id).to.equal('54735722e16620ba1eee36af');
   });
 });
