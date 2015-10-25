@@ -480,6 +480,24 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+
+    it('should not contains attributes key', function (done) {
+      var dataSet = [{ id: 2 }, { id: 3 }];
+
+      var json = new JsonApiSerializer('tags', dataSet, {
+        ref: true,
+        included: false,
+        topLevelLinks: {
+          self: '/articles/1/relationships/tags',
+          related: '/articles/1/tags'
+        }
+      });
+
+      expect(json.data[0]).to.not.have.key('attributes');
+      expect(json.data[1]).to.not.have.key('attributes');
+
+      done(null, json);
+    });
   });
 
   describe('Nested documents', function () {
@@ -1356,7 +1374,6 @@ describe('JSON API Serializer', function () {
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
-          attributes: [],
           included: false,
           ignoreRelationshipData: true,
           relationshipLinks: {
@@ -1394,7 +1411,6 @@ describe('JSON API Serializer', function () {
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
-          attributes: [],
           included: false,
           relationshipLinks: {
             related: '/foo/bar'
@@ -1434,14 +1450,13 @@ describe('JSON API Serializer', function () {
         attributes: ['firstName', 'lastName', 'address'],
         address: {
           ref: 'id',
-          attributes: [],
           included: false,
           relationshipLinks: {
             related: '/foo/bar'
           }
         }
       });
-      
+
       expect(json.data[0].relationships.address.data).to.not.be.empty;
       expect(json.data[1].relationships.address.data).to.be.empty;
       done(null, json);
