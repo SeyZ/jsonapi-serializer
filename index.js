@@ -1,1 +1,4 @@
-module.exports = require('./lib/serializer');
+module.exports = {
+  Serializer: require('./lib/serializer'),
+  Deserializer: require('./lib/deserializer'),
+};

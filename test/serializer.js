@@ -184,7 +184,7 @@ describe('Options', function () {
 
   describe('keyForAttribute', function () {
     it('should serialize attribute in underscore', function (done) {
-      var inflection = require('inflection');
+      var Inflector = require('inflected');
       var dataSet = {
         id: '1',
         firstName: 'Sandro',
@@ -199,7 +199,7 @@ describe('Options', function () {
         address: { attributes: ['zipCode'] },
         pluralizeType: false,
         keyForAttribute: function (attribute) {
-          return inflection.underscore(attribute);
+          return Inflector.underscore(attribute);
         }
       });
 
@@ -595,7 +595,7 @@ describe('JSON API Serializer', function () {
 
   describe('Nested of nested document', function () {
     it('should be serialized', function (done) {
-      var inflection = require('inflection');
+      var Inflector = require('inflected');
       var dataSet = {
         _id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
@@ -616,7 +616,7 @@ describe('JSON API Serializer', function () {
         id: '_id',
         attributes: ['_id', 'firstName', 'lastName', 'foo'],
         keyForAttribute: function (key) {
-          return inflection.underscore(key);
+          return Inflector.underscore(key);
         },
         foo: {
           attributes: ['bar'],
@@ -632,7 +632,7 @@ describe('JSON API Serializer', function () {
       expect(json.data).to.have.property('attributes').that.is
         .an('object')
         .eql({
-          id: '54735750e16638ba1eee59cb',
+          _id: '54735750e16638ba1eee59cb',
           'first_name': 'Sandro',
           'last_name': 'Munda',
           foo: {
