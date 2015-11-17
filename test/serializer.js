@@ -1309,6 +1309,104 @@ describe('JSON API Serializer', function () {
     });
   });
 
+  describe('Related Meta inside an array compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        addresses: [{
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }],
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        addresses: [{
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }]
+      }];
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'addresses'],
+        addresses: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          includedLinks: {
+            self: 'http://localhost:4000/users/1/includedlinks'
+          },
+          relationshipMeta: {
+            count: 1
+          }
+        }
+      });
+
+      expect(json.data[0].relationships.addresses.meta).eql({
+        count: 1
+      });
+
+      done(null, json);
+    });
+  });
+
+  describe('Related Meta (Function) inside an array compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        addresses: [{
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }],
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        addresses: [{
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }]
+      }];
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'addresses'],
+        addresses: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          includedLinks: {
+            self: function (record, current) {
+              return 'http://localhost:4000/addresses/' + current.zipCode;
+            }
+          },
+          relationshipMeta: {
+            count: function (record, current) {
+              return record.addresses.length;
+            }
+          }
+        }
+      });
+
+      expect(json.data[0].relationships.addresses.meta).eql({
+        count: 1
+      });
+
+      done(null, json);
+    });
+  });
+
   describe('Duplicate compound document', function () {
     it('should not have duplicated entries into included', function (done) {
       var dataSet = [{
