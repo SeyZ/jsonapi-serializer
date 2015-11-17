@@ -21,6 +21,7 @@ API](http://jsonapi.org) (1.0 compliant).
         - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
         - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
         - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
+        - *relationshipMeta*: An object that describes the meta inside relationships. Values can be *string* or a *function* (see examples below)
         - *ignoreRelationshipData*: Do not include the `data` key inside the relationship. Default: false.
         - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include:
           - dash-case (default)
@@ -168,6 +169,11 @@ var users = new JSONAPISerializer('users', data, {
       "self": "http://example.com/relationships/books",
       "related": "http://example.com/books"
     },
+    relationshipMeta: {
+      count: function(user, book) {
+        return user.books.length;
+      },
+    },
     includedLinks: {
       self: function (dataSet, book) {
         return 'http://example.com/books/' + book.id;
@@ -202,6 +208,9 @@ The result will be something like:
         "links": {
           "self": "http://example.com/relationships/books",
           "related": "http://example.com/books"
+        },
+        "meta": {
+          "count": 2
         }
       }
     }
@@ -220,6 +229,9 @@ The result will be something like:
         "links": {
           "self": "http://example.com/relationships/books",
           "related": "http://example.com/books"
+        },
+        "meta": {
+          "count": 1
         }
       }
     }
