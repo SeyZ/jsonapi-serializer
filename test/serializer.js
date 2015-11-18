@@ -112,8 +112,6 @@ describe('Options', function () {
         }
       });
 
-      console.log(json.data);
-
       expect(json.data.type).equal('user');
       expect(json.included[0]).to.have.property('type').equal('home');
       expect(json.included[1]).to.have.property('type').equal('work');
