@@ -226,8 +226,7 @@ describe('Options', function () {
       };
 
       var json = new JsonApiSerializer('user', dataSet, {
-        attributes: ['firstName', 'lastName', 'books', 'address',
-          'phoneNumber'],
+        attributes: ['firstName', 'lastName', 'phoneNumber', 'address'],
         address: { attributes: ['zipCode'] },
         pluralizeType: false,
         keyForAttribute: function (attribute) {
@@ -602,10 +601,13 @@ describe('JSON API Serializer', function () {
         firstName: 'Sandro',
         lastName: 'Munda',
         foo: {
-          _id: '54735722e16620ba1eee36af',
           bar: {
             firstName: 'Lawrence',
-            lastName: 'Bennett'
+            lastName: 'Bennett',
+            barbar: {
+              firstName: 'Peter',
+              lastName: 'Forney'
+            }
           }
         }
       };
@@ -619,9 +621,9 @@ describe('JSON API Serializer', function () {
         foo: {
           attributes: ['bar'],
           bar: {
-            attributes: ['_id', 'firstName', 'lastName', 'barbar'],
+            attributes: ['firstName', 'lastName', 'barbar'],
             barbar: {
-              attributes: ['firstName', 'lastName']
+              attributes: ['firstName']
             }
           }
         }
@@ -634,10 +636,12 @@ describe('JSON API Serializer', function () {
           'first_name': 'Sandro',
           'last_name': 'Munda',
           foo: {
-            id: '54735722e16620ba1eee36af',
             bar: {
               'first_name': 'Lawrence',
-              'last_name': 'Bennett'
+              'last_name': 'Bennett',
+              barbar: {
+                'first_name': 'Peter'
+              }
             }
           }
         });
@@ -1605,6 +1609,37 @@ describe('JSON API Serializer', function () {
 
       expect(json.data[0].relationships.address.data).to.not.be.empty;
       expect(json.data[1].relationships.address.data).to.be.empty;
+      done(null, json);
+    });
+
+    it('should only serialize address.street attribute', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: [{
+          type: 'home',
+          street: 'Dogwood Way',
+          zip: '12345'
+        },{
+          type: 'work',
+          street: 'Dogwood Way 2',
+          zip: '12345'
+        }]
+      };
+
+      var json = new JsonApiSerializer('users', dataSet, {
+        attributes: ['id', 'firstName', 'updated_at', 'address'],
+        address: {
+          attributes: ['street']
+        }
+      });
+
+      expect(json.data.attributes.address).eql([
+        { street: 'Dogwood Way' },
+        { street: 'Dogwood Way 2' }
+      ]);
+
       done(null, json);
     });
   });
