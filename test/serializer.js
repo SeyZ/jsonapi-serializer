@@ -1444,7 +1444,7 @@ describe('JSON API Serializer', function () {
             }
           },
           relationshipMeta: {
-            count: function (record, current) {
+            count: function (record) {
               return record.addresses.length;
             }
           }
@@ -1607,6 +1607,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
+      // jshint expr: true
       expect(json.data[0].relationships.address.data).to.not.be.empty;
       expect(json.data[1].relationships.address.data).to.be.empty;
       done(null, json);
