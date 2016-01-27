@@ -474,6 +474,36 @@ describe('JSON API Serializer', function () {
     });
   });
 
+  describe('Flat data resource', function() {
+    it('should create nested resources', function(done) {
+      var resource = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        streetAddress: '406 Madison Court',
+        zipCode: '49426',
+        country: 'USA'
+      };
+
+      var json = new JsonApiSerializer('user', resource, {
+        customAttributes: ['address'],
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          attributes: ['streetAddress', 'zipCode', 'country']
+        }
+      });
+
+      expect(json.data.attributes).to.have.property('address').that.is
+        .an('object')
+        .eql({
+          'street-address': '406 Madison Court',
+          'zip-code': '49426',
+          'country': 'USA'
+        });
+
+      done(null, json);
+    });
+  });
 
   describe('Null data resource', function () {
     it('should be returned as NULL', function (done) {
