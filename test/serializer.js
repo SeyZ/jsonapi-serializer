@@ -1644,4 +1644,20 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('Database model objects', function () {
+    it('properly pass on requests for attributes', function () {
+      var mongoose = require('mongoose');
+      var userSchema = new mongoose.Schema({ firstName: String, lastName: String });
+      var User = mongoose.model('User', userSchema);
+      var user1 = new User({ firstName: 'Lawrence', lastName: 'Bennett' });
+      
+      var json = new JsonApiSerializer('users', user1, {
+        attributes: ['firstName', 'lastName']
+      });
+
+      expect(json.data.attributes).to.have.property('first-name');
+      expect(json.data.attributes).to.have.property('last-name');
+    });
+  });
 });
