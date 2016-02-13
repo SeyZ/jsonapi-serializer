@@ -1249,8 +1249,9 @@ describe('JSON API Serializer', function () {
             }
           },
           relationshipLinks: {
-            related: function (record, current) {
-              return 'http://localhost:4000/addresses/' + current[0].zipCode;
+            related: function (record, current, parent) {
+              return 'http://localhost:4000/users/' + parent.id +
+                '/addresses/' + current[0].zipCode;
             }
           }
         }
@@ -1261,7 +1262,7 @@ describe('JSON API Serializer', function () {
         self: 'http://localhost:4000/addresses/49426'
       });
       expect(json.data[0].relationships.addresses.links).eql({
-        related: 'http://localhost:4000/addresses/49426'
+        related: 'http://localhost:4000/users/54735750e16638ba1eee59cb/addresses/49426'
       });
 
       done(null, json);
