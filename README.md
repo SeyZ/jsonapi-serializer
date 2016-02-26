@@ -4,6 +4,9 @@
 A Node.js framework agnostic library for serializing your data to [JSON
 API](http://jsonapi.org) (1.0 compliant).
 
+- [Migrate from 2.0 to 2.1](https://github.com/SeyZ/jsonapi-serializer/wiki/Migrate-from-2.0-to-2.1)
+- [Migrate from 1.x to 2.0](https://github.com/SeyZ/jsonapi-serializer/wiki/Migrate-from-1.x-to-2.0)
+
 ## Installation
 `$ npm install jsonapi-serializer`
 
