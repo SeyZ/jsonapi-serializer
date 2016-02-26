@@ -61,12 +61,6 @@ var data = [
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 
 var UserSerializer = new JSONAPISerializer('users', {
-  topLevelLinks: { self: 'http://localhost:3000/api/users' },
-  dataLinks: {
-    self: function (user) {
-      return 'http://localhost:3000/api/users/' + user.id
-    }
-  },
   attributes: ['firstName', 'lastName']
 });
 
@@ -79,25 +73,20 @@ The result will be something like:
 
 ```javascript
 {
-  "links": {
-    "self": "http://localhost:3000/api/users"
-  },
   "data": [{
     "type": "users",
     "id": "1",
     "attributes": {
       "first-name": "Sandro",
       "last-name": "Munda"
-    },
-    "links": "http://localhost:3000/api/users/1"
+    }
   }, {
     "type": "users",
     "id": "2",
     "attributes": {
       "first-name": "John",
       "last-name": "Doe"
-    },
-    "links": "http://localhost:3000/api/users/2"
+    }
   }]
 }
 ```
