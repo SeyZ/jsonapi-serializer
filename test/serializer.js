@@ -1662,4 +1662,30 @@ describe('JSON API Serializer', function () {
       expect(json.data.attributes).to.have.property('last-name');
     });
   });
+
+  describe('falsy attribute values', function() {
+    it('properly attach falsy attributes', function() {
+      var dataSet = {
+        id: '1',
+        count: 0,
+        bool: false,
+        dbNull: null,
+        emptyString: ''
+      };
+
+      var json = new JSONAPISerializer('tester', {
+        attributes: ['count', 'bool', 'dbNull', 'emptyString']
+      }).serialize(dataSet);
+
+      expect(json.data.attributes).to.have.property('count');
+      expect(json.data.attributes.count).to.equal(0);
+      expect(json.data.attributes).to.have.property('bool');
+      expect(json.data.attributes.bool).to.equal(false);
+      expect(json.data.attributes).to.have.property('db-null');
+      expect(json.data.attributes['db-null']).to.equal(null);
+      expect(json.data.attributes).to.have.property('empty-string');
+      expect(json.data.attributes['empty-string']).to.equal('');
+    });
+  });
+
 });
