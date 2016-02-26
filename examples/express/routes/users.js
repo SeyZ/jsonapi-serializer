@@ -16,8 +16,8 @@ router.get('/', function (req, res) {
     password: 'ultrasecret'
   }];
 
-  var json = new UserSerializer(users).serialize();
-  res.send(json);
+  var jsonapi = UserSerializer.serialize(users);
+  res.send(jsonapi);
 });
 
 module.exports = router;

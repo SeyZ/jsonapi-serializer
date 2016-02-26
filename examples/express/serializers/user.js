@@ -1,14 +1,6 @@
 'use strict';
-var JSONAPISerializer = require('jsonapi-serializer');
+var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 
-function UserSerializer(user) {
-
-  this.serialize = function () {
-    return new JSONAPISerializer('users', user, {
-      attributes: ['firstName', 'lastName'],
-    });
-  };
-
-}
-
-module.exports = UserSerializer;
+module.exports = new JSONAPISerializer('users', {
+  attributes: ['firstName', 'lastName']
+});
