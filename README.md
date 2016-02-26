@@ -12,7 +12,7 @@ API](http://jsonapi.org) (1.0 compliant).
 ### Serialization
 
     var JSONAPISerializer = require('jsonapi-serializer').Serializer;
-    JSONAPISerializer(type, opts).serialize(data);
+    new JSONAPISerializer(type, opts).serialize(data);
 
 The function `JSONAPISerializer` takes two arguments:
 
