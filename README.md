@@ -44,10 +44,10 @@ Calling the `serialize` method on the returned object will serialize your `data`
 **Examples**
 
 - [Express example](https://github.com/SeyZ/jsonapi-serializer/tree/master/examples/express)
-- [Simple usage](#simple-usage)
+- [Simple usage](#simple-usage-serializer)
 - [More example](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/serializer.js)
 
-<a name="simple-usage"></a>
+<a name="simple-usage-serializer"></a>
 Simple usage:
 
 ```javascript
@@ -93,7 +93,14 @@ The result will be something like:
 
 ### Deserialization
 
-Deserialization is very similar in process to serialization and can make use of the same options object.
+Deserialization is very similar in process to serialization.
+
+**Examples**
+
+- [Simple usage](#simple-usage-deserializer)
+- [More example](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/deserializer.js)
+
+<a name="simple-usage-deserializer"></a>
 Given the JSON API serialized `users` from the example above:
 
 ```javascript
