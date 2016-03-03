@@ -93,22 +93,139 @@ The result will be something like:
 
 ### Deserialization
 
-Deserialization is very similar in process to serialization.
+    var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
+    new JSONAPIDeserializer(opts).serialize(data);
+
+The function `JSONAPIDeserializer` takes one argument:
+
+- `opts`: The deserializer options.
+
+Calling the `deserialize` method on the returned object will deserialize your `data` (JSONAPI document) to a plain javascript object.
+
+**Available deserialization option (`opts` argument)**
+
+- *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+- AN\_ATTRIBUTE\_TYPE: this option name corresponds to the type of a relationship from your JSONAPI document.
+	- *valueForRelationship*: A function that returns whatever you want for a relationship (see examples below)
+
 
 **Examples**
 
 - [Simple usage](#simple-usage-deserializer)
+- [Relationship](#relationship-deserializer)
 - [More example](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/deserializer.js)
 
 <a name="simple-usage-deserializer"></a>
-Given the JSON API serialized `users` from the example above:
+Simple usage:
+
+```
+{
+  data: [{
+    type: 'users',
+    id: '1',
+    attributes: {
+      'first-name': Sandro,
+      'last-name': Munda
+    }
+  }, {
+    type: 'users',
+    id: '2',
+    attributes: {
+      'first-name': 'John',
+      'last-name': 'Doe'
+    }
+  }]
+}
+```
 
 ```javascript
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 
 new JSONAPIDeserializer().deserialize(jsonapi, function (err, users) {
-  // `users` here is equivalent to `data` in the Serialization example.
+  // `users` is...
 });
+```
+
+```javascript
+[
+  { id: 1, firstName: 'Sandro', lastName: 'Munda' },
+  { id: 2, firstName: 'John', lastName: 'Doe' }
+];
+```
+<a name="relationship-deserializer"></a>
+Relationship:
+
+```
+{
+  data: [{
+    type: 'users',
+    id: '54735750e16638ba1eee59cb',
+    attributes: {
+      'first-name': 'Sandro',
+      'last-name': 'Munda'
+    },
+    relationships: {
+      address: {
+        data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+      }
+    }
+  }, {
+    type: 'users',
+    id: '5490143e69e49d0c8f9fc6bc',
+    attributes: {
+      'first-name': 'Lawrence',
+      'last-name': 'Bennett'
+    },
+    relationships: {
+      address: {
+        data: { type: 'addresses', id: '54735697e16624ba1eee36bf' }
+      }
+    }
+  }]
+}
+```
+
+```javascript
+var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
+
+new JSONAPIDeserializer({
+  addresses: {
+    valueForRelationship: function (relationship) {
+      return {
+        id: relationship.id,
+        'address-line1': '406 Madison Court',
+        'zip-code': '49426',
+        country: 'USA'
+      };
+    }
+  }
+}).deserialize(jsonapi, function (err, users) {
+  // `users` is...
+});
+```
+
+```
+[{
+  id: '54735750e16638ba1eee59cb',
+  'first-name': 'Sandro',
+  'last-name': 'Munda',
+  address: {
+    id: '54735722e16620ba1eee36af',
+    'address-line1': '406 Madison Court',
+    'zip-code': '49426',
+    country: 'USA'
+  }
+}, {
+  id: '5490143e69e49d0c8f9fc6bc',
+  'first-name': 'Lawrence',
+  'last-name': 'Bennett',
+  address: {
+    id: '54735697e16624ba1eee36bf',
+    'address-line1': '406 Madison Court',
+    'zip-code': '49426',
+    country: 'USA'
+  }
+}]
 ```
 
 # License
