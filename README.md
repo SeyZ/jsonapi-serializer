@@ -91,6 +91,22 @@ The result will be something like:
 }
 ```
 
+### Deserialization
+
+Deserialization is very similar in process to serialization and can make use of the same options object.
+Given the JSON API serialized `users` from the example above:
+
+```javascript
+var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
+
+var UserDeserializer = new JSONAPIDeserializer({
+  attributes: ['firstName', 'lastName']
+});
+
+var deserializedUsers = UserDeserializer.deserialize(users, function (users) {
+  // `users` here is equivalent to `data` in the Serialization example.
+```
+
 # License
 
 [MIT](https://github.com/SeyZ/jsonapi-serializer/blob/master/LICENSE)
