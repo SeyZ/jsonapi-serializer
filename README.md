@@ -106,12 +106,9 @@ Given the JSON API serialized `users` from the example above:
 ```javascript
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 
-var UserDeserializer = new JSONAPIDeserializer({
-  attributes: ['firstName', 'lastName']
-});
-
-var deserializedUsers = UserDeserializer.deserialize(users, function (users) {
+new JSONAPIDeserializer().deserialize(jsonapi, function (err, users) {
   // `users` here is equivalent to `data` in the Serialization example.
+});
 ```
 
 # License
