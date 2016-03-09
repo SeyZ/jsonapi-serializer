@@ -546,6 +546,43 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+
+    it('should contains all attributes', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '2',
+          type: 'home',
+          street: 'Dogwood Way',
+          zip: '12345'
+        }
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName', 'address'],
+      }).serialize(dataSet);
+
+      expect(json).eql({
+        data: {
+          type: 'users',
+          id: '1',
+          attributes: {
+            'first-name': 'Sandro',
+            'last-name': 'Munda',
+            address: {
+              id: '2',
+              type: 'home',
+              street: 'Dogwood Way',
+              zip: '12345'
+            }
+          }
+        }
+      });
+
+      done(null, json);
+    });
   });
 
   describe('Nested documents', function () {
@@ -1663,8 +1700,8 @@ describe('JSON API Serializer', function () {
     });
   });
 
-  describe('falsy attribute values', function() {
-    it('properly attach falsy attributes', function() {
+  describe('falsy attribute values', function () {
+    it('properly attach falsy attributes', function () {
       var dataSet = {
         id: '1',
         count: 0,
@@ -1687,5 +1724,4 @@ describe('JSON API Serializer', function () {
       expect(json.data.attributes['empty-string']).to.equal('');
     });
   });
-
 });
