@@ -490,5 +490,33 @@ describe('JSON API Deserializer', function () {
         });
       });
     });
+
+    describe('With null data relationship', function () {
+      it('should ignore the relationship', function (done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            id: '54735750e16638ba1eee59cb',
+            attributes: {
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            },
+            relationships: {
+              address: { data: null }
+            }
+          }
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).eql({
+              id: '54735750e16638ba1eee59cb',
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            });
+            done(null, json);
+          });
+      });
+    });
   });
 });
