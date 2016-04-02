@@ -1724,4 +1724,52 @@ describe('JSON API Serializer', function () {
       expect(json.data.attributes['empty-string']).to.equal('');
     });
   });
+
+  describe('options provided to serialization', function () {
+    it('should allow meta to be passed in to serialize', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var meta = {
+        count: 1
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName']
+      }).serialize(dataSet, {
+        meta: meta
+      });
+
+      expect(json.meta.count).equal(1);
+      done(null, json);
+    });
+
+    it('should merge constant and provided meta', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var meta = {
+        count: 1
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        meta: {
+          offset: 0
+        }
+      }).serialize(dataSet, {
+        meta: meta
+      });
+
+      expect(json.meta.count).equal(1);
+      expect(json.meta.offset).equal(0);
+      done(null, json);
+    });
+  });
 });
