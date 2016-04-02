@@ -1771,5 +1771,132 @@ describe('JSON API Serializer', function () {
       expect(json.meta.offset).equal(0);
       done(null, json);
     });
+
+    it('allows options to be provided to top level links', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: function(data, opts){
+            return 'http://localhost:3000/api/users/' + data.id + "?sid=" + opts.sid;
+          }
+        },
+        attributes: ['firstName', 'lastName']
+      }).serialize(dataSet, {
+          sid: "someSessionId"
+      });
+
+      expect(json).to.have.property('links').eql({
+        self: 'http://localhost:3000/api/users/' + dataSet.id + "?sid=someSessionId"
+      });
+
+      done(null, json);
+    });
+
+    it('allows options to be provided to data level links', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }, {
+        id: '5490212e69e49d0c4f9fc6b4',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        dataLinks: {
+          self: function (dataSet, user, dest, opts) {
+            return 'http://localhost:3000/api/datalinks/' + user.id + "?sid=" + opts.sid;
+          }
+        },
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet, {
+          sid: "someSessionId"
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '54735750e16638ba1eee59cb',
+        attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        links: {
+          self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb?sid=someSessionId'
+        }
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '5490212e69e49d0c4f9fc6b4',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        links: {
+          self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4?sid=someSessionId'
+        }
+      });
+
+      done(null, json);
+    });
+
+    it('allows options to be provided to included and relationship links', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        addresses: [{
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }],
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        addresses: [{
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }]
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'addresses'],
+        addresses: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          includedLinks: {
+            self: function (record, current, dest, opts) {
+              return 'http://localhost:4000/addresses/' + current.zipCode + "?sid=" + opts.sid;
+            }
+          },
+          relationshipLinks: {
+            related: function (record, current, parent, opts) {
+              return 'http://localhost:4000/users/' + parent.id +
+                '/addresses/' + current[0].zipCode + "?sid=" + opts.sid;
+            }
+          }
+        }
+      }).serialize(dataSet, {
+          sid: "someSessionId"
+      });
+
+      expect(json.included[0]).to.have.property('links');
+      expect(json.included[0].links).eql({
+        self: 'http://localhost:4000/addresses/49426?sid=someSessionId'
+      });
+      expect(json.data[0].relationships.addresses.links).eql({
+        related: 'http://localhost:4000/users/54735750e16638ba1eee59cb/addresses/49426?sid=someSessionId'
+      });
+
+      done(null, json);
+    });
   });
 });
