@@ -76,6 +76,47 @@ describe('Options', function () {
     });
   });
 
+  describe('type for relationship', function () {
+    it('should set a related type according to the configuration of the attribute', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: [{
+          id: '2',
+          type: 'home',
+          street: 'Dogwood Way',
+          zip: '12345'
+        },{
+          id: '3',
+          type: 'work',
+          street: 'Dogwood Way',
+          zip: '12345'
+        }]
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName', 'address'],
+        pluralizeType: false,
+        address: {
+          type: 'overridden',
+          ref: function(user, address) {
+            return address.id;
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included[0]).to.have.property('type').equal('overridden');
+      expect(json.included[1]).to.have.property('type').equal('overridden');
+
+      expect(json.data.relationships).to.have.property('address').that.is.an('object');
+      expect(json.data.relationships.address.data[0]).to.have.property('type').that.is.eql('overridden');
+      expect(json.data.relationships.address.data[1]).to.have.property('type').that.is.eql('overridden');
+
+      done(null, json);
+    });
+  });
+
   describe('typeForAttributeRecord', function () {
     it('should set a related type according to the func return based on the attribute value', function (done) {
       var dataSet = {
