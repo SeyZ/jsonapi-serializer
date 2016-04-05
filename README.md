@@ -94,7 +94,7 @@ The result will be something like:
 ### Deserialization
 
     var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
-    new JSONAPIDeserializer(opts).serialize(data);
+    new JSONAPIDeserializer(opts).deserialize(data);
 
 The function `JSONAPIDeserializer` takes one argument:
 
