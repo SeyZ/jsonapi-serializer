@@ -76,6 +76,47 @@ describe('Options', function () {
     });
   });
 
+  describe('type for relationship', function () {
+    it('should set a related type according to the configuration of the attribute', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: [{
+          id: '2',
+          type: 'home',
+          street: 'Dogwood Way',
+          zip: '12345'
+        },{
+          id: '3',
+          type: 'work',
+          street: 'Dogwood Way',
+          zip: '12345'
+        }]
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName', 'address'],
+        pluralizeType: false,
+        address: {
+          type: 'overridden',
+          ref: function(user, address) {
+            return address.id;
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included[0]).to.have.property('type').equal('overridden');
+      expect(json.included[1]).to.have.property('type').equal('overridden');
+
+      expect(json.data.relationships).to.have.property('address').that.is.an('object');
+      expect(json.data.relationships.address.data[0]).to.have.property('type').that.is.eql('overridden');
+      expect(json.data.relationships.address.data[1]).to.have.property('type').that.is.eql('overridden');
+
+      done(null, json);
+    });
+  });
+
   describe('typeForAttributeRecord', function () {
     it('should set a related type according to the func return based on the attribute value', function (done) {
       var dataSet = {
@@ -1722,6 +1763,181 @@ describe('JSON API Serializer', function () {
       expect(json.data.attributes['db-null']).to.equal(null);
       expect(json.data.attributes).to.have.property('empty-string');
       expect(json.data.attributes['empty-string']).to.equal('');
+    });
+  });
+
+  describe('options provided to serialization', function () {
+    it('should allow meta to be passed in to serialize', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var meta = {
+        count: 1
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName']
+      }).serialize(dataSet, {
+        meta: meta
+      });
+
+      expect(json.meta.count).equal(1);
+      done(null, json);
+    });
+
+    it('should merge constant and provided meta', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var meta = {
+        count: 1
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        meta: {
+          offset: 0
+        }
+      }).serialize(dataSet, {
+        meta: meta
+      });
+
+      expect(json.meta.count).equal(1);
+      expect(json.meta.offset).equal(0);
+      done(null, json);
+    });
+
+    it('allows options to be provided to top level links', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: function(data, opts){
+            return 'http://localhost:3000/api/users/' + data.id + "?sid=" + opts.sid;
+          }
+        },
+        attributes: ['firstName', 'lastName']
+      }).serialize(dataSet, {
+          sid: "someSessionId"
+      });
+
+      expect(json).to.have.property('links').eql({
+        self: 'http://localhost:3000/api/users/' + dataSet.id + "?sid=someSessionId"
+      });
+
+      done(null, json);
+    });
+
+    it('allows options to be provided to data level links', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }, {
+        id: '5490212e69e49d0c4f9fc6b4',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        dataLinks: {
+          self: function (dataSet, user, dest, opts) {
+            return 'http://localhost:3000/api/datalinks/' + user.id + "?sid=" + opts.sid;
+          }
+        },
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet, {
+          sid: "someSessionId"
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '54735750e16638ba1eee59cb',
+        attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        links: {
+          self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb?sid=someSessionId'
+        }
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '5490212e69e49d0c4f9fc6b4',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        links: {
+          self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4?sid=someSessionId'
+        }
+      });
+
+      done(null, json);
+    });
+
+    it('allows options to be provided to included and relationship links', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        addresses: [{
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        }],
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        addresses: [{
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        }]
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'addresses'],
+        addresses: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          includedLinks: {
+            self: function (record, current, dest, opts) {
+              return 'http://localhost:4000/addresses/' + current.zipCode + "?sid=" + opts.sid;
+            }
+          },
+          relationshipLinks: {
+            related: function (record, current, parent, opts) {
+              return 'http://localhost:4000/users/' + parent.id +
+                '/addresses/' + current[0].zipCode + "?sid=" + opts.sid;
+            }
+          }
+        }
+      }).serialize(dataSet, {
+          sid: "someSessionId"
+      });
+
+      expect(json.included[0]).to.have.property('links');
+      expect(json.included[0].links).eql({
+        self: 'http://localhost:4000/addresses/49426?sid=someSessionId'
+      });
+      expect(json.data[0].relationships.addresses.links).eql({
+        related: 'http://localhost:4000/users/54735750e16638ba1eee59cb/addresses/49426?sid=someSessionId'
+      });
+
+      done(null, json);
     });
   });
 });
