@@ -1724,4 +1724,49 @@ describe('JSON API Serializer', function () {
       expect(json.data.attributes['empty-string']).to.equal('');
     });
   });
+
+  describe('Attribute name mapping', function () {
+    it('should use the correct attribute names', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        meta: {
+          id: '1',
+          foo: 'bar'
+        }
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'meta:metum'],
+        metum: {
+          ref: 'id',
+          attributes: ['foo']
+        },
+        meta: { count: 1 }
+      }).serialize(dataSet);
+
+      expect(json).to.be.eql({
+        meta: { count: 1 },
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: {
+            'first-name': 'Sandro'
+          },
+          relationships: {
+            meta: {
+              data: { type: 'meta', id: '1' }
+            }
+          }
+        }],
+        included: [{
+          type: 'meta',
+          id: '1',
+          attributes: { foo: 'bar' }
+        }]
+      });
+
+      done(null, json);
+    });
+  });
 });
