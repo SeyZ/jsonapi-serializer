@@ -519,4 +519,26 @@ describe('JSON API Deserializer', function () {
       });
     });
   });
+
+  describe('without ID', function () {
+    it('ID should not be returned', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+        }
+      };
+
+      new JSONAPIDeserializer()
+        .deserialize(dataSet, function (err, json) {
+          expect(json.hasOwnProperty('id')).to.be.false;
+          expect(json).to.be.eql({
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          });
+
+          done(null, json);
+        });
+    });
+  });
 });
