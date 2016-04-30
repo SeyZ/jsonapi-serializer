@@ -267,7 +267,7 @@ describe('JSON API Deserializer', function () {
 
         expect(json[0]).to.have.key('id', 'firstName', 'lastName',
           'myAddress');
-        
+
         expect(json[0].myAddress).to.be.eql({
           id: '54735722e16620ba1eee36af',
           addressLine1: '406 Madison Court',
@@ -277,7 +277,7 @@ describe('JSON API Deserializer', function () {
 
         expect(json[1]).to.have.key('id', 'firstName', 'lastName',
           'myAddress');
-        
+
         expect(json[1].myAddress).to.be.eql({
           id: '54735697e16624ba1eee36bf',
           addressLine1: '361 Shady Lane',
@@ -287,9 +287,9 @@ describe('JSON API Deserializer', function () {
 
         done(null, json);
       });
-      
+
     });
-  
+
     describe('With multiple levels', function () {
       it('should merge all include relationships to attributes', function (done) {
         var dataSet = {
@@ -611,6 +611,27 @@ describe('JSON API Deserializer', function () {
             done(null, json);
           });
       });
-    })
+    });
+
+    describe('without ID', function () {
+      it('ID should not be returned', function (done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+          }
+        };
+
+        new JSONAPIDeserializer()
+        .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.eql({
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          });
+
+          done(null, json);
+        });
+      });
+    });
   });
 });
