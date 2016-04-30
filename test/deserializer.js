@@ -215,6 +215,81 @@ describe('JSON API Deserializer', function () {
       });
     });
 
+    it('should convert relationship attributes to camelCase', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: {
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          },
+          relationships: {
+            'my-address': {
+              data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+            }
+          }
+        }, {
+          type: 'users',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: {
+            'first-name': 'Lawrence',
+            'last-name': 'Bennett'
+          },
+          relationships: {
+            'my-address': {
+              data: { type: 'addresses', id: '54735697e16624ba1eee36bf' }
+            }
+          }
+        }],
+        included: [{
+          type: 'addresses',
+          id: '54735722e16620ba1eee36af',
+          attributes: {
+            'address-line1': '406 Madison Court',
+            'zip-code': '49426',
+            country: 'USA'
+          }
+        }, {
+          type: 'addresses',
+          id: '54735697e16624ba1eee36bf',
+          attributes: {
+            'address-line1': '361 Shady Lane',
+            'zip-code': '23185',
+            country: 'USA'
+          }
+        }]
+      };
+
+      new JSONAPIDeserializer({keyForAttribute: 'camelCase'})
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.be.an('array').with.length(2);
+
+        expect(json[0]).to.have.key('id', 'firstName', 'lastName',
+          'myAddress');
+        
+        expect(json[0].myAddress).to.be.eql({
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        });
+
+        expect(json[1]).to.have.key('id', 'firstName', 'lastName',
+          'myAddress');
+        
+        expect(json[1].myAddress).to.be.eql({
+          id: '54735697e16624ba1eee36bf',
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA'
+        });
+
+        done(null, json);
+      });
+      
+    });
+  
     describe('With multiple levels', function () {
       it('should merge all include relationships to attributes', function (done) {
         var dataSet = {
