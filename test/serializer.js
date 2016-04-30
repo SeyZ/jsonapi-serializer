@@ -74,6 +74,25 @@ describe('Options', function () {
       expect(json.data.type).equal('user_foo');
       done(null, json);
     });
+
+    it('should pass the object as a second variable to the func', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        customType: 'user_foo'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        typeForAttribute: function (attribute, user) {
+          return user.customType;
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.type).equal('user_foo');
+      done(null, json);
+    });
   });
 
   describe('typeForAttributeRecord', function () {
