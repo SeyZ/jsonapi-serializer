@@ -98,17 +98,13 @@ describe('Options', function () {
       var json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName', 'address'],
         address: {
-          ref: function(user, address) {
+          ref: function (user, address) {
             return address.id;
-          }
+          },
+          attributes: ['street', 'zip']
         },
         typeForAttribute: function (attribute, record) {
-          if (record) {
-            if (record.type) {
-              return record.type;
-            }
-          }
-          return attribute;
+          return (record && record.type) ? record.type : attribute;
         }
       }).serialize(dataSet);
 
@@ -119,6 +115,7 @@ describe('Options', function () {
       expect(json.data.relationships).to.have.property('address').that.is.an('object');
       expect(json.data.relationships.address.data[0]).to.have.property('type').that.is.eql('home');
       expect(json.data.relationships.address.data[1]).to.have.property('type').that.is.eql('work');
+
 
       done(null, json);
     });
@@ -568,6 +565,7 @@ describe('JSON API Serializer', function () {
         data: {
           type: 'users',
           id: '1',
+          relationships: {},
           attributes: {
             'first-name': 'Sandro',
             'last-name': 'Munda',
@@ -633,7 +631,6 @@ describe('JSON API Serializer', function () {
 
   describe('Nested of nested document', function () {
     it('should be serialized', function (done) {
-      var Inflector = require('inflected');
       var dataSet = {
         _id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
@@ -653,9 +650,7 @@ describe('JSON API Serializer', function () {
       var json = new JSONAPISerializer('users', {
         id: '_id',
         attributes: ['_id', 'firstName', 'lastName', 'foo'],
-        keyForAttribute: function (key) {
-          return Inflector.underscore(key);
-        },
+        keyForAttribute: 'underscore_case',
         foo: {
           attributes: ['bar'],
           bar: {
@@ -1139,6 +1134,7 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        relationships: {},
         links: { self: 'http://localhost:3000/api/datalinks' }
       });
 
@@ -1146,6 +1142,7 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        relationships: {},
         links: { self: 'http://localhost:3000/api/datalinks' }
       });
 
@@ -1181,6 +1178,7 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        relationships: {},
         links: {
           self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb'
         }
@@ -1190,6 +1188,7 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        relationships: {},
         links: {
           self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4'
         }
@@ -1769,4 +1768,51 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('ref: true', function () {
+     it('should serialize strings as relationships', function (done) {
+       var dataSet = [{
+         id: '54735750e16638ba1eee59cb',
+         firstName: 'Sandro',
+         lastName: 'Munda',
+         address: ['54735722e16620ba1eee36af', '54735722e16620ba1eee36af']
+       }, {
+         id: '5490143e69e49d0c8f9fc6bc',
+         firstName: 'Lawrence',
+         lastName: 'Bennett',
+         address: []
+       }];
+
+       var json = new JSONAPISerializer('users', {
+         attributes: ['firstName', 'lastName', 'address'],
+         address: {
+           ref: true
+         }
+       }).serialize(dataSet);
+
+       done(null, json);
+     });
+
+    it('should serialize string as relationship', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: '54735722e16620ba1eee36af'
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: true
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address.data.id).to
+        .equal('54735722e16620ba1eee36af');
+
+      done(null, json);
+    });
+  });
+
 });
