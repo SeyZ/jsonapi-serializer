@@ -593,5 +593,24 @@ describe('JSON API Deserializer', function () {
           });
       });
     });
+
+    describe('Without data.attributes, resource identifier', function() {
+      it('should deserialize an object without data.attributes', function(done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            id: '54735750e16638ba1eee59cb'
+          }
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).eql({
+              id: '54735750e16638ba1eee59cb'
+            });
+            done(null, json);
+          });
+      });
+    })
   });
 });
