@@ -105,6 +105,7 @@ Calling the `deserialize` method on the returned object will deserialize your `d
 **Available deserialization option (`opts` argument)**
 
 - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+- *keyForType*: A function or string to add "type" field to attributes. Functions are passed the "type" value and `keyForAttribute` utility method to be able to normalize type field key.
 - AN\_ATTRIBUTE\_TYPE: this option name corresponds to the type of a relationship from your JSONAPI document.
 	- *valueForRelationship*: A function that returns whatever you want for a relationship (see examples below)
 
