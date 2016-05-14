@@ -1832,6 +1832,48 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+
+    it('should convert IDs to string', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: [5]
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: true
+        }
+      }).serialize(dataSet);
+
+      expect(json.data[0].relationships.address.data[0].id).to
+        .equal('5');
+
+      done(null, json);
+    });
+
+    it('should convert ID to string', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: 10
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: true
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address.data.id).to
+        .equal('10');
+
+      done(null, json);
+    });
   });
 
 });
