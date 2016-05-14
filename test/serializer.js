@@ -648,6 +648,28 @@ describe('JSON API Serializer', function () {
     });
   });
 
+  describe('Null relationship', function () {
+    it('should serialize the relationship as { data: null }', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({ data: null });
+      done(null, json);
+    });
+  });
+
   describe('Nested of nested document', function () {
     it('should be serialized', function (done) {
       var dataSet = {
@@ -1910,5 +1932,4 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
-
 });
