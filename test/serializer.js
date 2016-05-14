@@ -1630,6 +1630,41 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
 
+    it('should not add a resource to included for null `data` relationship', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {}
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['addressLine1', 'zipCode', 'country']
+        },
+      }).serialize(dataSet);
+
+      expect(json.data[0].relationships.address.data).to.be.an('object');
+      expect(json.data[1].relationships.address.data).to.equal(null);
+      expect(json).to.have.property('included').to.be.an('array').with
+        .length(1);
+      expect(json.included[0].id).to.equal('54735722e16620ba1eee36af');
+
+      done(null, json);
+    });
+
     it('should have an empty array for the `data` attribute when relationship is many-to', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
