@@ -594,6 +594,60 @@ describe('JSON API Deserializer', function () {
       });
     });
 
+    describe('With null included nested relationship', function () {
+      it('should ignore the nested relationship', function (done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            id: '54735750e16638ba1eee59cb',
+            attributes: {
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            },
+            relationships: {
+              address: {
+                data: {
+                  id: '2e593a7f2c3f2e5fc0b6ea1d4f03a2a3',
+                  type: 'address'
+                }
+              }
+            }
+          },
+          included:
+            [
+              {
+                id: '2e593a7f2c3f2e5fc0b6ea1d4f03a2a3',
+                type: 'address',
+                attributes: {
+                  'state': 'Alabama', 
+                  'zip-code': '35801'
+                },
+                relationships: {
+                  telephone: {
+                    data: null
+                  }
+                }
+              }
+            ]
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).eql({
+              id: '54735750e16638ba1eee59cb',
+              'first-name': 'Sandro',
+              'last-name': 'Munda',
+              'address': {
+                'id': '2e593a7f2c3f2e5fc0b6ea1d4f03a2a3',
+                'state': 'Alabama',
+                'zip-code': '35801'
+              }
+            });
+            done(null, json);
+          });
+      });
+    });
+
     describe('Without data.attributes, resource identifier', function() {
       it('should deserialize an object without data.attributes', function(done) {
         var dataSet = {
@@ -632,6 +686,39 @@ describe('JSON API Deserializer', function () {
           done(null, json);
         });
       });
+    });
+  });
+
+  describe('without callback', function () {
+    it('should return promise', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+        }, {
+          type: 'users',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+        }]
+      };
+
+      new JSONAPIDeserializer()
+          .deserialize(dataSet).then(function (json) {
+            expect(json).to.be.an('array').with.length(2);
+            expect(json[0]).to.be.eql({
+              id: '54735750e16638ba1eee59cb',
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            });
+            expect(json[1]).to.be.eql({
+              id: '5490143e69e49d0c8f9fc6bc',
+              'first-name': 'Lawrence',
+              'last-name': 'Bennett'
+            });
+
+            done(null, json);
+          });
     });
   });
 });
