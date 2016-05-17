@@ -566,8 +566,8 @@ describe('JSON API Deserializer', function () {
       });
     });
 
-    describe('With null data relationship', function () {
-      it('should ignore the relationship', function (done) {
+    describe('With empty relationship', function () {
+      it('should include the relationship as null (one-to)', function (done) {
         var dataSet = {
           data: {
             type: 'users',
@@ -587,7 +587,35 @@ describe('JSON API Deserializer', function () {
             expect(json).eql({
               id: '54735750e16638ba1eee59cb',
               'first-name': 'Sandro',
+              'last-name': 'Munda',
+              'address': null
+            });
+            done(null, json);
+          });
+      });
+
+      it('should include the relationship as empty array (to-many)', function (done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            id: '54735750e16638ba1eee59cb',
+            attributes: {
+              'first-name': 'Sandro',
               'last-name': 'Munda'
+            },
+            relationships: {
+              addresses: { data: [] }
+            }
+          }
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).eql({
+              id: '54735750e16638ba1eee59cb',
+              'first-name': 'Sandro',
+              'last-name': 'Munda',
+              'addresses': []
             });
             done(null, json);
           });
@@ -619,7 +647,7 @@ describe('JSON API Deserializer', function () {
                 id: '2e593a7f2c3f2e5fc0b6ea1d4f03a2a3',
                 type: 'address',
                 attributes: {
-                  'state': 'Alabama', 
+                  'state': 'Alabama',
                   'zip-code': '35801'
                 },
                 relationships: {
@@ -640,7 +668,8 @@ describe('JSON API Deserializer', function () {
               'address': {
                 'id': '2e593a7f2c3f2e5fc0b6ea1d4f03a2a3',
                 'state': 'Alabama',
-                'zip-code': '35801'
+                'zip-code': '35801',
+                'telephone': null
               }
             });
             done(null, json);
