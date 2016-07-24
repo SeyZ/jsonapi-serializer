@@ -93,6 +93,42 @@ describe('Options', function () {
       expect(json.data.type).equal('user_foo');
       done(null, json);
     });
+    it('should use the default behaviour when typeForAttribute returns undefined', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        bestFriend: {
+          id: '2',
+          customType: 'people'
+        },
+        job: {
+          id: '1'
+        }
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName', 'bestFriend', 'job'],
+        typeForAttribute: function (attribute, data) {
+          // sometimes this returns undefined
+          return data.customType;
+        },
+        job: {
+          ref: 'id',
+          included: false
+        },
+        bestFriend: {
+          ref: 'id',
+          included: false
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.type).equal('users');
+      expect(json.data.relationships.job.data.type).equal('jobs');
+      expect(json.data.relationships['best-friend'].data.type).equal('people');
+      done(null, json);
+    });
+
   });
 
   describe('typeForAttributeRecord', function () {
