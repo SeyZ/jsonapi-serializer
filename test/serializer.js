@@ -584,7 +584,6 @@ describe('JSON API Serializer', function () {
         data: {
           type: 'users',
           id: '1',
-          relationships: {},
           attributes: {
             'first-name': 'Sandro',
             'last-name': 'Munda',
@@ -1175,7 +1174,6 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-        relationships: {},
         links: { self: 'http://localhost:3000/api/datalinks' }
       });
 
@@ -1183,7 +1181,6 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
-        relationships: {},
         links: { self: 'http://localhost:3000/api/datalinks' }
       });
 
@@ -1219,7 +1216,6 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-        relationships: {},
         links: {
           self: 'http://localhost:3000/api/datalinks/54735750e16638ba1eee59cb'
         }
@@ -1229,7 +1225,6 @@ describe('JSON API Serializer', function () {
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
-        relationships: {},
         links: {
           self: 'http://localhost:3000/api/datalinks/5490212e69e49d0c4f9fc6b4'
         }
