@@ -721,4 +721,60 @@ describe('JSON API Deserializer', function () {
           });
     });
   });
+
+  describe('with meta', function () {
+    it('meta object should be inlcuded', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          meta: {
+            some: 'attribute'
+          }
+        }
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.be.eql({
+          'first-name': 'Sandro',
+          'last-name': 'Munda',
+          'meta': {
+            'some': 'attribute'
+          }
+        });
+
+        done(null, json);
+      });
+    });
+
+    describe('camelCase attributes', function () {
+      it('meta object should be inlcuded and its attributes should be in camelCase', function (done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+            meta: {
+              'some-attr': 'value'
+            }
+          }
+        };
+
+        new JSONAPIDeserializer({
+          keyForAttribute: 'camelCase'
+        })
+        .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.eql({
+            'firstName': 'Sandro',
+            'lastName': 'Munda',
+            'meta': {
+              'someAttr': 'value'
+            }
+          });
+
+          done(null, json);
+        });
+      });
+    });
+  });
 });
