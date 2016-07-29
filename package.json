@@ -4,7 +4,7 @@
   "description": "A Node.js framework agnostic library for serializing your data to JSON API",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/_mocha"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
