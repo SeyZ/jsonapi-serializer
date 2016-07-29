@@ -800,10 +800,10 @@ describe('JSON API Serializer', function () {
 
       expect(json.included[0]).to.have.property('attributes').to.be
         .an('object').eql({
-          'address-line1': '406 Madison Court',
-          'zip-code': '49426',
-          'country': 'USA'
-        });
+        'address-line1': '406 Madison Court',
+        'zip-code': '49426',
+        'country': 'USA'
+      });
 
       expect(json.data[0].relationships).to.have.property('address').that.is
         .an('object');
@@ -1877,28 +1877,28 @@ describe('JSON API Serializer', function () {
   });
 
   describe('ref: true', function () {
-     it('should serialize strings as relationships', function (done) {
-       var dataSet = [{
-         id: '54735750e16638ba1eee59cb',
-         firstName: 'Sandro',
-         lastName: 'Munda',
-         address: ['54735722e16620ba1eee36af', '54735722e16620ba1eee36af']
-       }, {
-         id: '5490143e69e49d0c8f9fc6bc',
-         firstName: 'Lawrence',
-         lastName: 'Bennett',
-         address: []
-       }];
+    it('should serialize strings as relationships', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: ['54735722e16620ba1eee36af', '54735722e16620ba1eee36af']
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: []
+      }];
 
-       var json = new JSONAPISerializer('users', {
-         attributes: ['firstName', 'lastName', 'address'],
-         address: {
-           ref: true
-         }
-       }).serialize(dataSet);
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: true
+        }
+      }).serialize(dataSet);
 
-       done(null, json);
-     });
+      done(null, json);
+    });
 
     it('should serialize string as relationship', function (done) {
       var dataSet = {
@@ -1963,4 +1963,117 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+  describe('Meta inside data', function () {
+    it('should be set', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        dataMeta: {
+          'nick-name': 'Sandro'
+        },
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data).to.have.property('meta');
+      done(null, json);
+    });
+  });
+
+  describe('Meta inside data (using function)', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        meta: { 'nick-name': 'Sandro' }
+      }, {
+        id: '5490212e69e49d0c4f9fc6b4',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        meta: {
+          'nick-name': 'Lawrie'
+        }
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        dataMeta: function(record, current){
+          return current.meta;
+        },
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '54735750e16638ba1eee59cb',
+        attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        meta: { 'nick-name': 'Sandro' }
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '5490212e69e49d0c4f9fc6b4',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        meta: { 'nick-name': 'Lawrie' }
+      });
+
+      done(null, json);
+    });
+  });
+
+  describe('Meta inside data (using function  )', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        meta: { 'nick-name': 'Sandro' }
+      }, {
+        id: '5490212e69e49d0c4f9fc6b4',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        meta: {
+          'nick-name': 'Lawrie'
+        }
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        dataMeta: {
+          other_names : function (dataSet, user) {
+            return user.meta;
+          }
+        },
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '54735750e16638ba1eee59cb',
+        attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        meta: { 'other_names': { 'nick-name': 'Sandro' } }
+      });
+
+      expect(json.data).to.include({
+        type: 'users',
+        id: '5490212e69e49d0c4f9fc6b4',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+        meta: { 'other_names': { 'nick-name': 'Lawrie' } }
+      });
+
+      done(null, json);
+    });
+  });
+
 });

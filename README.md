@@ -40,6 +40,7 @@ Calling the `serialize` method on the returned object will serialize your `data`
     - *pluralizeType*: A boolean to indicate if the type must be pluralized or not. Default: true.
     - *typeForAttribute*: A function that maps the attribute (passed as an argument) to the type you want to override. If it returns `undefined`, ignores the flag for that attribute. Option *pluralizeType* ignored if set.
     - *meta*: An object to include non-standard meta-information.
+    - *dataMeta*: An object to include non-standard meta-information inside data. Value can be *object* or a *function* or Values can be *string* or a *function*(see examples below)
 
 **Examples**
 
