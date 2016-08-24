@@ -391,6 +391,7 @@ describe('JSON API Deserializer', function () {
               id: '54735697e16624ba1eee36bf',
               'address-line1': '361 Shady Lane',
               'zip-code': '23185',
+              lock: '2'
               country: 'USA'
             });
 
