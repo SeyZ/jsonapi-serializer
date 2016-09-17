@@ -1758,6 +1758,33 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
 
+    it('should serialize the address attr when missing in dataSet', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          ignoreRelationshipData: true,
+          relationshipLinks: {
+            related: '/foo/bar'
+          }
+        }
+      }).serialize(dataSet);
+
+      // jshint expr: true
+      expect(json.data[0].relationships.address.data).to.be.empty;
+      expect(json.data[0].relationships.address.links).eql({
+        related: '/foo/bar'
+      });
+      done(null, json);
+    });
+
     it('should only serialize address.street attribute', function (done) {
       var dataSet = {
         id: '1',
