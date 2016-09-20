@@ -1758,7 +1758,7 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
 
-    it('should serialize the address attr when missing in dataSet', function (done) {
+    it('should ignore the attribute when missing in the dataSet', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
@@ -1771,6 +1771,31 @@ describe('JSON API Serializer', function () {
           ref: 'id',
           included: false,
           ignoreRelationshipData: true,
+          relationshipLinks: {
+            related: '/foo/bar'
+          }
+        }
+      }).serialize(dataSet);
+
+      // jshint expr: true
+      expect(json.data[0].relationships).to.be.undefined;
+      done(null, json);
+    });
+
+    it('should set the attr to null with nullIfMissing option', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          ignoreRelationshipData: true,
+          nullIfMissing: true,
           relationshipLinks: {
             related: '/foo/bar'
           }
