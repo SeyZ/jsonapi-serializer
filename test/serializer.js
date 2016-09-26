@@ -1810,6 +1810,31 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
 
+    it('should ignore null relationships', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['country'],
+          country: {
+            ref: 'id',
+            attributes: ['name']
+          }
+        }
+      }).serialize(dataSet);
+
+      // jshint expr: true
+      expect(json.data[0].relationships.address.data).to.be.null;
+      done(null, json);
+    });
+
     it('should only serialize address.street attribute', function (done) {
       var dataSet = {
         id: '1',
