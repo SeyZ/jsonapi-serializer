@@ -30,6 +30,7 @@ Calling the `serialize` method on the returned object will serialize your `data`
 - *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
     - *ref*: If present, it's considered as a relationships.
     - *included*: Consider the relationships as [compound document](http://jsonapi.org/format/#document-compound-documents). Default: true.
+    - *id*: Configurable identifier field for the resource. Default: `id`.
     - *attributes*: An array of attributes to show.
     - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
     - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
