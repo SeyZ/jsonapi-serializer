@@ -2,6 +2,7 @@
 /* global describe, it */
 
 var expect = require('chai').expect;
+var _ = require('lodash');
 
 var JSONAPIDeserializer = require('../lib/deserializer');
 
@@ -497,8 +498,7 @@ describe('JSON API Deserializer', function () {
     });
 
     describe('Without included', function () {
-      it('should use the value of valueForRelationship opt', function (done) {
-        var dataSet = {
+      var baseDataSet = {
           data: [{
             type: 'users',
             id: '54735750e16638ba1eee59cb',
@@ -526,6 +526,8 @@ describe('JSON API Deserializer', function () {
           }]
         };
 
+      it('should use the value of valueForRelationship opt', function (done) {
+        var dataSet = _.cloneDeep(baseDataSet);
         new JSONAPIDeserializer({
           addresses: {
             valueForRelationship: function (relationship) {
@@ -559,6 +561,41 @@ describe('JSON API Deserializer', function () {
             'address-line1': '406 Madison Court',
             'zip-code': '49426',
             country: 'USA'
+          });
+
+          done(null, json);
+        });
+      });
+      it('should use the value of a return promise from valueForRelationship opt', function (done) {
+        var dataSet = _.cloneDeep(baseDataSet);
+        new JSONAPIDeserializer({
+          addresses: {
+            valueForRelationship: function (relationship) {
+              return new Promise(function(resolve) {
+                setTimeout(function() {
+                  resolve({
+                    id: relationship.id,
+                  });
+                }, 10);
+              })
+            }
+          }
+        })
+        .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.an('array').with.length(2);
+
+          expect(json[0]).to.have.key('id', 'first-name', 'last-name',
+            'address');
+
+          expect(json[0].address).to.be.eql({
+            id: '54735722e16620ba1eee36af',
+          });
+
+          expect(json[1]).to.have.key('id', 'first-name', 'last-name',
+            'address');
+
+          expect(json[1].address).to.be.eql({
+            id: '54735697e16624ba1eee36bf',
           });
 
           done(null, json);
