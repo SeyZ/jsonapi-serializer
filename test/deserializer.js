@@ -733,7 +733,7 @@ describe('JSON API Deserializer', function () {
       });
     });
 
-    describe('without ID', function () {
+    describe('Without ID', function () {
       it('ID should not be returned', function (done) {
         var dataSet = {
           data: {
@@ -753,6 +753,118 @@ describe('JSON API Deserializer', function () {
         });
       });
     });
+
+    describe('With key for "type" field deserialization', function() {
+      it('should not add "type" field to attributes if "keyForType" option not provided', function(done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: {'first-name': 'Sandro', 'last-name': 'Munda'}
+          }
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function(err, json) {
+            expect(json).to.be.eql({
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            });
+
+            done();
+          });
+      });
+
+      it('should not add "type" field to attributes if keyForType results with null', function(done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: {'first-name': 'Sandro', 'last-name': 'Munda'}
+          }
+        };
+
+        new JSONAPIDeserializer({
+          keyForType: function() {
+            return null;
+          }
+        }).deserialize(dataSet, function(err, json) {
+          expect(json).to.be.eql({
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          });
+
+          done();
+        });
+      });
+
+      it('should use as is "keyForType" option when it\'s a string', function(done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: {'first-name': 'Sandro', 'last-name': 'Munda'}
+          }
+        };
+
+        new JSONAPIDeserializer({keyForType: '$type'})
+          .deserialize(dataSet, function(err, json) {
+            expect(json).to.be.eql({
+              '$type': 'users',
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            });
+
+            done();
+          });
+      });
+
+      it('should set "type" attribute with key as returned by "keyForType" function', function(done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: {'first-name': 'Sandro', 'last-name': 'Munda'}
+          }
+        };
+
+        new JSONAPIDeserializer({
+          keyForType: function(type) {
+            // type == 'users'
+            return 'data-type';
+          }
+        }).deserialize(dataSet, function(err, json) {
+          expect(json).to.be.eql({
+            'data-type': 'users',
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          });
+
+          done();
+        });
+      });
+
+      it('should be able to use keyForAttribute utility within keyForType function', function(done) {
+        var dataSet = {
+          data: {
+            type: 'users',
+            attributes: {'first-name': 'Sandro', 'last-name': 'Munda'}
+          }
+        };
+
+        new JSONAPIDeserializer({
+          keyForAttribute: 'camelCase',
+          keyForType: function(type, keyForAttribute) {
+            // type == 'users'
+            return keyForAttribute('data-type');
+          }
+        }).deserialize(dataSet, function(err, json) {
+          expect(json).to.be.eql({
+            'dataType': 'users',
+            'firstName': 'Sandro',
+            'lastName': 'Munda'
+          });
+
+          done();
+        });
+      });
+    })
   });
 
   describe('without callback', function () {

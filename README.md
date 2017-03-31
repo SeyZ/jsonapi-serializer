@@ -36,6 +36,7 @@ Calling the `serialize` method on the returned object will serialize your `data`
     - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
     - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
     - *relationshipMeta*: An object that describes the meta inside relationships. Values can be *string* or a *function* (see examples below)
+    - *includedLinks*: An object that describes links inside included. Values can be *string* or a *function* (see examples below)
     - *ignoreRelationshipData*: Do not include the `data` key inside the relationship. Default: false.
     - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
     - *nullIfMissing*: Set the attribute to null if missing from your data input. Default: false.
@@ -108,6 +109,7 @@ Calling the `deserialize` method on the returned object will deserialize your `d
 **Available deserialization option (`opts` argument)**
 
 - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+- *keyForType*: A function or string to add "type" field to attributes. Functions are passed the "type" value and `keyForAttribute` utility method to be able to normalize type field key.
 - AN\_ATTRIBUTE\_TYPE: this option name corresponds to the type of a relationship from your JSONAPI document.
 	- *valueForRelationship*: A function that returns whatever you want for a relationship (see examples below) ***can return a Promise (see tests)***
   - *transform*: A function to transform each record after the deserialization.
