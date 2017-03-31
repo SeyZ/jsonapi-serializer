@@ -750,4 +750,64 @@ describe('JSON API Deserializer', function () {
           });
     });
   });
+
+  describe('Circular references', function () {
+    it('should not create an infinite loop', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: {
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          },
+          relationships: {
+            address: {
+              data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+            }
+          }
+        }],
+        included: [{
+          type: 'addresses',
+          id: '54735722e16620ba1eee36af',
+          attributes: {
+            'address-line1': '406 Madison Court',
+            'zip-code': '49426'
+          },
+          relationships: {
+            country: {
+              data: { type: 'countries', id: '54735722e16609ba1eee36af' }
+            }
+          }
+        }, {
+          type: 'countries',
+          id: '54735722e16609ba1eee36af',
+          attributes: {
+            country: 'USA'
+          },
+          relationships: {
+            address: {
+              data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+            }
+          }
+        }]
+      };
+
+      new JSONAPIDeserializer({keyForAttribute: 'snake_case'})
+          .deserialize(dataSet).then(function (json) {
+            expect(json).to.be.an('array').with.length(1);
+            expect(json[0]).to.have.key('id', 'first_name', 'last_name', 'address');
+            expect(json[0].address).to.be.eql({
+              address_line1: '406 Madison Court',
+              zip_code: '49426',
+              id: '54735722e16620ba1eee36af',
+              country: {
+                country: 'USA',
+                id: '54735722e16609ba1eee36af'
+              }
+            });
+            done(null, json);
+          });
+    });
+  });
 });
