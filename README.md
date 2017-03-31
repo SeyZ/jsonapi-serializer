@@ -1,5 +1,5 @@
 # JSON API Serializer
-[![Build Status](https://travis-ci.org/SeyZ/jsonapi-serializer.svg?branch=master)](https://travis-ci.org/SeyZ/jsonapi-serializer)
+[![Build Status](https://travis-ci.org/SeyZ/jsonapi-serializer.svg?branch=master)](https://travis-ci.org/SeyZ/jsonapi-serializer) [![npm version](https://img.shields.io/npm/v/jsonapi-serializer.svg)](https://www.npmjs.com/package/jsonapi-serializer)
 
 A Node.js framework agnostic library for serializing your data to [JSON
 API](http://jsonapi.org) (1.0 compliant).
@@ -108,7 +108,7 @@ Calling the `deserialize` method on the returned object will deserialize your `d
 
 - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
 - AN\_ATTRIBUTE\_TYPE: this option name corresponds to the type of a relationship from your JSONAPI document.
-	- *valueForRelationship*: A function that returns whatever you want for a relationship (see examples below)
+	- *valueForRelationship*: A function that returns whatever you want for a relationship (see examples below) ***can return a Promise (see tests)***
 
 
 **Examples**
@@ -229,6 +229,13 @@ new JSONAPIDeserializer({
   }
 }]
 ```
+
+## Notes on Promises
+The deserialization option `valueForRelationship` supports returning a `Promise` and so this library uses `Promises` under the hood. `bluebird` was previously used as a dependency, but due to bundle size concerns on both node and the web it was replaced with native promises.
+
+`bluebird` is definitely [more performant](http://bluebirdjs.com/docs/benchmarks.html) than native Promises. If performance is a major concern `Promise` can be globally polyfilled
+- node - via `global.Promise = require('bluebird')`
+- web - global `Promise` automatically gets assigned when using the [script tag](http://bluebirdjs.com/docs/getting-started.html) to load `bluebird`
 
 # License
 

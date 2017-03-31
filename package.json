@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-serializer",
-  "version": "3.4.2",
+  "version": "3.4.3",
   "description": "A Node.js framework agnostic library for serializing your data to JSON API",
   "main": "index.js",
   "scripts": {
@@ -9,8 +9,8 @@
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
   "repository": "SeyZ/jsonapi-serializer",
+  "engines" : { "node" : ">=0.12" },
   "dependencies": {
-    "bluebird": "^2.10.2",
     "inflected": "^1.1.6",
     "lodash": "^4.16.3"
   },
