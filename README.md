@@ -1,7 +1,12 @@
 # JSON API Serializer
+
+<p align="center">
+  <img src="https://github.com/SeyZ/jsonapi-serializer/blob/master/logo.jpg?raw=true" alt="JSONAPI Serializer Logo">
+</p>
+
 [![Build Status](https://travis-ci.org/SeyZ/jsonapi-serializer.svg?branch=master)](https://travis-ci.org/SeyZ/jsonapi-serializer) [![npm version](https://img.shields.io/npm/v/jsonapi-serializer.svg)](https://www.npmjs.com/package/jsonapi-serializer)
 
-A Node.js framework agnostic library for serializing your data to [JSON
+A Node.js framework agnostic library for (de)serializing your data to [JSON
 API](http://jsonapi.org) (1.0 compliant).
 
 - [Migrate from 2.0 to 3.0](https://github.com/SeyZ/jsonapi-serializer/wiki/Migrate-from-2.0-to-3.0)
@@ -25,24 +30,24 @@ The function `JSONAPISerializer` takes two arguments:
 Calling the `serialize` method on the returned object will serialize your `data` (object or array) to a compliant JSONAPI document.
 
 
-**Available serialization option (`opts` argument)**
+#### Available serialization option (`opts` argument)
 
-- *attributes*: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
-    - *ref*: If present, it's considered as a relationships.
-    - *included*: Consider the relationships as [compound document](http://jsonapi.org/format/#document-compound-documents). Default: true.
-    - *id*: Configurable identifier field for the resource. Default: `id`.
-    - *attributes*: An array of attributes to show.
-    - *topLevelLinks*: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
-    - *dataLinks*: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
-    - *relationshipLinks*: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
-    - *relationshipMeta*: An object that describes the meta inside relationships. Values can be *string* or a *function* (see examples below)
-    - *ignoreRelationshipData*: Do not include the `data` key inside the relationship. Default: false.
-    - *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
-    - *nullIfMissing*: Set the attribute to null if missing from your data input. Default: false.
-    - *pluralizeType*: A boolean to indicate if the type must be pluralized or not. Default: true.
-    - *typeForAttribute*: A function that maps the attribute (passed as an argument) to the type you want to override. If it returns `undefined`, ignores the flag for that attribute. Option *pluralizeType* ignored if set.
-    - *meta*: An object to include non-standard meta-information.
-    - *transform*: A function to transform each record before the serialization.
+- **attributes**: An array of attributes to show. You can define an attribute as an option if you want to define some relationships (included or not).
+    - **ref**: If present, it's considered as a relationships.
+    - **included**: Consider the relationships as [compound document](http://jsonapi.org/format/#document-compound-documents). Default: true.
+    - **id**: Configurable identifier field for the resource. Default: `id`.
+    - **attributes**: An array of attributes to show.
+    - **topLevelLinks**: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
+    - **dataLinks**: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
+    - **relationshipLinks**: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
+    - **relationshipMeta**: An object that describes the meta inside relationships. Values can be *string* or a *function* (see examples below)
+    - **ignoreRelationshipData**: Do not include the `data` key inside the relationship. Default: false.
+    - **keyForAttribute**: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+    - **nullIfMissing**: Set the attribute to null if missing from your data input. Default: false.
+    - **pluralizeType**: A boolean to indicate if the type must be pluralized or not. Default: true.
+    - **typeForAttribute**: A function that maps the attribute (passed as an argument) to the type you want to override. If it returns `undefined`, ignores the flag for that attribute. Option *pluralizeType* ignored if set.
+    - **meta**: An object to include non-standard meta-information.
+    - **transform**: A function to transform each record before the serialization.
 
 **Examples**
 
@@ -105,12 +110,12 @@ The function `JSONAPIDeserializer` takes one argument:
 
 Calling the `deserialize` method on the returned object will deserialize your `data` (JSONAPI document) to a plain javascript object.
 
-**Available deserialization option (`opts` argument)**
+#### Available deserialization option (`opts` argument)
 
-- *keyForAttribute*: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+- **keyForAttribute**: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
 - AN\_ATTRIBUTE\_TYPE: this option name corresponds to the type of a relationship from your JSONAPI document.
-	- *valueForRelationship*: A function that returns whatever you want for a relationship (see examples below) ***can return a Promise (see tests)***
-  - *transform*: A function to transform each record after the deserialization.
+	- **valueForRelationship**: A function that returns whatever you want for a relationship (see examples below) ***can return a Promise (see tests)***
+   - **transform**: A function to transform each record after the deserialization.
 
 **Examples**
 
