@@ -847,4 +847,42 @@ describe('JSON API Deserializer', function () {
           });
     });
   });
+
+  describe('transform', function () {
+    it('should transform record before deserialization', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+        }, {
+          type: 'users',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+        }]
+      };
+
+      new JSONAPIDeserializer({
+          transform: function (record) {
+            record['full-name'] = record['first-name'] + ' ' + record['last-name'];
+            delete record['first-name'];
+            delete record['last-name'];
+            return record;
+          }
+        })
+        .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.an('array').with.length(2);
+          expect(json[0]).to.be.eql({
+            id: '54735750e16638ba1eee59cb',
+            'full-name': 'Sandro Munda'
+          });
+          expect(json[1]).to.be.eql({
+            id: '5490143e69e49d0c8f9fc6bc',
+            'full-name': 'Lawrence Bennett'
+          });
+
+          done(null, json);
+        });
+    });
+  });
 });

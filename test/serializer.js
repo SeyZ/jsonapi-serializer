@@ -2040,4 +2040,42 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('transform', function () {
+    it('should transform record before serialization', function (done) {
+      var Inflector = require('inflected');
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [{ createdAt: '2015-08-04T06:09:24.864Z' }],
+        address: { zipCode: 42912 }
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['fullName', 'books', 'address'],
+        books: { attributes: ['createdAt'] },
+        address: { attributes: ['zipCode'] },
+        pluralizeType: false,
+        keyForAttribute: function (attribute) {
+          return Inflector.underscore(attribute);
+        },
+        transform: function (record) {
+          record.fullName = record.firstName + ' ' + record.lastName;
+          return record;
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.type).equal('user');
+      expect(json.data).to.have.property('attributes').that.is
+        .an('object')
+        .eql({
+          'full_name': 'Sandro Munda',
+          books: [{ 'created_at': '2015-08-04T06:09:24.864Z' }],
+          address: { 'zip_code': 42912 }
+        });
+
+      done(null, json);
+    });
+  });
 });
