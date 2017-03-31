@@ -753,6 +753,75 @@ describe('JSON API Deserializer', function () {
         });
       });
     });
+
+    describe('when mixed collection with option to include type as attributes', function () {
+      it('should include type as key', function (done) {
+        var dataSet = {
+          data: [{
+            type: 'users',
+            id: '54735750e16638ba1eee59cb',
+            attributes: {
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            },
+            relationships: {
+              address: {
+                data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+              }
+            }
+          }, {
+            type: 'locations',
+            id: '5490143e69e49d0c8f9fc6bc',
+            attributes: {
+              'name': 'Shady Location',
+              'address-line1': '361 Shady Lane',
+              'zip-code': '23185',
+              country: 'USA'
+            },
+          }],
+          included: [{
+            type: 'addresses',
+            id: '54735722e16620ba1eee36af',
+            attributes: {
+              'address-line1': '406 Madison Court',
+              'zip-code': '49426',
+              country: 'USA'
+            }
+          }]
+        };
+        
+        new JSONAPIDeserializer({typeAsAttribute: true})
+        .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.an('array').with.length(2);
+
+          expect(json[0]).to.have.key('id', 'first-name', 'last-name',
+            'address', 'type');
+
+          expect(json[0].address).to.be.eql({
+            id: '54735722e16620ba1eee36af',
+            'address-line1': '406 Madison Court',
+            'zip-code': '49426',
+            country: 'USA',
+            type: 'addresses'
+          });
+
+          expect(json[1]).to.have.key('id', 'name',
+            'address-line1', 'zip-code', 'country', 'type');
+            console.log(json[1])
+          expect(json[1]).to.be.eql({
+            name: 'Shady Location',
+            'address-line1': '361 Shady Lane',
+            'zip-code': '23185',
+            country: 'USA',
+            id: '5490143e69e49d0c8f9fc6bc',
+            type: 'locations'
+          });
+
+          done(null, json);
+        });
+
+      });
+    });
   });
 
   describe('without callback', function () {
