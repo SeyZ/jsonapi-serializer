@@ -789,7 +789,7 @@ describe('JSON API Deserializer', function () {
             }
           }]
         };
-        
+
         new JSONAPIDeserializer({typeAsAttribute: true})
         .deserialize(dataSet, function (err, json) {
           expect(json).to.be.an('array').with.length(2);
@@ -807,7 +807,6 @@ describe('JSON API Deserializer', function () {
 
           expect(json[1]).to.have.key('id', 'name',
             'address-line1', 'zip-code', 'country', 'type');
-            console.log(json[1])
           expect(json[1]).to.be.eql({
             name: 'Shady Location',
             'address-line1': '361 Shady Lane',
