@@ -4,7 +4,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
     <script type="text/javascript" src="jsonapi-serializer.js"></script>
     <script>
-      var JSONAPISerializer = require('jsonapi-serializer');
+      var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 
       var dataSet = [{
         _id: '54735750e16638ba1eee59cb',
@@ -16,10 +16,10 @@
         lastName: 'Bennett'
       }];
 
-      var json = new JSONAPISerializer('users', dataSet, {
+      var json = new JSONAPISerializer('users', {
         id: '_id',
         attributes: ['firstName', 'lastName']
-      });
+      }).serialize(dataSet);
 
       console.log(json);
     </script>
