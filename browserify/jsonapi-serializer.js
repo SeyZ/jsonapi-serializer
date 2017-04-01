@@ -85,6 +85,10 @@ module.exports = function (jsonapi, data, opts) {
   function extractAttributes(from) {
     var dest = keyForAttribute(from.attributes || {});
     if ('id' in from) { dest.id = from.id; }
+    if (opts.typeAsAttribute) {
+      if ('type' in from) { dest.type = from.type; }
+    }
+    if ('meta' in from) { dest.meta = keyForAttribute(from.meta || {}) }
 
     return dest;
   }
@@ -142,7 +146,14 @@ module.exports = function (jsonapi, data, opts) {
       .then(function (results) {
         var attributes = results[0];
         var relationships = results[1];
-        return _extend(attributes, relationships);
+        var record = _extend(attributes, relationships);
+
+        // If option is present, transform record
+        if (opts && opts.transform) {
+          record = opts.transform(record);
+        }
+
+        return record;
       });
   };
 };
@@ -468,6 +479,11 @@ module.exports = function (collectionName, record, payload, opts) {
         return null;
     }
 
+    // If option is present, transform record
+    if (opts && opts.transform) {
+      record = opts.transform(record);
+    }
+
     // Top-level data.
     var data = {
       type: getType(collectionName, record),
@@ -479,13 +495,21 @@ module.exports = function (collectionName, record, payload, opts) {
       data.links = getLinks(record, opts.dataLinks);
     }
 
+    // Data meta
+    if (opts.dataMeta) {
+      data.meta = getMeta(record, opts.dataMeta);
+    }
+
     _each(opts.attributes, function (attribute) {
       var splittedAttributes = attribute.split(':');
 
-      if (splittedAttributes[0] in record ||
-        (opts[attribute] && opts[attribute].nullIfMissing)) {
+      if (opts[attribute] && !record[attribute] && opts[attribute].nullIfMissing) {
+        record[attribute] = null;
+      }
 
+      if (splittedAttributes[0] in record) {
         if (!data.attributes) { data.attributes = {}; }
+
         var attributeMap = attribute;
         if (splittedAttributes.length > 1) {
           attribute = splittedAttributes[0];
@@ -545,7 +569,13 @@ module.exports = function (collectionName, records, opts) {
     }
 
     if (that.opts.meta) {
-      payload.meta = that.opts.meta;
+      payload.meta = _mapValues(that.opts.meta, function (value) {
+        if (isFunction(value)) {
+          return value(records);
+        } else {
+          return value;
+        }
+      });
     }
 
     if (Array.isArray(records)) {
