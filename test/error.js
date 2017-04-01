@@ -13,7 +13,7 @@ var NotFound = require('../lib/error/NotFound');
 describe('Errors', function () {
 
   describe('Status', function () {
-    it('should set HTTP status code 500 by default', function (done) {
+    it('should set HTTP status code 500 by implicit default', function (done) {
       var error = new JSONAPIError();
 
       assert(error.status === '500', 'Wrong HTTP status code');
@@ -21,10 +21,30 @@ describe('Errors', function () {
       done(null, error);
     });
 
-    it('should set HTTP status code', function (done) {
+    it('should set HTTP status code 500 by explicit default', function (done) {
+      var error = new JSONAPIError({
+        'id': 'id',
+      });
+
+      assert(error.status === '500', 'Wrong HTTP status code');
+
+      done(null, error);
+    });
+
+    it('should set implicit HTTP status code', function (done) {
       var error = new JSONAPIError(415);
 
       assert(error.status === '415', 'Wrong HTTP status code');
+
+      done(null, error);
+    });
+
+    it('should set HTTP status title from status code', function (done) {
+      var error = new JSONAPIError({
+        status: 404
+      });
+
+      assert(error.title === http.STATUS_CODES[404], 'Wrong HTTP status code');
 
       done(null, error);
     });
