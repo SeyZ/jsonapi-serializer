@@ -39,6 +39,7 @@ Calling the `serialize` method on the returned object will serialize your `data`
     - **attributes**: An array of attributes to show.
     - **topLevelLinks**: An object that describes the top-level links. Values can be *string* or a *function*
     - **dataLinks**: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
+    - **dataMeta**: An object that describes the meta inside data. Values can be a plain value or a *function* (see examples below)
     - **relationshipLinks**: An object that describes the links inside relationships. Values can be *string* or a *function*
     - **relationshipMeta**: An object that describes the meta inside relationships. Values can be a plain value or a *function*
     - **ignoreRelationshipData**: Do not include the `data` key inside the relationship. Default: false.

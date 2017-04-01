@@ -176,7 +176,7 @@ describe('Options', function () {
     });
   });
 
-  describe('meta', function () {
+  describe('Top level meta', function () {
     it('should set the meta key (plain value)', function (done) {
       var dataSet = {
         id: '1',
@@ -192,6 +192,66 @@ describe('Options', function () {
       }).serialize(dataSet);
 
       expect(json.meta.count).equal(1);
+      done(null, json);
+    });
+
+    it('should set the meta key (function)', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        meta: {
+          count: function (record) {
+            expect(record).to.be.eql({
+              id: '1',
+              firstName: 'Sandro',
+              lastName: 'Munda',
+            });
+
+            return 1;
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.meta.count).equal(1);
+      done(null, json);
+    });
+  });
+
+  describe('meta', function () {
+    it('should set the meta key to each data records (plain value)', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [
+          { createdAt: '2015-08-04T06:09:24.864Z' },
+          { createdAt: '2015-08-04T07:09:24.864Z' }
+        ]
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        books: [
+          { createdAt: '2015-09-04T06:10:24.864Z' }
+        ]
+      }];
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        dataMeta: {
+          count: function (record, current) {
+            return current.books.length;
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.data[0].meta.count).equal(2);
+      expect(json.data[1].meta.count).equal(1);
       done(null, json);
     });
 
