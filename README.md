@@ -114,7 +114,7 @@ Calling the `deserialize` method on the returned object will deserialize your `d
 #### Available deserialization option (`opts` argument)
 
 - **keyForAttribute**: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
-- AN\_ATTRIBUTE\_TYPE: this option name corresponds to the type of a relationship from your JSONAPI document.
+- **AN\_ATTRIBUTE\_TYPE**: this option name corresponds to the type of a relationship from your JSONAPI document.
 	- **valueForRelationship**: A function that returns whatever you want for a relationship (see examples below) ***can return a Promise (see tests)***
    - **transform**: A function to transform each record after the deserialization.
 
@@ -237,12 +237,71 @@ new JSONAPIDeserializer({
 }]
 ```
 
-## Notes on Promises
+#### Notes on Promises
 The deserialization option `valueForRelationship` supports returning a `Promise` and so this library uses `Promises` under the hood. `bluebird` was previously used as a dependency, but due to bundle size concerns on both node and the web it was replaced with native promises.
 
 `bluebird` is definitely [more performant](http://bluebirdjs.com/docs/benchmarks.html) than native Promises. If performance is a major concern `Promise` can be globally polyfilled
 - node - via `global.Promise = require('bluebird')`
 - web - global `Promise` automatically gets assigned when using the [script tag](http://bluebirdjs.com/docs/getting-started.html) to load `bluebird`
+
+## Error serialization
+
+    var JSONAPIError = require('jsonapi-serializer').Error;
+    var error = new JSONAPIError(opts);
+
+The function JSONAPIError takes one argument:
+
+- `opts`: The error options. All options are optional.
+
+#### Available error option (`opts` argument)
+
+- **id**: a unique identifier for this particular occurrence of the problem.
+- **status**: the HTTP status code applicable to this problem, expressed as a string value.
+- **code**: an application-specific error code, expressed as a string value.
+- **title**: a short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
+- **detail**: a human-readable explanation specific to this occurrence of the problem. Like title, this field’s value can be localized.
+- **source**: an object containing references to the source of the error, optionally including any of the following members:
+  - **pointer**: a JSON Pointer [RFC6901] to the associated entity in the request document [e.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute].
+  - **parameter**: a string indicating which URI query parameter caused the error.
+- **links**: a links object containing the following members:
+  - **about**: a link that leads to further details about this particular occurrence of the problem.
+- **meta**: a meta object containing non-standard meta-information about the error.
+
+**Examples**
+
+- [Simple usage](#simple-usage-error)
+- [More example](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/error.js)
+
+<a name="simple-usage-error"></a>
+Simple usage:
+
+```javascript
+var JSONAPIError = require('jsonapi-serializer').Error;
+
+var errors = new JSONAPIError({
+  code: '123',
+  source: { 'pointer': '/data/attributes/first-name' },
+  title: 'Value is too short',
+  detail: 'First name must contain at least three characters.'
+});
+
+// `errors` here are JSON API compliant.
+```
+
+The result will be something like:
+
+```javascript
+{
+  "errors": [
+    {
+      "code":   "123",
+      "source": { "pointer": "/data/attributes/first-name" },
+      "title":  "Value is too short",
+      "detail": "First name must contain at least three characters."
+    }
+  ]
+}
+```
 
 # License
 
