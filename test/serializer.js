@@ -1792,9 +1792,27 @@ describe('JSON API Serializer', function () {
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName', 'address'],
         address: {
+          nullIfMissing: true
+        }
+      }).serialize(dataSet);
+
+      // jshint expr: true
+      expect(json.data[0].attributes.address).to.be.null;
+      done(null, json);
+    });
+
+    it('should add the relationship with nullIfMissing option', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
           ref: 'id',
           included: false,
-          ignoreRelationshipData: true,
           nullIfMissing: true,
           relationshipLinks: {
             related: '/foo/bar'
@@ -1803,7 +1821,7 @@ describe('JSON API Serializer', function () {
       }).serialize(dataSet);
 
       // jshint expr: true
-      expect(json.data[0].relationships.address.data).to.be.empty;
+      expect(json.data[0].relationships.address.data).to.be.null;
       expect(json.data[0].relationships.address.links).eql({
         related: '/foo/bar'
       });
