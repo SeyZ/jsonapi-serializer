@@ -177,7 +177,7 @@ describe('Options', function () {
   });
 
   describe('meta', function () {
-    it('should set the meta key', function (done) {
+    it('should set the meta key (plain value)', function (done) {
       var dataSet = {
         id: '1',
         firstName: 'Sandro',
@@ -186,7 +186,35 @@ describe('Options', function () {
 
       var json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName'],
-        meta: { count: 1 }
+        meta: {
+          count: 1
+        }
+      }).serialize(dataSet);
+
+      expect(json.meta.count).equal(1);
+      done(null, json);
+    });
+
+    it('should set the meta key (function)', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        meta: {
+          count: function (record) {
+            expect(record).to.be.eql({
+              id: '1',
+              firstName: 'Sandro',
+              lastName: 'Munda',
+            });
+
+            return 1;
+          }
+        }
       }).serialize(dataSet);
 
       expect(json.meta.count).equal(1);

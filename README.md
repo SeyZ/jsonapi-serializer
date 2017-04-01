@@ -37,16 +37,16 @@ Calling the `serialize` method on the returned object will serialize your `data`
     - **included**: Consider the relationships as [compound document](http://jsonapi.org/format/#document-compound-documents). Default: true.
     - **id**: Configurable identifier field for the resource. Default: `id`.
     - **attributes**: An array of attributes to show.
-    - **topLevelLinks**: An object that describes the top-level links. Values can be *string* or a *function* (see examples below)
+    - **topLevelLinks**: An object that describes the top-level links. Values can be *string* or a *function*
     - **dataLinks**: An object that describes the links inside data. Values can be *string* or a *function* (see examples below)
-    - **relationshipLinks**: An object that describes the links inside relationships. Values can be *string* or a *function* (see examples below)
-    - **relationshipMeta**: An object that describes the meta inside relationships. Values can be *string* or a *function* (see examples below)
+    - **relationshipLinks**: An object that describes the links inside relationships. Values can be *string* or a *function*
+    - **relationshipMeta**: An object that describes the meta inside relationships. Values can be a plain value or a *function*
     - **ignoreRelationshipData**: Do not include the `data` key inside the relationship. Default: false.
     - **keyForAttribute**: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
     - **nullIfMissing**: Set the attribute to null if missing from your data input. Default: false.
     - **pluralizeType**: A boolean to indicate if the type must be pluralized or not. Default: true.
     - **typeForAttribute**: A function that maps the attribute (passed as an argument) to the type you want to override. If it returns `undefined`, ignores the flag for that attribute. Option *pluralizeType* ignored if set.
-    - **meta**: An object to include non-standard meta-information.
+    - **meta**: An object to include non-standard meta-information. Values can be a plain value or a *function*
     - **transform**: A function to transform each record before the serialization.
 
 **Examples**
