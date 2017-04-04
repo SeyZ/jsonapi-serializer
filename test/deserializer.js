@@ -3,6 +3,15 @@
 
 var expect = require('chai').expect;
 var _ = require('lodash');
+var inflected = require('inflected');
+
+var camelCase = function keyForAttribute(att) {
+  att = inflected.underscore(att);
+  return inflected.camelize(att, false);
+}
+var snakeCase = function keyForAttribute(att) {
+  return inflected.underscore(att);
+}
 
 var JSONAPIDeserializer = require('../lib/deserializer');
 
@@ -70,9 +79,8 @@ describe('JSON API Deserializer', function () {
           attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
         }
       };
-
       new JSONAPIDeserializer({
-        keyForAttribute: 'camelCase'
+        keyForAttribute: camelCase
       }).deserialize(dataSet, function (err, json) {
         expect(json).to.be.eql({
           id: '54735750e16638ba1eee59cb',
@@ -119,7 +127,7 @@ describe('JSON API Deserializer', function () {
         }]
       };
 
-      new JSONAPIDeserializer({ keyForAttribute: 'camelCase' })
+      new JSONAPIDeserializer({ keyForAttribute: camelCase })
         .deserialize(dataSet, function (err, json) {
           expect(json).to.be.an('array').with.length(2);
 
@@ -262,7 +270,7 @@ describe('JSON API Deserializer', function () {
         }]
       };
 
-      new JSONAPIDeserializer({keyForAttribute: 'camelCase'})
+      new JSONAPIDeserializer({keyForAttribute: camelCase})
       .deserialize(dataSet, function (err, json) {
         expect(json).to.be.an('array').with.length(2);
 
@@ -898,7 +906,7 @@ describe('JSON API Deserializer', function () {
         }]
       };
 
-      new JSONAPIDeserializer({keyForAttribute: 'snake_case'})
+      new JSONAPIDeserializer({keyForAttribute: snakeCase})
           .deserialize(dataSet).then(function (json) {
             expect(json).to.be.an('array').with.length(1);
             expect(json[0]).to.have.key('id', 'first_name', 'last_name', 'address');
@@ -992,7 +1000,7 @@ describe('JSON API Deserializer', function () {
        };
 
        new JSONAPIDeserializer({
-         keyForAttribute: 'camelCase'
+         keyForAttribute: camelCase
        })
        .deserialize(dataSet, function (err, json) {
          expect(json).to.be.eql({
