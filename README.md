@@ -54,7 +54,7 @@ Calling the `serialize` method on the returned object will serialize your `data`
 
 - [Express example](https://github.com/SeyZ/jsonapi-serializer/tree/master/examples/express)
 - [Simple usage](#simple-usage-serializer)
-- [More example](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/serializer.js)
+- [More examples in tests](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/serializer.js)
 
 <a name="simple-usage-serializer"></a>
 Simple usage:
@@ -122,7 +122,7 @@ Calling the `deserialize` method on the returned object will deserialize your `d
 
 - [Simple usage](#simple-usage-deserializer)
 - [Relationship](#relationship-deserializer)
-- [More example](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/deserializer.js)
+- [More examples in tests](https://github.com/SeyZ/jsonapi-serializer/blob/master/test/deserializer.js)
 
 <a name="simple-usage-deserializer"></a>
 Simple usage:
