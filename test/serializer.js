@@ -3,6 +3,22 @@
 
 var expect = require('chai').expect;
 var _ = require('lodash');
+var inflected = require('inflected');
+
+var dashCase = function keyForAttribute(att) {
+  att = inflected.underscore(att);
+  return inflected.dasherize(att);
+}
+var CamelCase = function keyForAttribute(att) {
+  att = inflected.underscore(att);
+  return inflected.camelize(att);
+}
+var snakeCase = function keyForAttribute(att) {
+  return inflected.underscore(att);
+}
+var pluralize = function pluralize(type) {
+  return inflected.pluralize(type);
+}
 
 var JSONAPISerializer = require('../lib/serializer');
 
@@ -31,7 +47,7 @@ describe('Options', function () {
   });
 
   describe('pluralizeType', function () {
-    it('should allow type to not be pluralized', function (done) {
+    it('should allow type to be pluralized via function', function (done) {
       var dataSet = {
         id: '1',
         firstName: 'Sandro',
@@ -40,15 +56,13 @@ describe('Options', function () {
 
       var json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName'],
-        pluralizeType: false
       }).serialize(dataSet);
 
       expect(json.data.type).equal('user');
 
-      // Confirm it response the same with a truthy setting
       json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName'],
-        pluralizeType: true
+        pluralizeType: pluralize
       }).serialize(dataSet);
 
       expect(json.data.type).equal('users');
@@ -113,6 +127,8 @@ describe('Options', function () {
           // sometimes this returns undefined
           return data.customType;
         },
+        pluralizeType: pluralize,
+        keyForAttribute: dashCase,
         job: {
           ref: 'id',
           included: false
@@ -341,7 +357,6 @@ describe('Options', function () {
         attributes: ['firstName', 'lastName', 'books', 'address'],
         books: { attributes: ['createdAt'] },
         address: { attributes: ['zipCode'] },
-        pluralizeType: false,
         keyForAttribute: function (attribute) {
           return Inflector.underscore(attribute);
         }
@@ -372,7 +387,6 @@ describe('Options', function () {
       var json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName', 'phoneNumber', 'address'],
         address: { attributes: ['zipCode'] },
-        pluralizeType: false,
         keyForAttribute: function (attribute) {
           return _.camelCase(attribute);
         }
@@ -386,24 +400,18 @@ describe('Options', function () {
     });
   });
 
-  describe('keyForAttribute case strings', function () {
+  describe('keyForAttribute as function examples', function () {
     var dataSet = {
       id: '1',
       firstName: 'Sandro',
     };
 
-    it('should default the key case to dash-case', function (done) {
+    it('should default the keyForAttribute to return same attribute', function (done) {
       var jsonNoCase = new JSONAPISerializer('user', dataSet, {
         attributes: ['firstName'],
       });
 
-      var jsonInvalidCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'invalid case name'
-      }).serialize(dataSet);
-
-      expect(jsonNoCase.data.attributes['first-name']).equal('Sandro');
-      expect(jsonInvalidCase.data.attributes['first-name']).equal('Sandro');
+      expect(jsonNoCase.data.attributes['firstName']).equal('Sandro');
 
       done(null, jsonNoCase);
     });
@@ -411,49 +419,12 @@ describe('Options', function () {
     it('should update the key case to dash-case', function (done) {
       var jsonDashCase = new JSONAPISerializer('user', {
         attributes: ['firstName'],
-        keyForAttribute: 'dash-case'
-      }).serialize(dataSet);
-
-      var jsonLispCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'lisp-case'
-      }).serialize(dataSet);
-
-      var jsonSpinalCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'spinal-case'
-      }).serialize(dataSet);
-
-      var jsonKababCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'kebab-case'
+        keyForAttribute: dashCase
       }).serialize(dataSet);
 
       expect(jsonDashCase.data.attributes['first-name']).equal('Sandro');
-      expect(jsonLispCase.data.attributes['first-name']).equal('Sandro');
-      expect(jsonSpinalCase.data.attributes['first-name']).equal('Sandro');
-      expect(jsonKababCase.data.attributes['first-name']).equal('Sandro');
 
       done(null, jsonDashCase);
-    });
-
-    it('should update the key case to underscore_case', function (done) {
-      var jsonUnderscoreCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'underscore_case'
-      }).serialize(dataSet);
-
-      var jsonSnakeCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'snake_case'
-      }).serialize(dataSet);
-
-      // jshint camelcase: false
-      expect(jsonUnderscoreCase.data.attributes.first_name).equal('Sandro');
-      expect(jsonSnakeCase.data.attributes.first_name).equal('Sandro');
-      // jshint camelcase: true
-
-      done(null, jsonUnderscoreCase);
     });
 
     it('should update the key case to CamelCase', function (done) {
@@ -464,26 +435,10 @@ describe('Options', function () {
 
       var jsonCamelCase = new JSONAPISerializer('user', {
         attributes: ['firstName'],
-        keyForAttribute: 'CamelCase'
+        keyForAttribute: CamelCase
       }).serialize(dataSet);
 
       expect(jsonCamelCase.data.attributes.FirstName).equal('Sandro');
-
-      done(null, jsonCamelCase);
-    });
-
-    it('should update the key case to camelCase', function (done) {
-      var dataSet = {
-        id: '1',
-        firstName: 'Sandro',
-      };
-
-      var jsonCamelCase = new JSONAPISerializer('user', {
-        attributes: ['firstName'],
-        keyForAttribute: 'camelCase'
-      }).serialize(dataSet);
-
-      expect(jsonCamelCase.data.attributes.firstName).equal('Sandro');
 
       done(null, jsonCamelCase);
     });
@@ -514,6 +469,8 @@ describe('Options', function () {
       var json = new JSONAPISerializer('users', {
         id: 'id',
         attributes: ['firstName', 'lastName', 'address'],
+        keyForAttribute: dashCase,
+        pluralizeType: pluralize,
         address: {
           ref: function (collection, field) {
             return collection.id + field.country + field.zipCode;
@@ -568,6 +525,7 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName'],
+        keyForAttribute: dashCase
       }).serialize(dataSet);
 
       expect(json).to.have.property('data').with.length(2);
@@ -598,6 +556,7 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName'],
+        keyForAttribute: dashCase
       }).serialize(resource);
 
       expect(json).to.have.property('data').and.to.be.instanceof(Object);
@@ -657,6 +616,7 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName', 'address'],
+        keyForAttribute: dashCase,
         address: {
           attributes: ['addressLine1', 'zipCode', 'country']
         }
@@ -706,6 +666,8 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName', 'address'],
+        keyForAttribute: dashCase,
+        pluralizeType: pluralize
       }).serialize(dataSet);
 
       expect(json).eql({
@@ -818,7 +780,8 @@ describe('JSON API Serializer', function () {
       var json = new JSONAPISerializer('users', {
         id: '_id',
         attributes: ['_id', 'firstName', 'lastName', 'foo'],
-        keyForAttribute: 'underscore_case',
+        keyForAttribute: snakeCase,
+        pluralizeType: pluralize,
         foo: {
           attributes: ['bar'],
           bar: {
@@ -877,6 +840,8 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName', 'address'],
+        keyForAttribute: dashCase,
+        pluralizeType: pluralize,
         address: {
           ref: 'id',
           attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
@@ -1010,6 +975,8 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName', 'books'],
+        keyForAttribute: dashCase,
+        pluralizeType: pluralize,
         books: {
           ref: 'id',
           attributes: ['title', 'isbn', 'author'],
@@ -1097,6 +1064,7 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName', 'books'],
+        keyForAttribute: dashCase,
         books: {
           ref: 'id',
           attributes: ['title', 'isbn', 'authors'],
@@ -1168,6 +1136,8 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'lastName', 'address'],
+        keyForAttribute: dashCase,
+        pluralizeType: pluralize,
         address: {
           ref: 'id',
           attributes: ['addressLine1', 'zipCode', 'country', 'neighbours'],
@@ -1296,6 +1266,7 @@ describe('JSON API Serializer', function () {
           self: 'http://localhost:3000/api/datalinks'
         },
         attributes: ['firstName', 'lastName'],
+        keyForAttribute: dashCase
       }).serialize(dataSet);
 
       expect(json.data).to.include({
@@ -1338,6 +1309,7 @@ describe('JSON API Serializer', function () {
           }
         },
         attributes: ['firstName', 'lastName'],
+        keyForAttribute: dashCase,
       }).serialize(dataSet);
 
       expect(json.data).to.include({
@@ -1985,7 +1957,8 @@ describe('JSON API Serializer', function () {
       var user = new User({ firstName: 'Lawrence', lastName: 'Bennett' });
 
       var json = new JSONAPISerializer('users', {
-        attributes: ['firstName', 'lastName']
+        attributes: ['firstName', 'lastName'],
+        keyForAttribute: dashCase,
       }).serialize(user);
 
       expect(json.data.attributes).to.have.property('first-name');
@@ -2004,7 +1977,8 @@ describe('JSON API Serializer', function () {
       };
 
       var json = new JSONAPISerializer('tester', {
-        attributes: ['count', 'bool', 'dbNull', 'emptyString']
+        attributes: ['count', 'bool', 'dbNull', 'emptyString'],
+        keyForAttribute: dashCase
       }).serialize(dataSet);
 
       expect(json.data.attributes).to.have.property('count');
@@ -2031,6 +2005,7 @@ describe('JSON API Serializer', function () {
 
       var json = new JSONAPISerializer('users', {
         attributes: ['firstName', 'meta:metum'],
+        keyForAttribute: dashCase,
         metum: {
           ref: 'id',
           attributes: ['foo']
@@ -2166,7 +2141,6 @@ describe('JSON API Serializer', function () {
         attributes: ['fullName', 'books', 'address'],
         books: { attributes: ['createdAt'] },
         address: { attributes: ['zipCode'] },
-        pluralizeType: false,
         keyForAttribute: function (attribute) {
           return Inflector.underscore(attribute);
         },

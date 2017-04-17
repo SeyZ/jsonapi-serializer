@@ -17,6 +17,11 @@ API](http://jsonapi.org) (1.0 compliant).
 
 ## Documentation
 
+- [Serialization](#serialization)
+- [Deserialization](#deserialization)
+  - [Notes on Promises - valueForRelationship](#notes-on-promises)
+- [Error serialization](#error-serialization)
+
 ### Serialization
 
     var JSONAPISerializer = require('jsonapi-serializer').Serializer;
@@ -43,10 +48,10 @@ Calling the `serialize` method on the returned object will serialize your `data`
     - **relationshipLinks**: An object that describes the links inside relationships. Values can be *string* or a *function*
     - **relationshipMeta**: An object that describes the meta inside relationships. Values can be a plain value or a *function*
     - **ignoreRelationshipData**: Do not include the `data` key inside the relationship. Default: false.
-    - **keyForAttribute**: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+    - **keyForAttribute**: A function to customize attribute keys. The function is passed the attribute key string as a single argument and expects a string to be returned. Default: `(attributeKey) => attributeKey`.
     - **nullIfMissing**: Set the attribute to null if missing from your data input. Default: false.
-    - **pluralizeType**: A boolean to indicate if the type must be pluralized or not. Default: true.
-    - **typeForAttribute**: A function that maps the attribute (passed as an argument) to the type you want to override. If it returns `undefined`, ignores the flag for that attribute. Option *pluralizeType* ignored if set.
+    - **pluralizeType**: A function to customize plurization of type. Example: `(type) => type + 's'` will produce `user`->`users`. Default: `(type) => type`. NOTE: This option is ignored if *typeForAttribute* is set and returns a value.
+    - **typeForAttribute**: A function that maps the attribute (passed as an argument) to the type you want to override. If it returns `undefined`, it ignores the flag for that attribute. NOTE: Option *pluralizeType* ignored if a value is returned.
     - **meta**: An object to include non-standard meta-information. Values can be a plain value or a *function*
     - **transform**: A function to transform each record before the serialization.
 
@@ -68,8 +73,10 @@ var data = [
 
 ```javascript
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
+var inflected = require('inflected');
 
-var UserSerializer = new JSONAPISerializer('users', {
+var UserSerializer = new JSONAPISerializer('user', {
+  pluralizeType: (type) => type + 's',
   attributes: ['firstName', 'lastName']
 });
 
@@ -86,15 +93,15 @@ The result will be something like:
     "type": "users",
     "id": "1",
     "attributes": {
-      "first-name": "Sandro",
-      "last-name": "Munda"
+      "firstName": "Sandro",
+      "lastName": "Munda"
     }
   }, {
     "type": "users",
     "id": "2",
     "attributes": {
-      "first-name": "John",
-      "last-name": "Doe"
+      "firstName": "John",
+      "lastName": "Doe"
     }
   }]
 }
@@ -113,7 +120,7 @@ Calling the `deserialize` method on the returned object will deserialize your `d
 
 #### Available deserialization option (`opts` argument)
 
-- **keyForAttribute**: A function or string to customize attributes. Functions are passed the attribute as a single argument and expect a string to be returned. Strings are aliases for inbuilt functions for common case conversions. Options include: `dash-case` (default), `lisp-case`, `spinal-case`, `kebab-case`, `underscore_case`, `snake_case`, `camelCase`, `CamelCase`.
+- **keyForAttribute**: A function to customize attribute keys. The function is passed the attribute key string as a single argument and expects a string to be returned. Default: `(attributeKey) => attributeKey`.
 - **AN\_ATTRIBUTE\_TYPE**: this option name corresponds to the type of a relationship from your JSONAPI document.
 	- **valueForRelationship**: A function that returns whatever you want for a relationship (see examples below) ***can return a Promise (see tests)***
    - **transform**: A function to transform each record after the deserialization.
@@ -133,8 +140,8 @@ Simple usage:
     type: 'users',
     id: '1',
     attributes: {
-      'first-name': Sandro,
-      'last-name': Munda
+      'first-name': 'Sandro',
+      'last-name': 'Munda'
     }
   }, {
     type: 'users',
@@ -157,8 +164,8 @@ new JSONAPIDeserializer().deserialize(jsonapi, function (err, users) {
 
 ```javascript
 [
-  { id: 1, firstName: 'Sandro', lastName: 'Munda' },
-  { id: 2, firstName: 'John', lastName: 'Doe' }
+  { id: 1, 'first-name': 'Sandro', 'last-name': 'Munda' },
+  { id: 2, 'first-name': 'John', 'last-name': 'Doe' }
 ];
 ```
 <a name="relationship-deserializer"></a>
