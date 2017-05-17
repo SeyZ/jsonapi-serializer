@@ -714,11 +714,7 @@ describe('JSON API Deserializer', function () {
             });
 
             expect(json[0].addresses[2].lock).to.be.eql({
-              'address-line1': '123 Sth Street',
-              'zip-code': '12332',
-              country: 'USA',
-              id: '54735697e16624ba1eee36cf',
-              lock: { 'secret-key': 'S*7v0oMf7YxCtFyA$ffy', id: '1' }
+              'secret-key': 'S*7v0oMf7YxCtFyA$ffy', id: '1'
             });
 
             done(null, json);
