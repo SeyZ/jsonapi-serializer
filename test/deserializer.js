@@ -1046,6 +1046,50 @@ describe('JSON API Deserializer', function () {
 
       });
     });
+
+    describe('With multiple relations', function () {
+      it('should include both relations if they point to same include', function (done) {
+        var dataSet = {
+          data: {
+            type: 'posts',
+            id: 1,
+            relationships: {
+              owner: {
+                data: {
+                  type: 'users',
+                  id: 1,
+                },
+              },
+              publisher: {
+                data: {
+                  type: 'users',
+                  id: 1,
+                },
+              },
+            },
+          },
+          included: [
+            {
+              type: 'users',
+              id: 1,
+              attributes: {
+                'first-name': 'Sandro',
+                'last-name': 'Munda',
+              },
+            },
+          ],
+        };
+
+        new JSONAPIDeserializer().deserialize(dataSet).then(function(json) {
+          expect(json).to.be.an('object').with.keys('id', 'owner', 'publisher');
+          expect(json.owner).to.exist;
+          expect(json.publisher).to.exist;
+          expect(json.owner).to.be.eql(json.publisher);
+
+          done(null, json);
+        });
+      });
+    });
   });
 
   describe('without callback', function () {
@@ -1133,7 +1177,12 @@ describe('JSON API Deserializer', function () {
               id: '54735722e16620ba1eee36af',
               country: {
                 country: 'USA',
-                id: '54735722e16609ba1eee36af'
+                id: '54735722e16609ba1eee36af',
+                address: {
+                  address_line1: '406 Madison Court',
+                  zip_code: '49426',
+                  id: '54735722e16620ba1eee36af',
+                }
               }
             });
             done(null, json);
