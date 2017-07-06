@@ -387,10 +387,13 @@ describe('Options', function () {
   });
 
   describe('keyForAttribute case strings', function () {
-    var dataSet = {
-      id: '1',
-      firstName: 'Sandro',
-    };
+    var dataSet;
+    beforeEach(function() {
+      dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+      };
+    });
 
     it('should default the key case to dash-case', function (done) {
       var jsonNoCase = new JSONAPISerializer('user', dataSet, {
@@ -406,6 +409,21 @@ describe('Options', function () {
       expect(jsonInvalidCase.data.attributes['first-name']).equal('Sandro');
 
       done(null, jsonNoCase);
+    });
+
+    it('should not mutate nested objects to default case configured otherwise', function (done) {
+      dataSet.countries = [ { short_name: 'Brazil' }, { short_name: 'USA' } ];
+      var json = new JSONAPISerializer('user', {
+        ignoreNestedArray: true,
+        attributes: ['firstName', 'countries']
+      }).serialize(dataSet);
+
+
+      expect(json.data.attributes['first-name']).equal('Sandro');
+      var keys = json.data.attributes.countries.map(function(obj) { return Object.keys(obj).pop(); });
+      expect(keys[0]).to.equal('short_name');
+      expect(keys[1]).to.equal('short_name');
+      done(null, json);
     });
 
     it('should update the key case to dash-case', function (done) {
