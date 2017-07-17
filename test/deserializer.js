@@ -1032,5 +1032,32 @@ describe('JSON API Deserializer', function () {
         done(null, json);
       });
     });
+
+    it("should prefer links on object", function(done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: {
+            self: "/users/1"
+          }
+        },
+        links: {
+          self: '/articles/1/relationships/tags',
+          related: '/articles/1/tags'
+        }
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.have.key('first-name', 'last-name', 'links');
+        expect(json.links).to.be.eql({
+            self: "/users/1"
+        });
+
+        done(null, json);
+      });
+
+    });
   });
 });
