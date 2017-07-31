@@ -1203,6 +1203,62 @@ describe('JSON API Serializer', function () {
     });
   });
 
+  describe('Cycling references', function () {
+    it('should set the relationships in both includes', function (done) {
+      var dataSet = {
+        id: '1',
+        user: {
+          id: '2',
+          name: 'Sandro Munda',
+          address: {
+            id: '3',
+            zipCode: '49426',
+            primaryUser: { id: '2', name: 'Sandro Munda' },
+          }
+        }
+      };
+
+      var json = new JSONAPISerializer('cycling', {
+        attributes: ['user'],
+        user: {
+          ref: 'id',
+          attributes: ['name', 'address'],
+          address: {
+            ref: 'id',
+            attributes: ['zipCode', 'primaryUser'],
+            primaryUser: {
+              ref: 'id',
+              attributes: ['name']
+            }
+          }
+        },
+        keyForAttribute: 'camelCase',
+        typeForAttribute: function (type) {
+          if (type === 'primaryUser') { return 'users'; }
+          return undefined;
+        }
+      }).serialize(dataSet);
+
+      console.log(require('util').inspect(json, { depth: null }));
+
+      expect(json.included).contains({
+        type: 'users',
+        id: '2',
+        attributes: { name: 'Sandro Munda' },
+        relationships: { address: { data: { type: 'addresses', id: '3' } } }
+      });
+
+      expect(json.included).contains({
+        type: 'addresses',
+        id: '3',
+        attributes: { zipCode: '49426' },
+        relationships: { primaryUser: { data: { type: 'users', id: '2' } } }
+      });
+
+      done(null, json);
+    });
+  });
+
   describe('Top level links with an array of resources', function () {
     it('should be set', function (done) {
       var dataSet = [{
