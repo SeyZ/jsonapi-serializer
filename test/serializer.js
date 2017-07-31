@@ -1239,8 +1239,6 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      console.log(require('util').inspect(json, { depth: null }));
-
       expect(json.included).contains({
         type: 'users',
         id: '2',

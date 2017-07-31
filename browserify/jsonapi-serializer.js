@@ -411,7 +411,10 @@ module.exports = function (collectionName, record, payload, opts) {
   }
 
   function pushToIncluded(dest, include) {
-    if (!isCompoundDocumentIncluded(dest, include)) {
+    var included = isCompoundDocumentIncluded(dest, include);
+    if (included) {
+      included = _extend(included, include);
+    } else {
       if (!dest.included) { dest.included = []; }
       dest.included.push(include);
     }
