@@ -1255,6 +1255,236 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+
+    it('should merge the attributes together', function (done) {
+      var dataSet = {
+        id: '1',
+        user: {
+          id: '2',
+          name: 'Sandro Munda',
+          gender: null,
+          age: 28,
+          address: {
+            id: '3',
+            zipCode: '49426',
+            primaryUser: {
+              id: '2',
+              name: 'Sandro Munda',
+              gender: 'male'
+            }
+          }
+        }
+      };
+
+      var json = new JSONAPISerializer('cycling', {
+        attributes: ['user'],
+        user: {
+          ref: 'id',
+          attributes: ['name', 'address', 'gender', 'age'],
+          address: {
+            ref: 'id',
+            attributes: ['zipCode', 'primaryUser'],
+            primaryUser: {
+              ref: 'id',
+              attributes: ['name', 'gender']
+            }
+          }
+        },
+        keyForAttribute: 'camelCase',
+        typeForAttribute: function (type) {
+          if (type === 'primaryUser') { return 'users'; }
+          return undefined;
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).contains({
+        type: 'users',
+        id: '2',
+        attributes: { name: 'Sandro Munda', gender: 'male', age: 28 },
+        relationships: { address: { data: { type: 'addresses', id: '3' } } }
+      });
+
+      expect(json.included).contains({
+        type: 'addresses',
+        id: '3',
+        attributes: { zipCode: '49426' },
+        relationships: { primaryUser: { data: { type: 'users', id: '2' } } }
+      });
+
+      done(null, json);
+    });
+
+    it('should merge the attributes together (opposite)', function (done) {
+      var dataSet = {
+        id: '1',
+        user: {
+          id: '2',
+          name: 'Sandro Munda',
+          gender: null,
+          address: {
+            id: '3',
+            zipCode: '49426',
+            primaryUser: {
+              id: '2',
+              name: 'Sandro Munda',
+              gender: 'male',
+              age: 28
+            }
+          }
+        }
+      };
+
+      var json = new JSONAPISerializer('cycling', {
+        attributes: ['user'],
+        user: {
+          ref: 'id',
+          attributes: ['name', 'address', 'gender'],
+          address: {
+            ref: 'id',
+            attributes: ['zipCode', 'primaryUser'],
+            primaryUser: {
+              ref: 'id',
+              attributes: ['name', 'gender', 'age']
+            }
+          }
+        },
+        keyForAttribute: 'camelCase',
+        typeForAttribute: function (type) {
+          if (type === 'primaryUser') { return 'users'; }
+          return undefined;
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).contains({
+        type: 'users',
+        id: '2',
+        attributes: { name: 'Sandro Munda', gender: 'male', age: 28 },
+        relationships: { address: { data: { type: 'addresses', id: '3' } } }
+      });
+
+      expect(json.included).contains({
+        type: 'addresses',
+        id: '3',
+        attributes: { zipCode: '49426' },
+        relationships: { primaryUser: { data: { type: 'users', id: '2' } } }
+      });
+
+      done(null, json);
+    });
+
+    it('should ignore the attribute override with a falsy value', function (done) {
+      var dataSet = {
+        id: '1',
+        user: {
+          id: '2',
+          name: 'Sandro Munda',
+          gender: 'male',
+          address: {
+            id: '3',
+            zipCode: '49426',
+            primaryUser: {
+              id: '2',
+              name: 'Sandro Munda',
+              gender: null
+            }
+          }
+        }
+      };
+
+      var json = new JSONAPISerializer('cycling', {
+        attributes: ['user'],
+        user: {
+          ref: 'id',
+          attributes: ['name', 'address', 'gender'],
+          address: {
+            ref: 'id',
+            attributes: ['zipCode', 'primaryUser'],
+            primaryUser: {
+              ref: 'id',
+              attributes: ['name', 'gender']
+            }
+          }
+        },
+        keyForAttribute: 'camelCase',
+        typeForAttribute: function (type) {
+          if (type === 'primaryUser') { return 'users'; }
+          return undefined;
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).contains({
+        type: 'users',
+        id: '2',
+        attributes: { name: 'Sandro Munda', gender: 'male' },
+        relationships: { address: { data: { type: 'addresses', id: '3' } } }
+      });
+
+      expect(json.included).contains({
+        type: 'addresses',
+        id: '3',
+        attributes: { zipCode: '49426' },
+        relationships: { primaryUser: { data: { type: 'users', id: '2' } } }
+      });
+
+      done(null, json);
+    });
+
+    it('should ignore the attribute override with a falsy value (opposite)', function (done) {
+      var dataSet = {
+        id: '1',
+        user: {
+          id: '2',
+          name: 'Sandro Munda',
+          gender: null,
+          address: {
+            id: '3',
+            zipCode: '49426',
+            primaryUser: {
+              id: '2',
+              name: 'Sandro Munda',
+              gender: 'male'
+            }
+          }
+        }
+      };
+
+      var json = new JSONAPISerializer('cycling', {
+        attributes: ['user'],
+        user: {
+          ref: 'id',
+          attributes: ['name', 'address', 'gender'],
+          address: {
+            ref: 'id',
+            attributes: ['zipCode', 'primaryUser'],
+            primaryUser: {
+              ref: 'id',
+              attributes: ['name', 'gender']
+            }
+          }
+        },
+        keyForAttribute: 'camelCase',
+        typeForAttribute: function (type) {
+          if (type === 'primaryUser') { return 'users'; }
+          return undefined;
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).contains({
+        type: 'users',
+        id: '2',
+        attributes: { name: 'Sandro Munda', gender: 'male' },
+        relationships: { address: { data: { type: 'addresses', id: '3' } } }
+      });
+
+      expect(json.included).contains({
+        type: 'addresses',
+        id: '3',
+        attributes: { zipCode: '49426' },
+        relationships: { primaryUser: { data: { type: 'users', id: '2' } } }
+      });
+
+      done(null, json);
+    });
   });
 
   describe('Top level links with an array of resources', function () {
