@@ -28,6 +28,20 @@ describe('Options', function () {
       expect(json.data[0].id).equal('54735750e16638ba1eee59cb');
       done(null, json);
     });
+
+    it('should not serialize id if it isn\'t defined', function (done) {
+      var dataSet = [{
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName']
+      }).serialize(dataSet);
+
+      expect(json.data[0]).to.not.have.property('id');
+      done(null, json);
+    });
   });
 
   describe('pluralizeType', function () {
