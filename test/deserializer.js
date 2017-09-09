@@ -1033,4 +1033,31 @@ describe('JSON API Deserializer', function () {
       });
     });
   });
+
+  describe('id', function () {
+    it('should override the id field', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+        }, {
+          type: 'users',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+        }]
+      };
+
+      new JSONAPIDeserializer({
+        id: '_id'
+      }).deserialize(dataSet, function (err, json) {
+        expect(json[0]).to.not.have.keys('id');
+        expect(json[1]).to.not.have.keys('id');
+        expect(json[0]._id).equal('54735750e16638ba1eee59cb');
+        expect(json[1]._id).equal('5490143e69e49d0c8f9fc6bc');
+        done(null, json);
+      });
+
+    });
+  });
 });
