@@ -28,6 +28,35 @@ describe('Options', function () {
       expect(json.data[0].id).equal('54735750e16638ba1eee59cb');
       done(null, json);
     });
+
+    it('should not be serialized when it\'s null', function (done) {
+      var dataSet = {
+        id: null,
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data).to.not.have.keys('id');
+      done(null, json);
+    });
+
+    it('should not be serialized when it\'s undefined', function (done) {
+      var dataSet = {
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data).to.not.have.keys('id');
+      done(null, json);
+    });
   });
 
   describe('pluralizeType', function () {
