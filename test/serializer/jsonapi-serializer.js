@@ -1718,7 +1718,16 @@ describe('JSON API Serializer', function () {
     it('properly pass on requests for attributes', function () {
       var mongoose = require('mongoose');
       var userSchema = new mongoose.Schema({ firstName: String, lastName: String });
-      var User = mongoose.model('User', userSchema);
+
+      var User;
+
+      // support mocha --watch by protecting against mongoose model redefinition inside tests
+      try {
+        User = mongoose.model('User')
+      } catch (e) {
+        User = mongoose.model('User', userSchema)
+      }
+
       var user = new User({ firstName: 'Lawrence', lastName: 'Bennett' });
 
       var json = new JSONAPISerializer('users', {
