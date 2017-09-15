@@ -166,7 +166,7 @@ describe('JSON API Serializer ref: true', function() {
           ref: true,
         }
       },
-      keyForAttribute(key) {
+      keyForAttribute: function(key) {
         if (key === 'author') {
           return 'person-who-wrote-it'
         }
