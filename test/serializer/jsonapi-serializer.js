@@ -473,7 +473,7 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         type: 'books',
         id: '52735730e16632ba1eee62dd',
         attributes: {
@@ -487,7 +487,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         type: 'books',
         id: '52735780e16610ba1eee15cd',
         attributes: {
@@ -504,7 +504,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         id: '2934f384bb824a7cb7b238b8dc194a22',
         type: 'authors',
         attributes: {
@@ -513,7 +513,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         id: '5ed95269a8334d8a970a2bd9fa599288',
         type: 'authors',
         attributes: {
@@ -560,7 +560,7 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         type: 'books',
         id: '52735730e16632ba1eee62dd',
         attributes: {
@@ -577,7 +577,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         id: '2934f384bb824a7cb7b238b8dc194a22',
         type: 'authors',
         attributes: {
@@ -586,7 +586,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         id: '5ed95269a8334d8a970a2bd9fa599288',
         type: 'authors',
         attributes: {
@@ -631,7 +631,7 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         id: '5cd95269a8334d8a970a2bd9fa599278',
         type: 'addresses',
         attributes: {
@@ -646,7 +646,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.included).to.include({
+      expect(json.included).to.deep.include({
         type: 'neighbours',
         id: '5490143e69e49d0c8f9fc6bc',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
@@ -692,14 +692,14 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'users',
         id: '2',
         attributes: { name: 'Sandro Munda' },
         relationships: { address: { data: { type: 'addresses', id: '3' } } }
       });
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'addresses',
         id: '3',
         attributes: { zipCode: '49426' },
@@ -750,14 +750,14 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'users',
         id: '2',
         attributes: { name: 'Sandro Munda', gender: 'male', age: 28 },
         relationships: { address: { data: { type: 'addresses', id: '3' } } }
       });
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'addresses',
         id: '3',
         attributes: { zipCode: '49426' },
@@ -808,14 +808,14 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'users',
         id: '2',
         attributes: { name: 'Sandro Munda', gender: 'male', age: 28 },
         relationships: { address: { data: { type: 'addresses', id: '3' } } }
       });
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'addresses',
         id: '3',
         attributes: { zipCode: '49426' },
@@ -865,14 +865,14 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'users',
         id: '2',
         attributes: { name: 'Sandro Munda', gender: 'male' },
         relationships: { address: { data: { type: 'addresses', id: '3' } } }
       });
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'addresses',
         id: '3',
         attributes: { zipCode: '49426' },
@@ -922,14 +922,14 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'users',
         id: '2',
         attributes: { name: 'Sandro Munda', gender: 'male' },
         relationships: { address: { data: { type: 'addresses', id: '3' } } }
       });
 
-      expect(json.included).contains({
+      expect(json.included).to.deep.include({
         type: 'addresses',
         id: '3',
         attributes: { zipCode: '49426' },
@@ -1035,14 +1035,14 @@ describe('JSON API Serializer', function () {
         attributes: ['firstName', 'lastName'],
       }).serialize(dataSet);
 
-      expect(json.data).to.include({
+      expect(json.data).to.deep.include({
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
         links: { self: 'http://localhost:3000/api/datalinks' }
       });
 
-      expect(json.data).to.include({
+      expect(json.data).to.deep.include({
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
@@ -1077,7 +1077,7 @@ describe('JSON API Serializer', function () {
         attributes: ['firstName', 'lastName'],
       }).serialize(dataSet);
 
-      expect(json.data).to.include({
+      expect(json.data).to.deep.include({
         type: 'users',
         id: '54735750e16638ba1eee59cb',
         attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
@@ -1086,7 +1086,7 @@ describe('JSON API Serializer', function () {
         }
       });
 
-      expect(json.data).to.include({
+      expect(json.data).to.deep.include({
         type: 'users',
         id: '5490212e69e49d0c4f9fc6b4',
         attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
