@@ -91,4 +91,51 @@ describe('JSON API Serializer ref: true', function() {
 
     done(null, json);
   });
+
+  it('should work in nested objects', function() {
+    var dataSet = [{
+      id: '54735750e16638ba1eee59cb',
+      firstName: 'Sandro',
+      lastName: 'Munda',
+      books: [{
+        id: '52735730e16632ba1eee62dd',
+        title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+        isbn: '978-0062301239',
+        author: '2934f384bb824a7cb7b238b8dc194a22'
+      }, {
+        id: '52735780e16610ba1eee15cd',
+        title: 'Steve Jobs',
+        isbn: '978-1451648546',
+        author: '5ed95269a8334d8a970a2bd9fa599288'
+      }]
+    }];
+
+    var json = new JSONAPISerializer('users', {
+      attributes: ['firstName', 'lastName', 'books'],
+      books: {
+        ref: 'id',
+        attributes: ['title', 'isbn', 'author'],
+        author: {
+          ref: true,
+        }
+      }
+    }).serialize(dataSet);
+
+    expect(json.included).to.deep.include({
+      type: 'books',
+      id: '52735730e16632ba1eee62dd',
+      attributes: {
+        title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+        isbn: '978-0062301239'
+      },
+      relationships: {
+        author: {
+          data: {
+            type: 'authors',
+            id: '2934f384bb824a7cb7b238b8dc194a22'
+          }
+        }
+      }
+    });
+  })
 });
