@@ -1008,7 +1008,7 @@ describe('JSON API Deserializer', function () {
      });
   });
 
-  describe('links', function () {
+  describe('meta links', function () {
     it('should be included', function (done) {
       var dataSet = {
         data: {
@@ -1023,8 +1023,9 @@ describe('JSON API Deserializer', function () {
 
       new JSONAPIDeserializer()
       .deserialize(dataSet, function (err, json) {
-        expect(json).to.have.key('first-name', 'last-name', 'links');
-        expect(json.links).to.be.eql({
+        expect(json).to.have.key('first-name', 'last-name', 'meta');
+        expect(json.meta).to.have.key('links');
+        expect(json.meta.links).to.be.eql({
           self: '/articles/1/relationships/tags',
           related: '/articles/1/tags'
         });
@@ -1033,6 +1034,56 @@ describe('JSON API Deserializer', function () {
       });
     });
   });
+
+  describe('record specific links', function () {
+    it('should be included', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: { self: '/user/1' }
+        },
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.have.key('first-name', 'last-name', 'links');
+        expect(json.links).to.be.eql({ self: '/user/1'});
+
+        done(null, json);
+      });
+    });
+  });
+
+
+  describe('meta links and record specific links', function () {
+    it('should be included', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: { self: '/user/1' }
+        },
+        links: {
+          self: '/articles/1/relationships/tags',
+          related: '/articles/1/tags'
+        }
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.have.key('first-name', 'last-name', 'links', 'meta');
+        expect(json.meta).to.have.key('links');
+        expect(json.links).to.be.eql({ self: '/user/1'});
+        expect(json.meta.links).to.be.eql({
+          self: '/articles/1/relationships/tags',
+          related: '/articles/1/tags'
+        });
+        done(null, json);
+      });
+    });
+  });
+
 
   describe('id', function () {
     it('should override the id field', function (done) {
