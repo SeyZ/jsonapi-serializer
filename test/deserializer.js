@@ -1023,11 +1023,31 @@ describe('JSON API Deserializer', function () {
 
       new JSONAPIDeserializer()
       .deserialize(dataSet, function (err, json) {
-        expect(json).to.have.key('first-name', 'last-name', 'links');
-        expect(json.links).to.be.eql({
+        expect(json).to.have.key('first-name', 'last-name', 'meta_links');
+        expect(json.meta_links).to.be.eql({
           self: '/articles/1/relationships/tags',
           related: '/articles/1/tags'
         });
+
+        done(null, json);
+      });
+    });
+  });
+
+  describe('links in data', function () {
+    it('should be included', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: { self: '/user/1' }
+        },
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.have.key('first-name', 'last-name', 'links');
+        expect(json.links).to.be.eql({ self: '/user/1'});
 
         done(null, json);
       });
