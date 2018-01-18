@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-serializer",
-  "version": "3.5.5",
+  "version": "3.5.6",
   "description": "A Node.js framework agnostic library for serializing your data to JSON API",
   "main": "index.js",
   "scripts": {
