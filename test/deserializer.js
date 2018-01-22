@@ -954,7 +954,7 @@ describe('JSON API Deserializer', function () {
     });
   });
 
-  describe('meta', function () {
+  describe('record level meta data', function () {
     it('should be included', function (done) {
       var dataSet = {
         data: {
@@ -980,32 +980,144 @@ describe('JSON API Deserializer', function () {
       });
     });
 
-     it('should be in camelCase', function (done) {
-       var dataSet = {
-         data: {
-           type: 'users',
-           attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-           meta: {
-             'some-attr': 'value'
-           }
-         }
-       };
+    it('should be in camelCase', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          meta: {
+            'some-attr': 'value'
+          }
+        }
+      };
 
-       new JSONAPIDeserializer({
-         keyForAttribute: 'camelCase'
-       })
-       .deserialize(dataSet, function (err, json) {
-         expect(json).to.be.eql({
-           'firstName': 'Sandro',
-           'lastName': 'Munda',
-           'meta': {
-             'someAttr': 'value'
-           }
-         });
+      new JSONAPIDeserializer({
+        keyForAttribute: 'camelCase'
+      })
 
-         done(null, json);
-       });
-     });
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.be.eql({
+          'firstName': 'Sandro',
+          'lastName': 'Munda',
+          'meta': {
+            'someAttr': 'value'
+          }
+        });
+        done(null, json);
+      });
+    });
+  });
+
+  describe('top level meta data', function () {
+    it('should include top level meta data on the record', function (done) {
+      var dataSet = {
+        meta: {
+            something_meta: 'woah that\'s meta'
+        },
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+
+        }
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.be.eql({
+          'first-name': 'Sandro',
+          'last-name': 'Munda',
+          'meta': {
+            'something-meta': 'woah that\'s meta'
+          }
+        });
+
+        done(null, json);
+      });
+    });
+    it('should be in camelCase', function (done) {
+      var dataSet = {
+        meta: {
+          something_meta: 'woah that\'s meta'
+        },
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+        }
+      };
+      new JSONAPIDeserializer({
+          keyForAttribute: 'camelCase'
+      })
+      .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.eql({
+            'firstName': 'Sandro',
+            'lastName': 'Munda',
+            'meta': {
+                'somethingMeta': 'woah that\'s meta'
+            }
+          });
+        done(null, json);
+      });
+    });
+  });
+
+  describe('top level and record level meta data', function () {
+    it('should include both on the record', function (done) {
+      var dataSet = {
+        meta: {
+            top_it_off_meta: 'up here at the top'
+        },
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          meta: {
+              something_meta: 'woah that\'s meta'
+          },
+
+        }
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function (err, json) {
+        expect(json).to.be.eql({
+          'first-name': 'Sandro',
+          'last-name': 'Munda',
+          'meta': {
+            'something-meta': 'woah that\'s meta',
+            'top-it-off-meta': 'up here at the top'
+          }
+        });
+
+        done(null, json);
+      });
+    });
+    it('should be in camelCase', function (done) {
+      var dataSet = {
+        meta: {
+          something_meta: 'woah that\'s meta'
+        },
+        data: {
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          meta: {
+              more_meta: 'so meta'
+          },
+        }
+      };
+      new JSONAPIDeserializer({
+          keyForAttribute: 'camelCase'
+      })
+      .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.eql({
+            'firstName': 'Sandro',
+            'lastName': 'Munda',
+            'meta': {
+                'moreMeta': 'so meta',
+                'somethingMeta': 'woah that\'s meta'
+            }
+          });
+        done(null, json);
+      });
+    });
   });
 
   describe('meta links', function () {
@@ -1055,7 +1167,6 @@ describe('JSON API Deserializer', function () {
     });
   });
 
-
   describe('meta links and record specific links', function () {
     it('should be included', function (done) {
       var dataSet = {
@@ -1083,7 +1194,6 @@ describe('JSON API Deserializer', function () {
       });
     });
   });
-
 
   describe('id', function () {
     it('should override the id field', function (done) {
