@@ -4,12 +4,15 @@
   "description": "A Node.js framework agnostic library for serializing your data to JSON API",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha"
+    "test": "mocha --recursive",
+    "test-watch": "npm test -- -w --reporter min"
   },
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
   "repository": "SeyZ/jsonapi-serializer",
-  "engines" : { "node" : ">=0.12" },
+  "engines": {
+    "node": ">=0.12"
+  },
   "dependencies": {
     "inflected": "^1.1.6",
     "lodash": "^4.16.3"
