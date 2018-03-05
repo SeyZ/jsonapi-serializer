@@ -57,6 +57,36 @@ describe('Options', function () {
       expect(json.data).to.not.have.keys('id');
       done(null, json);
     });
+
+    it('should be serialized as string when it\'s integer', function (done) {
+      var dataSet = {
+        id: 1,
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data.id).to.be.equal('1');
+      done(null, json);
+    });
+
+    it('should be serialized when it\'s integer with zero value', function (done) {
+      var dataSet = {
+        id: 0,
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data.id).to.be.equal('0');
+      done(null, json);
+    });
   });
 
   describe('pluralizeType', function () {
