@@ -9,7 +9,9 @@
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
   "repository": "SeyZ/jsonapi-serializer",
-  "engines" : { "node" : ">=0.12" },
+  "engines": {
+    "node": ">=0.12"
+  },
   "dependencies": {
     "inflected": "^1.1.6",
     "lodash": "^4.16.3"
