@@ -400,6 +400,310 @@ describe('JSON API Deserializer', function () {
       });
     });
 
+    describe('With polymorphic relationships to same records', function () {
+      it('should return all data without circular error', function (done) {
+        var imageOne = 'https://avatars2.githubusercontent.com/u/15112077?s=400&u=9860ca2648dd28ec2c726d287980b4f7d615f590&v=4';
+        var imageTwo = 'https://www.placewise.com/images/employees/ashley-schauer.jpg';
+        var dataSet = {
+          data: {
+            id: '1',
+            type: 'users',
+            attributes: {
+              'first-name': 'Ashley',
+              'last-name': 'Schauer',
+              'username': 'AELSchauer'
+            },
+            relationships: {
+              images: {
+                data: [
+                  { type: 'images', id: '1' },
+                  { type: 'images', id: '2' }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              id: '1',
+              type: 'tags',
+              attributes: { name: 'jpeg' }
+            }, {
+              id: '2',
+              type: 'tags',
+              attributes: { name: 'color' }
+            }, {
+              id: '3',
+              type: 'tags',
+              attributes: { name: 'profile-pic' }
+            }, {
+              id: '4',
+              type: 'tags',
+              attributes: { name: 'black-and-white' }
+            }, {
+              id: '1',
+              type: 'images',
+              attributes: {
+                url: imageOne
+              },
+              relationships: {
+                tags: {
+                  data: [
+                    { type: 'tags', id: '1' },
+                    { type: 'tags', id: '2' },
+                    { type: 'tags', id: '3' }
+                  ]
+                }
+              }
+            },
+            {
+              id: '2',
+              type: 'images',
+              attributes: {
+                url: imageTwo
+              },
+              relationships: {
+                tags: {
+                  data: [
+                    { type: 'tags', id: '1' },
+                    { type: 'tags', id: '3' },
+                    { type: 'tags', id: '4' }
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).to.be.an('object');
+
+            expect(json).to.have.key('id', 'first-name', 'last-name', 
+              'username', 'images');
+
+            expect(json.images).to.be.an('array').with.length(2)
+
+            expect(json.images[0]).to.be.eql({
+              url: imageOne,
+              id: '1',
+              tags: [
+                { name: 'jpeg', id: '1' },
+                { name: 'color', id: '2' },
+                { name: 'profile-pic', id: '3' }
+             ]
+            });
+
+            expect(json.images[1]).to.be.eql({
+              url: imageTwo,
+              id: '2',
+              tags: [
+                { name: 'jpeg', id: '1' },
+                { name: 'profile-pic', id: '3' },
+                { name: 'black-and-white', id: '4' }
+              ]
+            });
+
+            done(null, json);
+          });
+      });
+    });
+
+    describe('With self-referencing relationships', function () {
+      it('should return all data without circular error', function (done) {
+        var dataSet = {
+          data: {
+            id: '1',
+            type: 'malls',
+            attributes: {
+              name: 'Twin Pines Mall'
+            },
+            relationships: {
+              stores: {
+                data: [
+                  { type: 'stores', id: '1' },
+                  { type: 'stores', id: '2' },
+                  { type: 'stores', id: '3' }
+                ]
+              },
+              deals: {
+                data: [
+                  { type: 'deals', id: '1' },
+                  { type: 'deals', id: '2' },
+                  { type: 'deals', id: '3' }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              id: '1',
+              type: 'stores',
+              attributes: {
+                name: 'Tasty Food'
+              },
+              relationships: {
+                deals: {
+                  data: [
+                    { type: 'deals', id: '1' },
+                    { type: 'deals', id: '2' }
+                  ]
+                }
+              }
+            }, {
+              id: '2',
+              type: 'stores',
+              attributes: {
+                name: 'Fashionable Clothes' 
+              },
+              relationships: {
+                deals: {
+                  data: [
+                    { type: 'deals', id: '3' }
+                  ]
+                }
+              }
+            }, {
+              id: '3',
+              type: 'stores',
+              attributes: {
+                name: 'Readable Books'
+              }
+            }, {
+              id: '1',
+              type: 'deals',
+              attributes: {
+                name: 'Free Drink with Snack Purchase'
+              },
+              relationships: {
+                stores: {
+                  data: [
+                    { type: 'stores', id: '1' }
+                  ]
+                }
+              }
+            }, {
+              id: '2',
+              type: 'deals',
+              attributes: {
+                name: "Free Samples of New Delicious Treat"
+              },
+              relationships: {
+                stores: {
+                  data: [
+                    { type: 'stores', id: '1' }
+                  ]
+                }
+              }
+            }, {
+              id: '3',
+              type: 'deals',
+              attributes: {
+                name: "Buy One Get One Off Shirts"
+              },
+              relationships: {
+                stores: {
+                  data: [
+                    { type: 'stores', id: '2' }
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).to.be.an('object');
+
+            expect(json).to.be.be.eql({
+              name: 'Twin Pines Mall',
+              id: '1',
+              stores: [
+                { 
+                  name: 'Tasty Food',
+                  id: '1',
+                  deals: [
+                    {
+                      name: 'Free Drink with Snack Purchase',
+                      id: '1',
+                      stores: [
+                        { name: 'Tasty Food', id: '1' }
+                      ]
+                    }, {
+                      name: 'Free Samples of New Delicious Treat',
+                      id: '2',
+                      stores: [
+                        { name: 'Tasty Food', id: '1' }
+                      ] 
+                    } 
+                  ]
+                }, { 
+                  name: 'Fashionable Clothes',
+                  id: '2',
+                  deals: [
+                    {
+                      name: 'Buy One Get One Off Shirts',
+                      id: '3',
+                      stores: [
+                        { name: 'Fashionable Clothes', id: '2' }
+                      ]
+                    }
+                  ]
+                }, { 
+                  name: 'Readable Books',
+                  id: '3'
+                } 
+              ],
+              deals: [
+                {
+                  name: 'Free Drink with Snack Purchase',
+                  id: '1',
+                  stores: [
+                    {
+                      name: 'Tasty Food',
+                      id: '1',
+                      deals: [
+                        { name: 'Free Drink with Snack Purchase', id: '1' },
+                        { name: 'Free Samples of New Delicious Treat', id: '2' }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: 'Free Samples of New Delicious Treat',
+                  id: '2',
+                  stores: [
+                    {
+                      name: 'Tasty Food',
+                      id: '1',
+                      deals: [
+                        { name: 'Free Drink with Snack Purchase', id: '1' },
+                        { name: 'Free Samples of New Delicious Treat', id: '2' }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: 'Buy One Get One Off Shirts',
+                  id: '3',
+                  stores: [
+                    {
+                      name: 'Fashionable Clothes',
+                      id: '2',
+                      deals: [
+                        { name: 'Buy One Get One Off Shirts', id: '3' }
+                      ]
+                    }
+                  ]
+                }
+              ] 
+            });
+
+            done(null, json);
+          });
+      });
+    });
+
     describe('With relationships data array', function () {
       it('should merge included relationships to attributes', function (done) {
         var dataSet = {
@@ -998,7 +1302,7 @@ describe('JSON API Deserializer', function () {
             type: 'locations',
             id: '5490143e69e49d0c8f9fc6bc',
             attributes: {
-              'name': 'Shady Location',
+              name: 'Shady Location',
               'address-line1': '361 Shady Lane',
               'zip-code': '23185',
               country: 'USA'
