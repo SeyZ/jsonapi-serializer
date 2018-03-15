@@ -2291,8 +2291,15 @@ describe('JSON API Serializer', function () {
   });
 
   describe('Database model objects', function () {
+    var mongoose = require('mongoose');
+
+    afterEach(function () {
+      if (mongoose.models['User']) {
+        delete mongoose.models['User']
+      }
+    })
+
     it('properly pass on requests for attributes', function () {
-      var mongoose = require('mongoose');
       var userSchema = new mongoose.Schema({ firstName: String, lastName: String });
       var User = mongoose.model('User', userSchema);
       var user = new User({ firstName: 'Lawrence', lastName: 'Bennett' });
