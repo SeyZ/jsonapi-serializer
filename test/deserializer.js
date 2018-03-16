@@ -1283,15 +1283,15 @@ describe('JSON API Deserializer', function () {
   });
 
   describe('links', function () {
-    it('should be included', function (done) {
+    it('should be included for a resource', function (done) {
       var dataSet = {
         data: {
           type: 'users',
           attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
-        },
-        links: {
-          self: '/articles/1/relationships/tags',
-          related: '/articles/1/tags'
+          links: {
+            self: '/articles/1/relationships/tags',
+            related: '/articles/1/tags'
+          }
         }
       };
 
@@ -1301,6 +1301,41 @@ describe('JSON API Deserializer', function () {
         expect(json.links).to.be.eql({
           self: '/articles/1/relationships/tags',
           related: '/articles/1/tags'
+        });
+
+        done(null, json);
+      });
+    });
+
+    it('should be included for each record in a collection', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: {
+            self: '/users/Tomas'
+          }
+        }, {
+          type: 'users',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+          links: {
+            'next-user': '/users/Marcus'
+          }
+        }]
+      };
+
+      new JSONAPIDeserializer({
+        keyForAttribute: 'camelCase'
+      })
+      .deserialize(dataSet, function (err, json) {
+        expect(json[0]).to.have.key('firstName', 'lastName', 'links');
+        expect(json[0].links).to.be.eql({
+          self: '/users/Tomas'
+        });
+
+        expect(json[1]).to.have.key('firstName', 'lastName', 'links');
+        expect(json[1].links).to.be.eql({
+          nextUser: '/users/Marcus'
         });
 
         done(null, json);
