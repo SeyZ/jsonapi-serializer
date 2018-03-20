@@ -1291,16 +1291,20 @@ describe('JSON API Deserializer', function () {
         },
         links: {
           self: '/articles/1/relationships/tags',
-          related: '/articles/1/tags'
+          related: '/articles/1/tags',
+          'extra-info': '/articles/1/extra/info'
         }
       };
 
-      new JSONAPIDeserializer()
+      new JSONAPIDeserializer({
+        keyForAttribute: 'camelCase'
+      })
       .deserialize(dataSet, function (err, json) {
-        expect(json).to.have.key('first-name', 'last-name', 'links');
+        expect(json).to.have.key('firstName', 'lastName', 'links');
         expect(json.links).to.be.eql({
           self: '/articles/1/relationships/tags',
-          related: '/articles/1/tags'
+          related: '/articles/1/tags',
+          extraInfo: '/articles/1/extra/info'
         });
 
         done(null, json);
