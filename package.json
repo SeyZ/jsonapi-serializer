@@ -1,14 +1,14 @@
 {
-  "name": "jsonapi-serializer",
+  "name": "jsonapi-sparsefield-serializer",
   "version": "3.5.6",
-  "description": "A Node.js framework agnostic library for serializing your data to JSON API",
+  "description": "A fork of jsonapi-serializer with sparsefield capability added",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
-  "author": "Sandro Munda <sandro@munda.me>",
+  "author": "Brian Fink <brian.fink@cvs.com>",
   "license": "MIT",
-  "repository": "SeyZ/jsonapi-serializer",
+  "repository": "bf86/jsonapi-sparsefield-serializer",
   "engines" : { "node" : ">=0.12" },
   "dependencies": {
     "inflected": "^1.1.6",
