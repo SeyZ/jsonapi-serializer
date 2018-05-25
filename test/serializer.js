@@ -2501,4 +2501,28 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('sparse fieldsets', function () {
+    it('should limit returned fields to those requested', function (done) {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        'first-name': 'Brian',
+        'last-name': 'Fink',
+        gender: 'male',
+      };
+
+      var req = { query: { fields: 'first-name,gender' } };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['first-name', 'last-name', 'gender'],
+
+      }).serialize(dataSet, req);
+
+      expect(json.data).to.have.property('attributes').that.is
+        .an('object')
+        .eql({ 'first-name': 'Brian', gender: 'male' });
+
+      done(null, json);
+    });
+  });
 });

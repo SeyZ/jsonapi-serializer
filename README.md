@@ -22,14 +22,15 @@ API](http://jsonapi.org) (1.0 compliant).
 ### Serialization
 
     var JSONAPISerializer = require('jsonapi-serializer').Serializer;
-    new JSONAPISerializer(type, opts).serialize(data);
+    new JSONAPISerializer(type, opts).serialize(data, req);
 
 The function `JSONAPISerializer` takes two arguments:
 
 - `type`: The resource type.
 - `opts`: The serialization options.
 
-Calling the `serialize` method on the returned object will serialize your `data` (object or array) to a compliant JSONAPI document.
+Calling the `serialize` method on the returned object will serialize your `data` (object or array) to a compliant JSONAPI document. It optionally takes a req object, whose query.fields property
+will be used to determine which fields to return (if present).
 
 
 #### Available serialization option (`opts` argument)
@@ -89,14 +90,45 @@ The result will be something like:
     "id": "1",
     "attributes": {
       "first-name": "Sandro",
-      "last-name": "Munda"
+      "last-name": "Munda",
+      "occupation": "Programmer"
     }
   }, {
     "type": "users",
     "id": "2",
     "attributes": {
       "first-name": "John",
-      "last-name": "Doe"
+      "last-name": "Doe",
+      "occupation": "Project Manager"
+    }
+  }]
+}
+```
+
+Sparse fieldsets:
+
+```javascript
+// /users?fields=occupation
+
+req.query.fields = 'occupation';
+var users = UserSerializer.serialize(data, req);
+```
+
+Result:
+
+```javascript
+{
+  "data": [{
+    "type": "users",
+    "id": "1",
+    "attributes": {
+      "occupation": "Programmer"
+    }
+  }, {
+    "type": "users",
+    "id": "2",
+    "attributes": {
+      "occupation": "Project Manager"
     }
   }]
 }
