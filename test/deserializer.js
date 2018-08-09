@@ -1216,6 +1216,70 @@ describe('JSON API Deserializer', function () {
         done(null, json);
       });
     });
+
+    it('should include links on relationship resources', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: {
+            'first-name': 'Sandro',
+            'last-name': 'Munda'
+          },
+          links: {
+            self: '/users/1'
+          },
+          relationships: {
+            address: {
+              data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+            }
+          }
+        }, {
+          type: 'users',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: {
+            'first-name': 'Lawrence',
+            'last-name': 'Bennett'
+          },
+          relationships: {
+            address: {
+              data: { type: 'addresses', id: '54735697e16624ba1eee36bf' }
+            }
+          }
+        }],
+        included: [{
+          type: 'addresses',
+          id: '54735722e16620ba1eee36af',
+          attributes: {
+            'address-line1': '406 Madison Court',
+            'zip-code': '49426',
+            country: 'USA'
+          }
+        }, {
+          type: 'addresses',
+          id: '54735697e16624ba1eee36bf',
+          attributes: {
+            'address-line1': '361 Shady Lane',
+            'zip-code': '23185',
+            country: 'USA'
+          },
+          links: {
+            self: '/addresses/1'
+          }
+        }]
+      };
+
+      new JSONAPIDeserializer()
+      .deserialize(dataSet, function(err, json) {
+        expect(json).to.be.an('array').with.length(2);
+        expect(json[0].address.links).to.equal(undefined);
+        expect(json[0].links).to.eql({ self: '/users/1' });
+        expect(json[1].address.links).to.eql({ self: '/addresses/1' });
+
+        done(null, json);
+      });
+
+    });
   });
 
   describe('meta links and record specific links', function () {
