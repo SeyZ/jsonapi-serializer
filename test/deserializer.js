@@ -1226,6 +1226,9 @@ describe('JSON API Deserializer', function () {
             'first-name': 'Sandro',
             'last-name': 'Munda'
           },
+          links: {
+            self: '/users/1'
+          },
           relationships: {
             address: {
               data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
@@ -1261,7 +1264,7 @@ describe('JSON API Deserializer', function () {
             country: 'USA'
           },
           links: {
-            home: '/addresses/1'
+            self: '/addresses/1'
           }
         }]
       };
@@ -1269,8 +1272,9 @@ describe('JSON API Deserializer', function () {
       new JSONAPIDeserializer()
       .deserialize(dataSet, function(err, json) {
         expect(json).to.be.an('array').with.length(2);
-        
-        expect(json[0].address.links).to.eql({ self: '/addresses/1' })
+        expect(json[0].address.links).to.equal(undefined);
+        expect(json[0].links).to.eql({ self: '/users/1' });
+        expect(json[1].address.links).to.eql({ self: '/addresses/1' });
 
         done(null, json);
       });
