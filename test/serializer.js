@@ -2501,4 +2501,63 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
   });
+
+  describe('relationshipLinks', function () {
+    it('should set the relationshipLinks parameter when the nullIfMissing is used', function () {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [{
+          id: '1',
+          createdAt: '2015-08-04T06:09:24.864Z',
+          publisher: {
+            id: '1',
+            name: 'hachette'
+          }
+        }, {
+          id: '2',
+          createdAt: '2015-08-04T07:09:24.864Z'
+        }]
+      };
+
+      var json = new JSONAPISerializer('users', {
+        topLevelLinks: {
+          self: 'http://localhost:3000/api/users'
+        },
+        attributes: ['firstName', 'lastName', 'books'],
+        books: {
+          ref: 'id',
+          attributes: ['createdAt', 'publisher'],
+          relationshipLinks: {
+            related: 'foo'
+          },
+          publisher: {
+            ref: 'id',
+            attributes: ['name'],
+            nullIfMissing: true,
+            relationshipLinks: {
+              related: 'bar'
+            },
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).eql([{
+        type: 'publishers',
+        id: '1',
+        attributes: { name: 'hachette' }
+      }, {
+        type: 'books',
+        id: '1',
+        attributes: { 'created-at': '2015-08-04T06:09:24.864Z' },
+        relationships: { publisher: { data: { type: 'publishers', id: '1' }, links: { related: 'bar' } } }
+      }, {
+        type: 'books',
+        id: '2',
+        attributes: { 'created-at': '2015-08-04T07:09:24.864Z' },
+        relationships: { publisher: { data: null, links: { related: 'bar' } } }
+      }]);
+    });
+  });
 });
