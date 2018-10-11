@@ -2562,18 +2562,15 @@ describe('JSON API Serializer', function () {
 
     it('should not be set when the relationshipLinks return null', function () {
       var dataSet = {
-        id: '1',
-        name: 'Sandro',
-        books: [{
-          id: '1',
-        }, {
-          id: '2',
-        }]
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
       };
 
       var json = new JSONAPISerializer('users', {
-        attributes: ['name'],
-        books: {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
           ref: 'id',
           included: false,
           relationshipLinks: {
@@ -2584,7 +2581,7 @@ describe('JSON API Serializer', function () {
         }
       }).serialize(dataSet);
 
-      expect(json.data.relationships).to.be.undefined;
+      expect(json.data.relationships.address).eql({ data: null });
     });
   });
 });
