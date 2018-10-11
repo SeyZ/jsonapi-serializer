@@ -2559,5 +2559,29 @@ describe('JSON API Serializer', function () {
         relationships: { publisher: { data: null, links: { related: 'bar' } } }
       }]);
     });
+
+    it('should not be set when the relationshipLinks return null', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            related: function () {
+              return null;
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({ data: null });
+    });
   });
 });
