@@ -328,6 +328,27 @@ describe('Options', function () {
       expect(json.data[1].meta.count).equal(1);
       done(null, json);
     });
+
+    it('should set the meta according to the func return', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett'
+      }];
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+        dataMeta: function (record) { return { copyright: record.firstName + ' ' + record.lastName }; } 
+      }).serialize(dataSet);
+
+      expect(json.data[0].meta.copyright).equal("Sandro Munda");
+      expect(json.data[1].meta.copyright).equal("Lawrence Bennett");
+      done(null, json);
+    });
   });
 
   describe('included', function () {
