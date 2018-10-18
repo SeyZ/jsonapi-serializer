@@ -1229,7 +1229,7 @@ describe('JSON API Deserializer', function () {
   });
 
   describe('meta', function () {
-    it('should be included', function (done) {
+    it('should be included for a resource', function (done) {
       var dataSet = {
         data: {
           type: 'users',
@@ -1254,7 +1254,37 @@ describe('JSON API Deserializer', function () {
       });
     });
 
-     it('should be in camelCase', function (done) {
+    it('should be included for a collection', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+        }, {
+          type: 'users',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+        }],
+        meta: {
+          count: 2,
+          'top-score': 192
+        }
+      };
+
+      new JSONAPIDeserializer({
+        keyForAttribute: 'camelCase'
+      })
+      .deserialize(dataSet, function (err, json) {
+        expect(json[0]).to.have.key('firstName', 'lastName');
+        expect(json[1]).to.have.key('firstName', 'lastName');
+        expect(json.meta).to.eql({
+          count: 2,
+          topScore: 192
+        });
+
+        done(null, json);
+      });
+    });
+
+    it('should be in camelCase', function (done) {
        var dataSet = {
          data: {
            type: 'users',
