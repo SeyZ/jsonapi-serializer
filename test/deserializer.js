@@ -1341,6 +1341,59 @@ describe('JSON API Deserializer', function () {
         done(null, json);
       });
     });
+
+    it('should be included for the collection', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' },
+          links: {
+            self: '/users/Tomas'
+          }
+        }, {
+          type: 'users',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' },
+          links: {
+            self: '/users/Marcus'
+          }
+        }],
+        links: {
+          all: '/users',
+          winners: {
+            href: '/winners',
+            meta: {
+              'top-score': 192
+            }
+          }
+        }
+      };
+
+      new JSONAPIDeserializer({
+        keyForAttribute: 'camelCase'
+      })
+      .deserialize(dataSet, function (err, json) {
+        expect(json[0]).to.have.key('firstName', 'lastName', 'links');
+        expect(json[0].links).to.be.eql({
+          self: '/users/Tomas'
+        });
+
+        expect(json[1]).to.have.key('firstName', 'lastName', 'links');
+        expect(json[1].links).to.be.eql({
+          self: '/users/Marcus'
+        });
+
+        expect(json.links).to.eql({
+          all: '/users',
+          winners: {
+            href: '/winners',
+            meta: {
+              topScore: 192
+            }
+          }
+        });
+        done(null, json);
+      });
+    });
   });
 
   describe('id', function () {
