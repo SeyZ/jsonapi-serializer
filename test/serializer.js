@@ -57,6 +57,21 @@ describe('Options', function () {
       expect(json.data).to.not.have.keys('id');
       done(null, json);
     });
+
+    it('should be a string', function (done) {
+      var dataSet = {
+        id: 123,
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data.id).to.equal('123');
+      done(null, json);
+    });
   });
 
   describe('pluralizeType', function () {
@@ -897,7 +912,7 @@ describe('JSON API Serializer', function () {
         firstName: 'Lawrence',
         lastName: 'Bennett',
         address: {
-          id: '54735697e16624ba1eee36bf',
+          id: 123,
           addressLine1: '361 Shady Lane',
           zipCode: '23185',
           country: 'USA'
@@ -933,6 +948,9 @@ describe('JSON API Serializer', function () {
         id: '54735722e16620ba1eee36af',
         type: 'addresses'
       });
+
+      expect(json.included[1]).to.have.property('id')
+        .equal('123');
 
       done(null, json);
     });
