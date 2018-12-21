@@ -1196,6 +1196,29 @@ describe('JSON API Deserializer', function () {
         done(null, json);
       });
     });
+
+    it('should handle camelCase', function (done) {
+      var dataSet = {
+        data: {
+          type: 'users',
+          attributes: { 'name': 'Sandro', 'last-name': 'Munda' },
+        },
+        links: {
+          self: '/articles/1/relationships/tags',
+          related_things: '/articles/1/tags'
+        }
+      };
+
+      new JSONAPIDeserializer({ keyForAttribute: 'camelCase' })
+      .deserialize(dataSet, function (err, json) {
+        expect(json.meta.links).to.be.eql({
+          self: '/articles/1/relationships/tags',
+          relatedThings: '/articles/1/tags'
+        });
+
+        done(null, json);
+      });
+    });
   });
 
   describe('record specific links', function () {
