@@ -497,6 +497,18 @@ describe('JSON API Deserializer', function () {
       });
     });
 
+    describe('With just null for data', function () {
+      it('should return null', function (done) {
+        var dataSet = { data: null };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).to.equal(null);
+            done(null, json);
+          });
+        });
+    });
+
     describe('Without included', function () {
       var baseDataSet = {
           data: [{
