@@ -1,0 +1,41 @@
+pairs:
+  # <initials>: <Firstname> <Lastname>[; <email-id>]
+  ak: Andrew Kang; akang
+  art: Artem Kochnev
+  ap: Andrew Parrish
+  bp: Boris Paskhaver
+  ce: Chris Elliott
+  cg: Chris Gomez
+  ck: Chien Kuo
+  cq: Charles Quirin
+  db: David Black
+  dd: David DiPanfilo
+  ea: Edem Attikese
+  eg: Emmanuel Genard
+  el: Elliot Laffey
+  im: Ian McNally
+  jm: Jan Mlcoch
+  jp: Josh (Bender) Philips
+  js: John Sandfort
+  ju: Joshua Ugba
+  ks: Karl Smith
+  kw: Keith Williams
+  lm: Laura Montemayor
+  mcs: Marie Sonko
+  mn: Mark Nyon
+  mw: Melissa Wahnish
+  ms: Mike Schechter
+  mns: Matan Shavit; mshavit
+  nr: Nathan Riemer
+  pa: Purnell Anthony
+  sb: Soarbh Bhatia
+  tc: Tim Caraballo
+  tf: Tai Farmer
+  wm: Will Miner
+  bm: Brenton Morris
+
+email:
+  prefix: pair
+  domain: 2u.com
+  no_solo_prefix: true
+  global: false  # Set to true for git-pair to change git configuration for all your projects
