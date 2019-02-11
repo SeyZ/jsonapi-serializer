@@ -495,6 +495,231 @@ describe('JSON API Deserializer', function () {
             done(null, json);
           });
       });
+
+      it('should merge included and reused relationships to attributes of shallow resources', function (done) {
+        var dataSet = {
+          data: [{
+            type: 'users',
+            id: '54735750e16638ba1eee59cb',
+            attributes: {
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            },
+            relationships: {
+              address: {
+                data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+              }
+            }
+          }, {
+            type: 'users',
+            id: '5490143e69e49d0c8f9fc6bc',
+            attributes: {
+              'first-name': 'Lawrence',
+              'last-name': 'Bennett'
+            },
+            relationships: {
+              address: {
+                data: { type: 'addresses', id: '54735697e16624ba1eee36bf' }
+              }
+            }
+          }, {
+            type: 'users',
+            id: '5490143e69e49d0c8f99bd62',
+            attributes: {
+              'first-name': 'Mary',
+              'last-name': 'Munda'
+            },
+            relationships: {
+              address: {
+                data: { type: 'addresses', id: '54735722e16620ba1eee36af' }
+              }
+            }
+          }],
+          included: [{
+            type: 'addresses',
+            id: '54735722e16620ba1eee36af',
+            attributes: {
+              'address-line1': '406 Madison Court',
+              'zip-code': '49426',
+              country: 'USA'
+            },
+            relationships: {
+              locks: {
+                data: [{ type: 'lock', id: '1' }, { type: 'lock', id: '2' }]
+              }
+            }
+          }, {
+            type: 'addresses',
+            id: '54735697e16624ba1eee36bf',
+            attributes: {
+              'address-line1': '361 Shady Lane',
+              'zip-code': '23185',
+              country: 'USA'
+            }
+          }, {
+            type: 'lock',
+            id: '1',
+            attributes: {
+              'secret-key': 'S*7v0oMf7YxCtFyA$ffy'
+            }
+          }, {
+            type: 'lock',
+            id: '2',
+            attributes: {
+              'secret-key': 'En8zd6ZT6#q&Fz^EwGMy'
+            }
+          }]
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).to.be.an('array').with.length(3);
+
+            expect(json[0]).to.have.key('id', 'first-name', 'last-name',
+              'address');
+
+            expect(json[0].address).to.be.eql({
+              'address-line1': '406 Madison Court',
+              'zip-code': '49426',
+              country: 'USA',
+              id: '54735722e16620ba1eee36af',
+              locks: [
+                { 'secret-key': 'S*7v0oMf7YxCtFyA$ffy', id: '1' },
+                { 'secret-key': 'En8zd6ZT6#q&Fz^EwGMy', id: '2' }
+              ]
+            });
+
+            expect(json[1]).to.have.key('id', 'first-name', 'last-name',
+              'address');
+
+            expect(json[1].address).to.be.eql({
+              id: '54735697e16624ba1eee36bf',
+              'address-line1': '361 Shady Lane',
+              'zip-code': '23185',
+              country: 'USA'
+            });
+
+            expect(json[2]).to.have.key('id', 'first-name', 'last-name',
+              'address');
+
+            expect(json[2].address).to.be.eql({
+              'address-line1': '406 Madison Court',
+              'zip-code': '49426',
+              country: 'USA',
+              id: '54735722e16620ba1eee36af',
+              locks: [
+                { 'secret-key': 'S*7v0oMf7YxCtFyA$ffy', id: '1' },
+                { 'secret-key': 'En8zd6ZT6#q&Fz^EwGMy', id: '2' }
+              ]
+            });
+
+            done(null, json);
+          });
+      });
+
+      it('should merge included and reused relationships to attributes of nested resources', function (done) {
+        var dataSet = {
+          data: [{
+            type: 'users',
+            id: '54735750e16638ba1eee59cb',
+            attributes: {
+              'first-name': 'Sandro',
+              'last-name': 'Munda'
+            },
+            relationships: {
+              addresses: {
+                data: [
+                  { type: 'addresses', id: '54735722e16620ba1eee36af' },
+                  { type: 'addresses', id: '54735697e16624ba1eee36bf' },
+                  { type: 'addresses', id: '54735697e16624ba1eee36cf' }
+                ]
+              }
+            }
+          }],
+          included: [{
+            type: 'addresses',
+            id: '54735722e16620ba1eee36af',
+            attributes: {
+              'address-line1': '406 Madison Court',
+              'zip-code': '49426',
+              country: 'USA'
+            },
+            relationships: {
+              lock: {
+                data: { type: 'lock', id: '1' }
+              }
+            }
+          }, {
+            type: 'addresses',
+            id: '54735697e16624ba1eee36bf',
+            attributes: {
+              'address-line1': '361 Shady Lane',
+              'zip-code': '23185',
+              country: 'USA'
+            },
+            relationships: {
+              lock: {
+                data: { type: 'lock', id: '2' }
+              }
+            }
+          }, {
+            type: 'addresses',
+            id: '54735697e16624ba1eee36cf',
+            attributes: {
+              'address-line1': '123 Sth Street',
+              'zip-code': '12332',
+              country: 'USA'
+            },
+            relationships: {
+              lock: {
+                data: { type: 'lock', id: '1' }
+              }
+            }
+          }, {
+            type: 'lock',
+            id: '1',
+            attributes: {
+              'secret-key': 'S*7v0oMf7YxCtFyA$ffy'
+            }
+          }, {
+            type: 'lock',
+            id: '2',
+            attributes: {
+              'secret-key': 'En8zd6ZT6#q&Fz^EwGMy'
+            }
+          }]
+        };
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).to.be.an('array').with.length(1);
+
+            expect(json[0]).to.have.key('id', 'first-name', 'last-name',
+              'addresses');
+
+            expect(json[0].addresses[0]).to.be.eql({
+              'address-line1': '406 Madison Court',
+              'zip-code': '49426',
+              country: 'USA',
+              id: '54735722e16620ba1eee36af',
+              lock: { 'secret-key': 'S*7v0oMf7YxCtFyA$ffy', id: '1' }
+            });
+
+            expect(json[0].addresses[1]).to.be.eql({
+              'address-line1': '361 Shady Lane',
+              'zip-code': '23185',
+              country: 'USA',
+              id: '54735697e16624ba1eee36bf',
+              lock: { 'secret-key': 'En8zd6ZT6#q&Fz^EwGMy', id: '2' }
+            });
+
+            expect(json[0].addresses[2].lock).to.be.eql({
+              'secret-key': 'S*7v0oMf7YxCtFyA$ffy', id: '1'
+            });
+
+            done(null, json);
+          });
+      });
     });
 
     describe('Without included', function () {
@@ -821,6 +1046,50 @@ describe('JSON API Deserializer', function () {
 
       });
     });
+
+    describe('With multiple relations', function () {
+      it('should include both relations if they point to same include', function (done) {
+        var dataSet = {
+          data: {
+            type: 'posts',
+            id: 1,
+            relationships: {
+              owner: {
+                data: {
+                  type: 'users',
+                  id: 1,
+                },
+              },
+              publisher: {
+                data: {
+                  type: 'users',
+                  id: 1,
+                },
+              },
+            },
+          },
+          included: [
+            {
+              type: 'users',
+              id: 1,
+              attributes: {
+                'first-name': 'Sandro',
+                'last-name': 'Munda',
+              },
+            },
+          ],
+        };
+
+        new JSONAPIDeserializer().deserialize(dataSet).then(function(json) {
+          expect(json).to.be.an('object').with.keys('id', 'owner', 'publisher');
+          expect(json.owner).to.exist;
+          expect(json.publisher).to.exist;
+          expect(json.owner).to.be.eql(json.publisher);
+
+          done(null, json);
+        });
+      });
+    });
   });
 
   describe('without callback', function () {
@@ -908,7 +1177,12 @@ describe('JSON API Deserializer', function () {
               id: '54735722e16620ba1eee36af',
               country: {
                 country: 'USA',
-                id: '54735722e16609ba1eee36af'
+                id: '54735722e16609ba1eee36af',
+                address: {
+                  address_line1: '406 Madison Court',
+                  zip_code: '49426',
+                  id: '54735722e16620ba1eee36af',
+                }
               }
             });
             done(null, json);
@@ -1055,6 +1329,33 @@ describe('JSON API Deserializer', function () {
             self: "/users/1"
         });
 
+        done(null, json);
+      });
+
+    });
+  });
+
+  describe('id', function () {
+    it('should override the id field', function (done) {
+      var dataSet = {
+        data: [{
+          type: 'users',
+          id: '54735750e16638ba1eee59cb',
+          attributes: { 'first-name': 'Sandro', 'last-name': 'Munda' }
+        }, {
+          type: 'users',
+          id: '5490143e69e49d0c8f9fc6bc',
+          attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+        }]
+      };
+
+      new JSONAPIDeserializer({
+        id: '_id'
+      }).deserialize(dataSet, function (err, json) {
+        expect(json[0]).to.not.have.keys('id');
+        expect(json[1]).to.not.have.keys('id');
+        expect(json[0]._id).equal('54735750e16638ba1eee59cb');
+        expect(json[1]._id).equal('5490143e69e49d0c8f9fc6bc');
         done(null, json);
       });
 
