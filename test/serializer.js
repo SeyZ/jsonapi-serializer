@@ -72,6 +72,21 @@ describe('Options', function () {
       expect(json.data.id).to.equal('123');
       done(null, json);
     });
+
+    it('should be serialized when it\'s 0', function (done) {
+      var dataSet = {
+        id: 0,
+        firstName: 'Sandro',
+        lastName: 'Munda'
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['firstName', 'lastName'],
+      }).serialize(dataSet);
+
+      expect(json.data.id).equal('0');
+      done(null, json);
+    });
   });
 
   describe('pluralizeType', function () {
@@ -342,7 +357,7 @@ describe('Options', function () {
 
       var json = new JSONAPISerializer('user', {
         attributes: ['firstName', 'lastName'],
-        dataMeta: function (record) { return { copyright: record.firstName + ' ' + record.lastName }; } 
+        dataMeta: function (record) { return { copyright: record.firstName + ' ' + record.lastName }; }
       }).serialize(dataSet);
 
       expect(json.data[0].meta.copyright).equal("Sandro Munda");
