@@ -5,13 +5,10 @@ var isFunction = require('lodash/isFunction');
 var _find = require('lodash/find');
 var _extend = require('lodash/extend');
 var _transform = require('lodash/transform');
-var _merge = require('lodash/merge');
-var _get = require('lodash/get');
-var _set = require('lodash/set');
 var Inflector = require('./inflector');
 
 module.exports = function (jsonapi, data, opts) {
-  var alreadyIncluded = {};
+  var alreadyIncluded = [];
 
   function isComplexType(obj) {
     return Array.isArray(obj) || isPlainObject(obj);
@@ -28,34 +25,30 @@ module.exports = function (jsonapi, data, opts) {
     }
   }
 
-  function findIncluded(relationshipData, relationshipName, from) {
+  function findIncluded(relationshipData, ancestry) {
     return new Promise(function (resolve) {
-      if (!jsonapi.included || !relationshipData) { return resolve(null); }
+      if (!jsonapi.included || !relationshipData) { resolve(null); }
 
       var included = _find(jsonapi.included, {
         id: relationshipData.id,
         type: relationshipData.type
       });
 
-      var path = [
-        from.type,
-        from.id,
-        relationshipName,
-        relationshipData.type,
-        relationshipData.id,
-      ]
-
-      // Check if the include is already processed (prevent circular
-      // references).
-      if (_get(alreadyIncluded, path, false)) {
-        return resolve(null);
-      } else {
-        _merge(alreadyIncluded, _set({}, path, true));
-      }
-
       if (included) {
+        // To prevent circular references, check if the record type
+        // has already been processed in this thread
+        if (ancestry.indexOf(included.type) > -1) {
+          return Promise
+            .all([extractAttributes(included)])
+            .then(function (results) {
+              var attributes = results[0];
+              var relationships = results[1];
+              resolve(_extend(attributes, relationships));
+            });
+        }
+
         return Promise
-          .all([extractAttributes(included), extractRelationships(included)])
+          .all([extractAttributes(included), extractRelationships(included, ancestry + ':' + included.type + included.id)])
           .then(function (results) {
             var attributes = results[0];
             var relationships = results[1];
@@ -105,7 +98,7 @@ module.exports = function (jsonapi, data, opts) {
     return dest;
   }
 
-  function extractRelationships(from) {
+  function extractRelationships(from, ancestry) {
     if (!from.relationships) { return; }
 
     var dest = {};
@@ -119,15 +112,15 @@ module.exports = function (jsonapi, data, opts) {
         } else if (Array.isArray(relationship.data)) {
           return Promise
             .all(relationship.data.map(function (relationshipData) {
-              return extractIncludes(relationshipData, key, from);
+              return extractIncludes(relationshipData, ancestry);
             }))
             .then(function (includes) {
               if (includes) { dest[keyForAttribute(key)] = includes; }
             });
         } else {
-          return extractIncludes(relationship.data, key, from)
-            .then(function (include) {
-              if (include) { dest[keyForAttribute(key)] = include; }
+          return extractIncludes(relationship.data, ancestry)
+            .then(function (includes) {
+              if (includes) { dest[keyForAttribute(key)] = includes; }
             });
         }
       }))
@@ -136,8 +129,8 @@ module.exports = function (jsonapi, data, opts) {
       });
   }
 
-  function extractIncludes(relationshipData, relationshipName, from) {
-    return findIncluded(relationshipData, relationshipName, from)
+  function extractIncludes(relationshipData, ancestry) {
+    return findIncluded(relationshipData, ancestry)
       .then(function (included) {
         var valueForRelationship = getValueForRelationship(relationshipData,
           included);
@@ -154,7 +147,7 @@ module.exports = function (jsonapi, data, opts) {
 
   this.perform = function () {
     return Promise
-      .all([extractAttributes(data), extractRelationships(data)])
+      .all([extractAttributes(data), extractRelationships(data, data.type + data.id)])
       .then(function (results) {
         var attributes = results[0];
         var relationships = results[1];
@@ -164,7 +157,6 @@ module.exports = function (jsonapi, data, opts) {
         if (jsonapi.links) {
           record.links = jsonapi.links;
         }
-
 
         // If option is present, transform record
         if (opts && opts.transform) {
@@ -176,7 +168,7 @@ module.exports = function (jsonapi, data, opts) {
   };
 };
 
-},{"./inflector":5,"lodash/extend":158,"lodash/find":159,"lodash/get":163,"lodash/isFunction":171,"lodash/isPlainObject":176,"lodash/merge":184,"lodash/set":188,"lodash/transform":196}],2:[function(require,module,exports){
+},{"./inflector":5,"lodash/extend":158,"lodash/find":159,"lodash/isFunction":171,"lodash/isPlainObject":176,"lodash/transform":195}],2:[function(require,module,exports){
 'use strict';
 var isFunction = require('lodash/isFunction');
 var DeserializerUtils = require('./deserializer-utils');
@@ -623,7 +615,7 @@ module.exports = function (collectionName, record, payload, opts) {
   };
 };
 
-},{"./inflector":5,"lodash/each":156,"lodash/find":159,"lodash/identity":165,"lodash/isFunction":171,"lodash/isNil":173,"lodash/isPlainObject":176,"lodash/keys":179,"lodash/mapKeys":181,"lodash/mapValues":182,"lodash/merge":184,"lodash/pick":185,"lodash/pickBy":186,"lodash/transform":196}],7:[function(require,module,exports){
+},{"./inflector":5,"lodash/each":156,"lodash/find":159,"lodash/identity":165,"lodash/isFunction":171,"lodash/isNil":173,"lodash/isPlainObject":176,"lodash/keys":179,"lodash/mapKeys":181,"lodash/mapValues":182,"lodash/merge":184,"lodash/pick":185,"lodash/pickBy":186,"lodash/transform":195}],7:[function(require,module,exports){
 'use strict';
 var isFunction = require('lodash/isFunction');
 var _mapValues = require('lodash/mapValues');
@@ -815,7 +807,7 @@ Inflections.prototype.clear = function(scope) {
 module.exports = Inflections;
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./hasProp":14,"./icPart":15,"./remove":17,"_process":197}],10:[function(require,module,exports){
+},{"./hasProp":14,"./icPart":15,"./remove":17,"_process":196}],10:[function(require,module,exports){
 'use strict';
 
 var Inflections     = require('./Inflections');
@@ -1144,7 +1136,7 @@ Transliterator.prototype.transliterate = function(string, replacement) {
 module.exports = Transliterator;
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":197}],13:[function(require,module,exports){
+},{"_process":196}],13:[function(require,module,exports){
 'use strict';
 
 function enDefaults(inflect) {
@@ -2628,7 +2620,7 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
 
 module.exports = baseMergeDeep;
 
-},{"./_assignMergeValue":37,"./_cloneBuffer":78,"./_cloneTypedArray":79,"./_copyArray":80,"./_initCloneObject":110,"./_safeGet":140,"./isArguments":166,"./isArray":167,"./isArrayLikeObject":169,"./isBuffer":170,"./isFunction":171,"./isObject":174,"./isPlainObject":176,"./isTypedArray":178,"./toPlainObject":194}],64:[function(require,module,exports){
+},{"./_assignMergeValue":37,"./_cloneBuffer":78,"./_cloneTypedArray":79,"./_copyArray":80,"./_initCloneObject":110,"./_safeGet":140,"./isArguments":166,"./isArray":167,"./isArrayLikeObject":169,"./isBuffer":170,"./isFunction":171,"./isObject":174,"./isPlainObject":176,"./isTypedArray":178,"./toPlainObject":193}],64:[function(require,module,exports){
 var basePickBy = require('./_basePickBy'),
     hasIn = require('./hasIn');
 
@@ -2938,7 +2930,7 @@ function castPath(value, object) {
 
 module.exports = castPath;
 
-},{"./_isKey":114,"./_stringToPath":151,"./isArray":167,"./toString":195}],77:[function(require,module,exports){
+},{"./_isKey":114,"./_stringToPath":151,"./isArray":167,"./toString":194}],77:[function(require,module,exports){
 var Uint8Array = require('./_Uint8Array');
 
 /**
@@ -3729,7 +3721,7 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbols;
 
-},{"./_arrayFilter":32,"./stubArray":189}],101:[function(require,module,exports){
+},{"./_arrayFilter":32,"./stubArray":188}],101:[function(require,module,exports){
 var arrayPush = require('./_arrayPush'),
     getPrototype = require('./_getPrototype'),
     getSymbols = require('./_getSymbols'),
@@ -3756,7 +3748,7 @@ var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbolsIn;
 
-},{"./_arrayPush":35,"./_getPrototype":98,"./_getSymbols":100,"./stubArray":189}],102:[function(require,module,exports){
+},{"./_arrayPush":35,"./_getPrototype":98,"./_getSymbols":100,"./stubArray":188}],102:[function(require,module,exports){
 var DataView = require('./_DataView'),
     Map = require('./_Map'),
     Promise = require('./_Promise'),
@@ -5182,7 +5174,7 @@ function findIndex(array, predicate, fromIndex) {
 
 module.exports = findIndex;
 
-},{"./_baseFindIndex":43,"./_baseIteratee":57,"./toInteger":192}],161:[function(require,module,exports){
+},{"./_baseFindIndex":43,"./_baseIteratee":57,"./toInteger":191}],161:[function(require,module,exports){
 var baseFlatten = require('./_baseFlatten');
 
 /**
@@ -5519,7 +5511,7 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-},{"./_root":139,"./stubFalse":190}],171:[function(require,module,exports){
+},{"./_root":139,"./stubFalse":189}],171:[function(require,module,exports){
 var baseGetTag = require('./_baseGetTag'),
     isObject = require('./isObject');
 
@@ -6183,43 +6175,6 @@ function property(path) {
 module.exports = property;
 
 },{"./_baseProperty":66,"./_basePropertyDeep":67,"./_isKey":114,"./_toKey":152}],188:[function(require,module,exports){
-var baseSet = require('./_baseSet');
-
-/**
- * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
- * it's created. Arrays are created for missing index properties while objects
- * are created for all other missing properties. Use `_.setWith` to customize
- * `path` creation.
- *
- * **Note:** This method mutates `object`.
- *
- * @static
- * @memberOf _
- * @since 3.7.0
- * @category Object
- * @param {Object} object The object to modify.
- * @param {Array|string} path The path of the property to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns `object`.
- * @example
- *
- * var object = { 'a': [{ 'b': { 'c': 3 } }] };
- *
- * _.set(object, 'a[0].b.c', 4);
- * console.log(object.a[0].b.c);
- * // => 4
- *
- * _.set(object, ['x', '0', 'y', 'z'], 5);
- * console.log(object.x[0].y.z);
- * // => 5
- */
-function set(object, path, value) {
-  return object == null ? object : baseSet(object, path, value);
-}
-
-module.exports = set;
-
-},{"./_baseSet":69}],189:[function(require,module,exports){
 /**
  * This method returns a new empty array.
  *
@@ -6244,7 +6199,7 @@ function stubArray() {
 
 module.exports = stubArray;
 
-},{}],190:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 /**
  * This method returns `false`.
  *
@@ -6264,7 +6219,7 @@ function stubFalse() {
 
 module.exports = stubFalse;
 
-},{}],191:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 var toNumber = require('./toNumber');
 
 /** Used as references for various `Number` constants. */
@@ -6308,7 +6263,7 @@ function toFinite(value) {
 
 module.exports = toFinite;
 
-},{"./toNumber":193}],192:[function(require,module,exports){
+},{"./toNumber":192}],191:[function(require,module,exports){
 var toFinite = require('./toFinite');
 
 /**
@@ -6346,7 +6301,7 @@ function toInteger(value) {
 
 module.exports = toInteger;
 
-},{"./toFinite":191}],193:[function(require,module,exports){
+},{"./toFinite":190}],192:[function(require,module,exports){
 var isObject = require('./isObject'),
     isSymbol = require('./isSymbol');
 
@@ -6414,7 +6369,7 @@ function toNumber(value) {
 
 module.exports = toNumber;
 
-},{"./isObject":174,"./isSymbol":177}],194:[function(require,module,exports){
+},{"./isObject":174,"./isSymbol":177}],193:[function(require,module,exports){
 var copyObject = require('./_copyObject'),
     keysIn = require('./keysIn');
 
@@ -6448,7 +6403,7 @@ function toPlainObject(value) {
 
 module.exports = toPlainObject;
 
-},{"./_copyObject":81,"./keysIn":180}],195:[function(require,module,exports){
+},{"./_copyObject":81,"./keysIn":180}],194:[function(require,module,exports){
 var baseToString = require('./_baseToString');
 
 /**
@@ -6478,7 +6433,7 @@ function toString(value) {
 
 module.exports = toString;
 
-},{"./_baseToString":72}],196:[function(require,module,exports){
+},{"./_baseToString":72}],195:[function(require,module,exports){
 var arrayEach = require('./_arrayEach'),
     baseCreate = require('./_baseCreate'),
     baseForOwn = require('./_baseForOwn'),
@@ -6545,7 +6500,7 @@ function transform(object, iteratee, accumulator) {
 
 module.exports = transform;
 
-},{"./_arrayEach":31,"./_baseCreate":41,"./_baseForOwn":46,"./_baseIteratee":57,"./_getPrototype":98,"./isArray":167,"./isBuffer":170,"./isFunction":171,"./isObject":174,"./isTypedArray":178}],197:[function(require,module,exports){
+},{"./_arrayEach":31,"./_baseCreate":41,"./_baseForOwn":46,"./_baseIteratee":57,"./_getPrototype":98,"./isArray":167,"./isBuffer":170,"./isFunction":171,"./isObject":174,"./isTypedArray":178}],196:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
