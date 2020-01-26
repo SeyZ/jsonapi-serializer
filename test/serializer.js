@@ -1154,6 +1154,96 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+    it('should be set into the `data.relationships` and `included` for Classes as well', function (done) {
+      class Author{
+        constructor(id, firstName, lastName){
+          this.id = id;
+          this.firstName = firstName;
+          this.lastName = lastName;
+        }
+      }
+      let vance = new Author('2934f384bb824a7cb7b238b8dc194a22', 'Ashlee', 'Vance');
+      let isaacson = new Author('5ed95269a8334d8a970a2bd9fa599288', 'Walter', 'Isaacson');
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [{
+          id: '52735730e16632ba1eee62dd',
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239',
+          author: vance
+        }, {
+          id: '52735780e16610ba1eee15cd',
+          title: 'Steve Jobs',
+          isbn: '978-1451648546',
+          author: isaacson
+        }]
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'books'],
+        books: {
+          ref: 'id',
+          attributes: ['title', 'isbn', 'author'],
+          author: {
+            ref: 'id',
+            attributes: ['firstName', 'lastName']
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).to.include({
+        type: 'books',
+        id: '52735730e16632ba1eee62dd',
+        attributes: {
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239'
+        },
+        relationships: {
+          author: {
+            data: { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' }
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        type: 'books',
+        id: '52735780e16610ba1eee15cd',
+        attributes: {
+          title: 'Steve Jobs',
+          isbn: '978-1451648546'
+        },
+        relationships: {
+          author: {
+            data: {
+              id: '5ed95269a8334d8a970a2bd9fa599288',
+              type: 'authors'
+            }
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '2934f384bb824a7cb7b238b8dc194a22',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Ashlee',
+          'last-name': 'Vance'
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '5ed95269a8334d8a970a2bd9fa599288',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Walter',
+          'last-name': 'Isaacson'
+        }
+      });
+
+      done(null, json);
+    });
   });
 
   describe('Multiple compound documents (array -> array)', function () {
@@ -1227,6 +1317,77 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+    it('should be set into the `data.relationships` and `included for Classes as well`', function (done) {
+      class Author{
+        constructor(id, firstName, lastName){
+          this.id = id;
+          this.firstName = firstName;
+          this.lastName = lastName;
+        }
+      }
+      let vance = new Author('2934f384bb824a7cb7b238b8dc194a22', 'Ashlee', 'Vance');
+      let isaacson = new Author('5ed95269a8334d8a970a2bd9fa599288', 'Walter', 'Isaacson');
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        books: [{
+          id: '52735730e16632ba1eee62dd',
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239',
+          authors: [vance, isaacson]
+        }]
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'books'],
+        books: {
+          ref: 'id',
+          attributes: ['title', 'isbn', 'authors'],
+          authors: {
+            ref: 'id',
+            attributes: ['firstName', 'lastName']
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).to.include({
+        type: 'books',
+        id: '52735730e16632ba1eee62dd',
+        attributes: {
+          title: 'Tesla, SpaceX, and the Quest for a Fantastic Future',
+          isbn: '978-0062301239'
+        },
+        relationships: {
+          authors: {
+            data: [
+              { id: '2934f384bb824a7cb7b238b8dc194a22', type: 'authors' },
+              { id: '5ed95269a8334d8a970a2bd9fa599288', type: 'authors' },
+            ]
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '2934f384bb824a7cb7b238b8dc194a22',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Ashlee',
+          'last-name': 'Vance'
+        }
+      });
+
+      expect(json.included).to.include({
+        id: '5ed95269a8334d8a970a2bd9fa599288',
+        type: 'authors',
+        attributes: {
+          'first-name': 'Walter',
+          'last-name': 'Isaacson'
+        }
+      });
+
+      done(null, json);
+    });
   });
 
 
@@ -1246,6 +1407,63 @@ describe('JSON API Serializer', function () {
             firstName: 'Lawrence',
             lastName: 'Bennett'
           }]
+        }
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          attributes: ['addressLine1', 'zipCode', 'country', 'neighbours'],
+          neighbours: {
+            ref: 'id',
+            attributes: ['firstName', 'lastName'],
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).to.include({
+        id: '5cd95269a8334d8a970a2bd9fa599278',
+        type: 'addresses',
+        attributes: {
+          'address-line1': '406 Madison Court',
+          'zip-code': '49426',
+          country: 'USA'
+        },
+        relationships: {
+          neighbours: {
+            data: [{ type: 'neighbours', id: '5490143e69e49d0c8f9fc6bc' }]
+          }
+        }
+      });
+
+      expect(json.included).to.include({
+        type: 'neighbours',
+        id: '5490143e69e49d0c8f9fc6bc',
+        attributes: { 'first-name': 'Lawrence', 'last-name': 'Bennett' }
+      });
+
+      done(null, json);
+    });
+    it('should be set into the `data.relationships` and `included for Classes as well`', function (done) {
+      class Neighbour{
+        constructor(id, firstName, lastName){
+          this.id = id;
+          this.firstName = firstName;
+          this.lastName = lastName;
+        }
+      }
+      let bennett = new Neighbour('5490143e69e49d0c8f9fc6bc', 'Lawrence', 'Bennett');
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '5cd95269a8334d8a970a2bd9fa599278',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA',
+          neighbours: [bennett]
         }
       }];
 
