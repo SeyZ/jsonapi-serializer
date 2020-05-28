@@ -1396,6 +1396,90 @@ describe('JSON API Deserializer', function () {
     });
   });
 
+  describe.only("With relationships using similar type names", function () {
+    it("should return all data with included attributes", function (done) {
+      var dataSet = {
+        data: {
+          type: "plan_data_history",
+          id: "47",
+          attibutes: {
+            author: 'Andi Feind',
+          },
+          relationships: {
+            plan_data: { data: { type: "plan_data", id: "122" } },
+          },
+        },
+        included: [
+          {
+            type: "plan_data",
+            id: "122",
+            attributes: {
+              date: "2020-01-01",
+            },
+          },
+        ],
+      };
+
+      new JSONAPIDeserializer().deserialize(dataSet).then(function (json) {
+        expect(json).to.be.an("object").with.keys("id", "plan-data");
+        expect(json['plan-data']).to.exist;
+        expect(json['plan-data']).to.be.an("object").with.keys("id", "date");
+        done(null, json);
+      });
+    });
+
+     it("should return all data without circular error2", function (done) {
+       var dataSet = {
+         data: {
+           type: "productsearch",
+           id: "47",
+           attributes: {
+             sku: "7TY55",
+           },
+           relationships: {
+             product: { data: { type: "products", id: "122" } },
+           },
+         },
+         included: [
+           {
+             type: "images",
+             id: "49",
+             attributes: {
+               mimeType: "image/jpeg",
+             },
+             relationships: {
+               product: { data: { type: "products", id: "122" } },
+             },
+           },
+           {
+             type: "products",
+             id: "122",
+             attributes: {
+               sku: "7TY55",
+             },
+             relationships: {
+               image: { data: { type: "images", id: "49" } },
+             },
+           },
+         ],
+       };
+
+       new JSONAPIDeserializer().deserialize(dataSet, function (err, json) {
+         expect(json).to.be.an("object").with.keys("id", "sku", "product");
+         expect(json.product).to.exist;
+         expect(json.product)
+           .to.be.an("object")
+           .with.keys("id", "sku", "image");
+         expect(json.product.image).to.exist;
+         expect(json.product.image)
+           .to.be.an("object")
+           .with.keys("id", "mime-type", "product");
+
+         done(null, json);
+       });
+     });
+  });
+
   describe('without callback', function () {
     it('should return promise', function (done) {
       var dataSet = {
