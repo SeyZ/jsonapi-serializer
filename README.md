@@ -11,6 +11,8 @@
 A Node.js framework agnostic library for (de)serializing your data to [JSON
 API](http://jsonapi.org) (1.0 compliant).
 
+psst: If you need an off-the-shelf admin panel for your app, check out what I build in my day job at [forestadmin.com](https://www.forestadmin.com) - it uses jsonapi-serializer to de/serialize data data coming from/to the APIs.
+
 - [Migrate from 2.0 to 3.0](https://github.com/SeyZ/jsonapi-serializer/wiki/Migrate-from-2.0-to-3.0)
 - [Migrate from 1.x to 2.0](https://github.com/SeyZ/jsonapi-serializer/wiki/Migrate-from-1.x-to-2.0)
 
