@@ -21,6 +21,6 @@
     "grunt": "^1.0.3",
     "grunt-browserify": "^5.3.0",
     "mocha": "^5.2.0",
-    "mongoose": "^4.3.4"
+    "mongoose": "^5.7.5"
   }
 }
