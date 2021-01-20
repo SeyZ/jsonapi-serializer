@@ -449,6 +449,37 @@ describe('Options', function () {
 
       done(null, json);
     });
+
+    it('should not change keys of nested object if not specified', function (done) {
+      var dataSet = {
+        id: '1',
+        nestedTest: {
+          dontChange: 1
+        },
+        nestedArrayTest: [{
+          dontChange: 1
+        }],
+      };
+
+      var json = new JSONAPISerializer('user', {
+        attributes: ['nestedTest', 'nestedArrayTest'],
+        keyForAttribute: 'underscore_case',
+      }).serialize(dataSet);
+
+      expect(json.data.type).equal('users');
+      expect(json.data).to.have.property('attributes').that.is
+        .an('object')
+        .eql({
+          'nested_test': {
+            dontChange: 1
+          },
+          'nested_array_test': [{
+            dontChange: 1
+          }],
+        });
+
+      done(null, json);
+    });
   });
 
   describe('keyForAttribute case strings', function () {
