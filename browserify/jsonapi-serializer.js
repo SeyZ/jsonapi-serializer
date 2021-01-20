@@ -541,6 +541,7 @@ module.exports = function (collectionName, record, payload, opts) {
     var embeds = [];
     var attributes = [];
 
+    var ret = {};
     if (opts && opts.attributes) {
       embeds = opts.attributes.filter(function (attr) {
         return opts[attr];
@@ -549,18 +550,17 @@ module.exports = function (collectionName, record, payload, opts) {
       attributes = opts.attributes.filter(function (attr) {
         return !opts[attr];
       });
+
+      if (attributes) { ret.attributes = pick(dest, attributes); }
+
+      embeds.forEach(function (embed) {
+        if (isComplexType(dest[embed])) {
+          that.serialize(ret, dest, embed, opts[embed]);
+        }
+      });
     } else {
-      attributes = _keys(dest);
+      ret.attributes = dest;
     }
-
-    var ret = {};
-    if (attributes) { ret.attributes = pick(dest, attributes); }
-
-    embeds.forEach(function (embed) {
-      if (isComplexType(dest[embed])) {
-        that.serialize(ret, dest, embed, opts[embed]);
-      }
-    });
 
     return ret.attributes;
   };
