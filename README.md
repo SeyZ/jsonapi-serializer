@@ -137,8 +137,8 @@ Simple usage:
     type: 'users',
     id: '1',
     attributes: {
-      'first-name': Sandro,
-      'last-name': Munda
+      'first-name': 'Sandro',
+      'last-name': 'Munda'
     }
   }, {
     type: 'users',
