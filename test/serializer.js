@@ -115,6 +115,40 @@ describe('Options', function () {
     });
   });
 
+  describe('singularizeType', function () {
+    it('should allow type to not be singularized', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+      
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName'],
+        singularizeType: false
+      }).serialize(dataSet);
+      
+      expect(json.data.type).equal('users');
+      done(null, json);
+    });
+
+    it('should allow type to be singularized', function (done) {
+      var dataSet = {
+        id: '1',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+      
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName'],
+        singularizeType: true
+      }).serialize(dataSet);
+
+      expect(json.data.type).equal('user');
+      done(null, json);
+    });
+  });
+
   describe('typeForAttribute', function () {
     it('should set the type according to the func return', function (done) {
       var dataSet = {
