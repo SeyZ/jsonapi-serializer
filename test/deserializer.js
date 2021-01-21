@@ -1638,4 +1638,22 @@ describe('JSON API Deserializer', function () {
 
     });
   });
+
+  describe('when data is null', function () {
+    it('should return an empty object', function (done) {
+      var dataSet = {
+        data: null,
+          jsonapi: {
+          version: '1.0'
+        }
+      };
+
+      new JSONAPIDeserializer()
+        .deserialize(dataSet, function (err, json) {
+          expect(json).to.be.eql({});
+
+          done(null, json);
+        });
+    });
+  });
 });
