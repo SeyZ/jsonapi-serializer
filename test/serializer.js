@@ -1021,6 +1021,64 @@ describe('JSON API Serializer', function () {
 
       done(null, json);
     });
+    it('should not add empty `relationships` in `included`', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Jane',
+        lastName: 'Munda',
+        address: {
+          id: '54735722e16620ba1eee36af',
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA'
+        },
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: true,
+          attributes: ['addressLine1', 'addressLine2', 'zipCode', 'country']
+        }
+      }).serialize(dataSet);
+
+      expect(json.included).to.have.length(1);
+
+      expect(json.included[0]).to.have.property('id')
+        .equal('54735722e16620ba1eee36af');
+
+      expect(json.included[0]).to.have.property('type').equal('addresses');
+
+      expect(json.included[0]).to.have.property('attributes').to.be
+        .an('object').eql({
+          'address-line1': '406 Madison Court',
+          'zip-code': '49426',
+          'country': 'USA'
+        });
+
+      expect(json.data[0].relationships).to.have.property('address').that.is
+        .an('object');
+
+      expect(json.data[0].relationships.address.data).eql({
+        id: '54735722e16620ba1eee36af',
+        type: 'addresses'
+      });
+
+      expect(json.included[0]).to.not.have.property('relationships');
+      
+      done(null, json);
+    });
   });
 
   describe('Compound documents', function () {
