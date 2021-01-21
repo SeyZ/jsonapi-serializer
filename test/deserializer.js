@@ -1394,6 +1394,55 @@ describe('JSON API Deserializer', function () {
         });
       });
     });
+
+    describe("With relationships using similar type names", function () {
+      it("should return all data without circular error", function (done) {
+        var dataSet = {
+          data: {
+            type: "productsearch",
+            id: "47",
+            attributes: {
+              sku: "7TY55",
+            },
+            relationships: {
+              product: { data: { type: "products", id: "122" } },
+            },
+          },
+          included: [
+            {
+              type: "images",
+              id: "49",
+              attributes: {
+                mimeType: "image/jpeg",
+              },
+              relationships: {
+                product: { data: { type: "products", id: "122" } },
+              },
+            },
+            {
+              type: "products",
+              id: "122",
+              attributes: {
+                sku: "7TY55"
+              },
+              relationships: {
+                image: { data: { type: "images", id: "49" } },
+              },
+            },
+          ],
+        };
+
+        new JSONAPIDeserializer().deserialize(dataSet, function (err, json) {
+          expect(json).to.be.an('object').with.keys('id', 'sku', 'product');
+          expect(json.product).to.exist;
+          expect(json.product).to.be.an('object').with.keys('id', 'sku', 'image');
+          expect(json.product.image).to.exist;
+          expect(json.product.image).to.be.an('object').with.keys('id', 'mime-type', 'product');
+
+          done(null, json);
+        });
+      });
+    });
   });
 
   describe('without callback', function () {
