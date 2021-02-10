@@ -8,7 +8,7 @@
   },
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
-  "repository": "SeyZ/jsonapi-serializer",
+  "repository": "swards/jsonapi-serializer",
   "engines": {
     "node": ">=0.12"
   },
