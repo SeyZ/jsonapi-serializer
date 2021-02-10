@@ -37,7 +37,7 @@ module.exports = function (jsonapi, data, opts) {
       if (included) {
         // To prevent circular references, check if the record type
         // has already been processed in this thread
-        if (ancestry.indexOf(':' + included.type + included.id) > -1) {
+        if (ancestry.indexOf(included.type + included.id) > -1) {
           return Promise
             .all([extractAttributes(included)])
             .then(function (results) {
