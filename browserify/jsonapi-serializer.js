@@ -145,17 +145,29 @@ module.exports = function (jsonapi, data, opts) {
       });
   }
 
+  function extractLinks(from) {
+    if (from.links) {
+      return from.links;
+    }
+    if (jsonapi.links) {
+      return jsonapi.links;
+    }
+    return undefined;
+  }
+
   this.perform = function () {
     return Promise
-      .all([extractAttributes(data), extractRelationships(data, data.type + data.id)])
+      .all([extractAttributes(data), extractRelationships(data, data.type + data.id), extractLinks(data)])
       .then(function (results) {
         var attributes = results[0];
         var relationships = results[1];
+        var links = results[2];
+        
         var record = _extend(attributes, relationships);
 
         // Links
-        if (jsonapi.links) {
-          record.links = jsonapi.links;
+        if (links) {
+          record.links = links;
         }
 
         // If option is present, transform record
