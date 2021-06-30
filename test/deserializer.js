@@ -616,88 +616,128 @@ describe('JSON API Deserializer', function () {
             expect(json).to.be.an('object');
 
             expect(json).to.be.be.eql({
-              name: 'Twin Pines Mall',
-              id: '1',
-              stores: [
-                { 
-                  name: 'Tasty Food',
-                  id: '1',
-                  deals: [
-                    {
-                      name: 'Free Drink with Snack Purchase',
-                      id: '1',
-                      stores: [
-                        { name: 'Tasty Food', id: '1' }
-                      ]
-                    }, {
-                      name: 'Free Samples of New Delicious Treat',
-                      id: '2',
-                      stores: [
-                        { name: 'Tasty Food', id: '1' }
-                      ] 
-                    } 
-                  ]
-                }, { 
-                  name: 'Fashionable Clothes',
-                  id: '2',
-                  deals: [
-                    {
-                      name: 'Buy One Get One Off Shirts',
-                      id: '3',
-                      stores: [
-                        { name: 'Fashionable Clothes', id: '2' }
-                      ]
-                    }
-                  ]
-                }, { 
-                  name: 'Readable Books',
-                  id: '3'
-                } 
-              ],
-              deals: [
-                {
-                  name: 'Free Drink with Snack Purchase',
-                  id: '1',
-                  stores: [
-                    {
-                      name: 'Tasty Food',
-                      id: '1',
-                      deals: [
-                        { name: 'Free Drink with Snack Purchase', id: '1' },
-                        { name: 'Free Samples of New Delicious Treat', id: '2' }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  name: 'Free Samples of New Delicious Treat',
-                  id: '2',
-                  stores: [
-                    {
-                      name: 'Tasty Food',
-                      id: '1',
-                      deals: [
-                        { name: 'Free Drink with Snack Purchase', id: '1' },
-                        { name: 'Free Samples of New Delicious Treat', id: '2' }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  name: 'Buy One Get One Off Shirts',
-                  id: '3',
-                  stores: [
-                    {
-                      name: 'Fashionable Clothes',
-                      id: '2',
-                      deals: [
-                        { name: 'Buy One Get One Off Shirts', id: '3' }
-                      ]
-                    }
-                  ]
-                }
-              ] 
-            });
+                "name": "Twin Pines Mall",
+                "id": "1",
+                "stores": [
+                  {
+                    "name": "Tasty Food",
+                    "id": "1",
+                    "deals": [
+                      {
+                        "name": "Free Drink with Snack Purchase",
+                        "id": "1",
+                        "stores": [
+                          {
+                            "name": "Tasty Food",
+                            "id": "1"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Free Samples of New Delicious Treat",
+                        "id": "2",
+                        "stores": [
+                          {
+                            "name": "Tasty Food",
+                            "id": "1"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Fashionable Clothes",
+                    "id": "2",
+                    "deals": [
+                      {
+                        "name": "Buy One Get One Off Shirts",
+                        "id": "3",
+                        "stores": [
+                          {
+                            "name": "Fashionable Clothes",
+                            "id": "2"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Readable Books",
+                    "id": "3"
+                  }
+                ],
+                "deals": [
+                  {
+                    "name": "Free Drink with Snack Purchase",
+                    "id": "1",
+                    "stores": [
+                      {
+                        "name": "Tasty Food",
+                        "id": "1",
+                        "deals": [
+                          {
+                            "name": "Free Drink with Snack Purchase",
+                            "id": "1"
+                          },
+                          {
+                            "name": "Free Samples of New Delicious Treat",
+                            "id": "2",
+                            "stores": [
+                              {
+                                "name": "Tasty Food",
+                                "id": "1"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Free Samples of New Delicious Treat",
+                    "id": "2",
+                    "stores": [
+                      {
+                        "name": "Tasty Food",
+                        "id": "1",
+                        "deals": [
+                          {
+                            "name": "Free Drink with Snack Purchase",
+                            "id": "1",
+                            "stores": [
+                              {
+                                "name": "Tasty Food",
+                                "id": "1"
+                              }
+                            ]
+                          },
+                          {
+                            "name": "Free Samples of New Delicious Treat",
+                            "id": "2"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Buy One Get One Off Shirts",
+                    "id": "3",
+                    "stores": [
+                      {
+                        "name": "Fashionable Clothes",
+                        "id": "2",
+                        "deals": [
+                          {
+                            "name": "Buy One Get One Off Shirts",
+                            "id": "3"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            );
 
             done(null, json);
           });
