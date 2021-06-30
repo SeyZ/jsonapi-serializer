@@ -48,11 +48,19 @@ module.exports = function (jsonapi, data, opts) {
         }
 
         return Promise
-          .all([extractAttributes(included), extractRelationships(included, ancestry + ':' + included.type + included.id)])
+          .all([extractAttributes(included), extractRelationships(included, ancestry + ':' + included.type + included.id), extractLinks(included)])
           .then(function (results) {
             var attributes = results[0];
             var relationships = results[1];
-            resolve(_extend(attributes, relationships));
+            var links = results[2];
+            const record = _extend(attributes, relationships);
+
+            // Links
+            if (links) {
+              record.links = links;
+            }
+
+            resolve(record)
           });
       } else {
         return resolve(null);
