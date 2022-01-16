@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-serializer-cvaize",
-  "version": "3.7.7",
+  "version": "3.7.8",
   "description": "A fork of jsonapi-serializer",
   "main": "index.js",
   "scripts": {
