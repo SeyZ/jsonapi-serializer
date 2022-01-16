@@ -1,14 +1,14 @@
 {
-  "name": "jsonapi-serializer",
-  "version": "3.6.7",
-  "description": "A Node.js framework agnostic library for serializing your data to JSON API",
+  "name": "jsonapi-serializer-cvaize",
+  "version": "3.7.7",
+  "description": "A fork of jsonapi-serializer",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
-  "author": "Sandro Munda <sandro@munda.me>",
+  "author": "Orlov Dmitry <cvaize@gmail.com>",
   "license": "MIT",
-  "repository": "SeyZ/jsonapi-serializer",
+  "repository": "cvaize/jsonapi-serializer",
   "engines": {
     "node": ">=0.12"
   },
