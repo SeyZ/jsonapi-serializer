@@ -1914,6 +1914,59 @@ describe('JSON API Serializer', function () {
     });
   });
 
+  describe('Meta inside an object compound document', function () {
+    it('should be set', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: {
+          addressLine1: '406 Madison Court',
+          zipCode: '49426',
+          country: 'USA',
+          exactMatch: true
+        },
+      }, {
+        id: '5490143e69e49d0c8f9fc6bc',
+        firstName: 'Lawrence',
+        lastName: 'Bennett',
+        address: {
+          addressLine1: '361 Shady Lane',
+          zipCode: '23185',
+          country: 'USA',
+          exactMatch: false
+        }
+      }];
+
+      var json = new JSONAPISerializer('users', {
+
+        attributes: ['firstName', 'lastName', 'address', ],
+        address: {
+          ref: 'zipCode',
+          attributes: ['addressLine1', 'country'],
+          dataMeta: {
+            exactMatch: function(item) {
+              
+              return item.address.exactMatch;
+            }
+          }
+        }
+      }).serialize(dataSet);
+
+      expect(json.included[0]).to.have.property('meta');
+      expect(json.included[0].meta).eql({
+        exactMatch: true
+      });
+
+      expect(json.included[1]).to.have.property('meta');
+      expect(json.included[1].meta).eql({
+        exactMatch: false
+      });
+
+      done(null, json);
+    });
+  });
+
   describe('Links (Function) inside an object compound document', function () {
     it('should be set', function (done) {
       var dataSet = [{
