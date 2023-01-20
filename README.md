@@ -1,3 +1,6 @@
+# I am looking for new maintainers
+If you are interested, send me an email: sandro@munda.me
+
 # JSON API Serializer
 
 <p align="center">
