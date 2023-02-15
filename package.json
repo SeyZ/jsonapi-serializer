@@ -1,6 +1,6 @@
 {
-  "name": "jsonapi-serializer",
-  "version": "3.6.7",
+  "name": "swards-jsonapi-serializer",
+  "version": "3.6.10",
   "description": "A Node.js framework agnostic library for serializing your data to JSON API",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "author": "Sandro Munda <sandro@munda.me>",
   "license": "MIT",
-  "repository": "SeyZ/jsonapi-serializer",
+  "repository": "swards/jsonapi-serializer",
   "engines": {
     "node": ">=0.12"
   },
