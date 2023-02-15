@@ -137,9 +137,15 @@ module.exports = function (jsonapi, data, opts) {
 
         if (valueForRelationship && isFunction(valueForRelationship.then)) {
           return valueForRelationship.then(function (value) {
+              if (relationshipData.meta) {
+                  value.meta = relationshipData.meta
+              }
             return value;
           });
         } else {
+            if (relationshipData.meta) {
+                valueForRelationship.meta = relationshipData.meta
+            }
           return valueForRelationship;
         }
       });
@@ -532,7 +538,13 @@ module.exports = function (collectionName, record, payload, opts) {
       if (typeof id !== 'undefined') { pushToIncluded(payload, included); }
     }
 
-    return typeof id !== 'undefined' ? { type: type, id: id } : null;
+    var json = typeof id !== 'undefined' ? { type: type, id: id } : null;
+
+    if (dest && dest.meta) {
+      json.meta = dest.meta
+    }
+
+    return json
   };
 
   this.serializeNested = function (dest, current, attribute, opts) {
