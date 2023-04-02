@@ -2668,5 +2668,29 @@ describe('JSON API Serializer', function () {
 
       expect(json.data.relationships.address).eql({ data: null });
     });
+
+    it('should serialize relationshipLinks when missing and nullIfMissing: false', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          ignoreRelationshipData: false,
+          nullIfMissing: false,
+          relationshipLinks: {
+            related: '/foo/bar'
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships).eql({
+        address: { links: { related: '/foo/bar' } }
+      });
+    });
   });
 });
