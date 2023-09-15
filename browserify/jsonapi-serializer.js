@@ -303,7 +303,6 @@ module.exports = {
 'use strict';
 var isPlainObject = require('lodash/isPlainObject');
 var isFunction = require('lodash/isFunction');
-var _find = require('lodash/find');
 var _merge = require('lodash/merge');
 var _identity = require('lodash/identity');
 var _transform = require('lodash/transform');
@@ -311,39 +310,42 @@ var _mapValues = require('lodash/mapValues');
 var _mapKeys = require('lodash/mapKeys');
 var _pick = require('lodash/pick');
 var _pickBy = require('lodash/pickBy');
-var _keys = require('lodash/keys');
 var _each = require('lodash/each');
 var _isNil = require('lodash/isNil');
 var Inflector = require('./inflector');
 
-module.exports = function (collectionName, record, payload, opts) {
+module.exports = function (collectionName, record, payload, opts, includedSet) {
   function isComplexType(obj) {
     return Array.isArray(obj) || isPlainObject(obj);
   }
 
+  function transformFunction(result, value, key) {
+    if (isComplexType(value)) {
+      result[keyForAttribute(key)] = keyForAttribute(value);
+    } else {
+      result[keyForAttribute(key)] = value;
+    }
+  }
+
+  function attributeFunction(attr) {
+    if (isComplexType(attr)) {
+      return keyForAttribute(attr);
+    } else {
+      return attr;
+    }
+  }
+
+  const keyForAttributeFunction = isFunction(opts.keyForAttribute)
+      ? opts.keyForAttribute
+      : (attribute) => Inflector.caserize(attribute, opts);
+
   function keyForAttribute(attribute) {
     if (isPlainObject(attribute)) {
-      return _transform(attribute, function (result, value, key) {
-        if (isComplexType(value)) {
-          result[keyForAttribute(key)] = keyForAttribute(value);
-        } else {
-          result[keyForAttribute(key)] = value;
-        }
-      });
+      return _transform(attribute, transformFunction);
     } else if (Array.isArray(attribute)) {
-      return attribute.map(function (attr) {
-        if (isComplexType(attr)) {
-          return keyForAttribute(attr);
-        } else {
-          return attr;
-        }
-      });
+      return attribute.map(attributeFunction);
     } else {
-      if (isFunction(opts.keyForAttribute)) {
-        return opts.keyForAttribute(attribute);
-      } else {
-        return Inflector.caserize(attribute, opts);
-      }
+      return keyForAttributeFunction(attribute);
     }
   }
 
@@ -411,45 +413,46 @@ module.exports = function (collectionName, record, payload, opts) {
     }
   }
 
+  function pickFunction (value, key) {
+    return keyForAttribute(key);
+  }
+
   function pick(obj, attributes) {
-    return _mapKeys(_pick(obj, attributes), function (value, key) {
-      return keyForAttribute(key);
-    });
+    return _mapKeys(_pick(obj, attributes), pickFunction);
   }
 
-  function isCompoundDocumentIncluded(included, item) {
-    return _find(payload.included, { id: item.id, type: item.type });
+  function isCompoundDocumentIncluded(setKey) {
+    return includedSet[setKey];
   }
 
-  function pushToIncluded(dest, include) {
-    var included = isCompoundDocumentIncluded(dest, include);
+  function pushToIncluded(payload, item) {
+    const setKey = `${item.type}-${item.id}`;
+    var included = isCompoundDocumentIncluded(setKey);
     if (included) {
       // Merge relationships
       included.relationships = _merge(included.relationships,
-        _pickBy(include.relationships, _identity));
+        _pickBy(item.relationships, _identity));
 
       // Merge attributes
       included.attributes = _merge(included.attributes,
-        _pickBy(include.attributes, _identity));
+        _pickBy(item.attributes, _identity));
     } else {
-      if (!dest.included) { dest.included = []; }
-      dest.included.push(include);
+      if (!payload.included) { payload.included = []; }
+      includedSet[setKey] = item;
+      payload.included.push(item);
     }
   }
 
   this.serialize = function (dest, current, attribute, opts) {
-    var that = this;
     var data = null;
 
     if (opts && opts.ref) {
       if (!dest.relationships) { dest.relationships = {}; }
 
       if (Array.isArray(current[attribute])) {
-        data = current[attribute].map(function (item) {
-          return that.serializeRef(item, current, attribute, opts);
-        });
+        data = current[attribute].map((item) => this.serializeRef(item, current, attribute, opts));
       } else {
-        data = that.serializeRef(current[attribute], current, attribute,
+        data = this.serializeRef(current[attribute], current, attribute,
           opts);
       }
 
@@ -472,16 +475,14 @@ module.exports = function (collectionName, record, payload, opts) {
     } else {
       if (Array.isArray(current[attribute])) {
         if (current[attribute].length && isPlainObject(current[attribute][0])) {
-          data = current[attribute].map(function (item) {
-            return that.serializeNested(item, current, attribute, opts);
-          });
+          data = current[attribute].map((item) => this.serializeNested(item, current, attribute, opts));
         } else {
           data = current[attribute];
         }
 
         dest.attributes[keyForAttribute(attribute)] = data;
       } else if (isPlainObject(current[attribute])) {
-        data = that.serializeNested(current[attribute], current, attribute, opts);
+        data = this.serializeNested(current[attribute], current, attribute, opts);
         dest.attributes[keyForAttribute(attribute)] = data;
       } else {
         dest.attributes[keyForAttribute(attribute)] = current[attribute];
@@ -490,7 +491,6 @@ module.exports = function (collectionName, record, payload, opts) {
   };
 
   this.serializeRef = function (dest, current, attribute, opts) {
-    var that = this;
     var id = getRef(current, dest, opts);
     var type = getType(attribute, dest);
 
@@ -517,11 +517,12 @@ module.exports = function (collectionName, record, payload, opts) {
     var included = { type: type, id: id };
     if (includedAttrs) { included.attributes = pick(dest, includedAttrs); }
 
-    relationships.forEach(function (relationship) {
+    const relationShipsFunction = (relationship) => {
       if (dest && (isComplexType(dest[relationship]) || dest[relationship] === null)) {
-        that.serialize(included, dest, relationship, opts[relationship]);
+        this.serialize(included, dest, relationship, opts[relationship]);
       }
-    });
+    }
+    relationships.forEach(relationShipsFunction);
 
     if (includedAttrs.length &&
       (opts.included === undefined || opts.included)) {
@@ -536,8 +537,6 @@ module.exports = function (collectionName, record, payload, opts) {
   };
 
   this.serializeNested = function (dest, current, attribute, opts) {
-    var that = this;
-
     var embeds = [];
     var attributes = [];
 
@@ -553,11 +552,12 @@ module.exports = function (collectionName, record, payload, opts) {
 
       if (attributes) { ret.attributes = pick(dest, attributes); }
 
-      embeds.forEach(function (embed) {
+      const embedsFunction = (embed) => {
         if (isComplexType(dest[embed])) {
-          that.serialize(ret, dest, embed, opts[embed]);
+          this.serialize(ret, dest, embed, opts[embed]);
         }
-      });
+      }
+      embeds.forEach(embedsFunction);
     } else {
       ret.attributes = dest;
     }
@@ -566,8 +566,6 @@ module.exports = function (collectionName, record, payload, opts) {
   };
 
   this.perform = function () {
-    var that = this;
-
     if( record === null ){
         return null;
     }
@@ -591,7 +589,7 @@ module.exports = function (collectionName, record, payload, opts) {
       data.meta = getMeta(record, opts.dataMeta);
     }
 
-    _each(opts.attributes, function (attribute) {
+    _each(opts.attributes, (attribute) => {
       var splittedAttributes = attribute.split(':');
 
       if (opts[attribute] && !record[attribute] && opts[attribute].nullIfMissing) {
@@ -607,7 +605,7 @@ module.exports = function (collectionName, record, payload, opts) {
           attributeMap = splittedAttributes[1];
         }
 
-        that.serialize(data, record, attribute, opts[attributeMap]);
+        this.serialize(data, record, attribute, opts[attributeMap]);
       }
     });
 
@@ -615,7 +613,7 @@ module.exports = function (collectionName, record, payload, opts) {
   };
 };
 
-},{"./inflector":5,"lodash/each":156,"lodash/find":159,"lodash/identity":165,"lodash/isFunction":171,"lodash/isNil":173,"lodash/isPlainObject":176,"lodash/keys":179,"lodash/mapKeys":181,"lodash/mapValues":182,"lodash/merge":184,"lodash/pick":185,"lodash/pickBy":186,"lodash/transform":195}],7:[function(require,module,exports){
+},{"./inflector":5,"lodash/each":156,"lodash/identity":165,"lodash/isFunction":171,"lodash/isNil":173,"lodash/isPlainObject":176,"lodash/mapKeys":181,"lodash/mapValues":182,"lodash/merge":184,"lodash/pick":185,"lodash/pickBy":186,"lodash/transform":195}],7:[function(require,module,exports){
 'use strict';
 var isFunction = require('lodash/isFunction');
 var _mapValues = require('lodash/mapValues');
@@ -625,15 +623,18 @@ module.exports = function (collectionName, records, opts) {
   this.serialize = function (records) {
     var that = this;
     var payload = {};
+    const includedSet = new Set();
+
+    function getLinksFunction(value) {
+      if (isFunction(value)) {
+        return value(records);
+      } else {
+        return value;
+      }
+    }
 
     function getLinks(links) {
-      return _mapValues(links, function (value) {
-        if (isFunction(value)) {
-          return value(records);
-        } else {
-          return value;
-        }
-      });
+      return _mapValues(links, getLinksFunction);
     }
 
     function collection() {
@@ -641,7 +642,7 @@ module.exports = function (collectionName, records, opts) {
 
       records.forEach(function (record) {
         var serializerUtils = new SerializerUtils(that.collectionName, record,
-          payload, that.opts);
+          payload, that.opts, includedSet);
         payload.data.push(serializerUtils.perform());
       });
 
@@ -650,7 +651,7 @@ module.exports = function (collectionName, records, opts) {
 
     function resource() {
       payload.data = new SerializerUtils(that.collectionName, records, payload,
-        that.opts).perform(records);
+        that.opts, includedSet).perform(records);
 
       return payload;
     }
