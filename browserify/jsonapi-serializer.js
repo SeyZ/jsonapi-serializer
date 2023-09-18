@@ -422,7 +422,7 @@ module.exports = function (collectionName, record, payload, opts, includedSet) {
   }
 
   function isCompoundDocumentIncluded(setKey) {
-    return includedSet[setKey];
+    return includedSet.get(setKey);
   }
 
   function pushToIncluded(payload, item) {
@@ -438,7 +438,7 @@ module.exports = function (collectionName, record, payload, opts, includedSet) {
         _pickBy(item.attributes, _identity));
     } else {
       if (!payload.included) { payload.included = []; }
-      includedSet[setKey] = item;
+      includedSet.set(setKey, item);
       payload.included.push(item);
     }
   }
@@ -623,7 +623,7 @@ module.exports = function (collectionName, records, opts) {
   this.serialize = function (records) {
     var that = this;
     var payload = {};
-    const includedSet = new Set();
+    const includedSet = new Map();
 
     function getLinksFunction(value) {
       if (isFunction(value)) {
