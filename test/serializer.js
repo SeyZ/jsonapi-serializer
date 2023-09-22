@@ -2645,7 +2645,7 @@ describe('JSON API Serializer', function () {
       }]);
     });
 
-    it('should not be set when the relationshipLinks return null', function () {
+    it('should not be set when the related relationshipLinks return null', function () {
       var dataSet = {
         id: '54735750e16638ba1eee59cb',
         firstName: 'Sandro',
@@ -2667,6 +2667,180 @@ describe('JSON API Serializer', function () {
       }).serialize(dataSet);
 
       expect(json.data.relationships.address).eql({ data: null });
+    });
+
+    it('should not be set when the self relationshipLinks return null', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            self: function () {
+              return null;
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({ data: null });
+    });
+
+    it('should not be set when the self and related relationshipLinks return null', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            self: function () {
+              return null;
+            },
+            related: function(){
+              return null;
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({ data: null });
+    });
+
+    it('should be set when the relationshipLinks returns a self link only', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            self: function(){
+              return 'self-relationship-link'
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({
+        data: null,
+        links: {
+          self: 'self-relationship-link'
+        }
+      });
+    });
+
+    it('should be set when the relationshipLinks returns a related link only', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            related: function(){
+              return 'related-relationship-link'
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({
+        data: null,
+        links: {
+          related: 'related-relationship-link'
+        }
+      });
+    });
+
+    it('should be set when the relationshipLinks returns a related link and null self link', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            related: function(){
+              return 'related-relationship-link'
+            },
+            self: function(){
+              return null
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({
+        data: null,
+        links: {
+          related: 'related-relationship-link'
+        }
+      });
+    });
+
+
+    it('should be set when the relationshipLinks returns a self link and null related link', function () {
+      var dataSet = {
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        address: null,
+      };
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'address'],
+        address: {
+          ref: 'id',
+          included: false,
+          relationshipLinks: {
+            related: function(){
+              return null
+            },
+            self: function(){
+              return 'self-relationship-link'
+            }
+          },
+        }
+      }).serialize(dataSet);
+
+      expect(json.data.relationships.address).eql({
+        data: null,
+        links: {
+          self: 'self-relationship-link'
+        }
+      });
     });
   });
 });
