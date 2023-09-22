@@ -2291,6 +2291,31 @@ describe('JSON API Serializer', function () {
       done(null, json);
     });
 
+    it('should not set the attr to null with nullIfMissing option', function (done) {
+      var dataSet = [{
+        id: '54735750e16638ba1eee59cb',
+        firstName: 'Sandro',
+        lastName: 'Munda',
+        isActive: false,
+        count: 0
+      }];
+
+      var json = new JSONAPISerializer('users', {
+        attributes: ['firstName', 'lastName', 'isActive', 'count'],
+        isActive: {
+          nullIfMissing: true
+        },
+        count: {
+          nullIfMissing: true
+        }        
+      }).serialize(dataSet);
+
+      // jshint expr: true
+      expect(json.data[0].attributes['is-active']).to.be.false;
+      expect(json.data[0].attributes.count).eql(0);
+      done(null, json);
+    });    
+
     it('should add the relationship with nullIfMissing option', function (done) {
       var dataSet = [{
         id: '54735750e16638ba1eee59cb',
