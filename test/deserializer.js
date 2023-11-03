@@ -392,7 +392,8 @@ describe('JSON API Deserializer', function () {
               id: '54735697e16624ba1eee36bf',
               'address-line1': '361 Shady Lane',
               'zip-code': '23185',
-              country: 'USA'
+              country: 'USA',
+              lock: { id: '2' }
             });
 
             done();
@@ -478,7 +479,7 @@ describe('JSON API Deserializer', function () {
           .deserialize(dataSet, function (err, json) {
             expect(json).to.be.an('object');
 
-            expect(json).to.have.key('id', 'first-name', 'last-name', 
+            expect(json).to.have.key('id', 'first-name', 'last-name',
               'username', 'images');
 
             expect(json.images).to.be.an('array').with.length(2)
@@ -553,7 +554,7 @@ describe('JSON API Deserializer', function () {
               id: '2',
               type: 'stores',
               attributes: {
-                name: 'Fashionable Clothes' 
+                name: 'Fashionable Clothes'
               },
               relationships: {
                 deals: {
@@ -619,7 +620,7 @@ describe('JSON API Deserializer', function () {
               name: 'Twin Pines Mall',
               id: '1',
               stores: [
-                { 
+                {
                   name: 'Tasty Food',
                   id: '1',
                   deals: [
@@ -634,10 +635,10 @@ describe('JSON API Deserializer', function () {
                       id: '2',
                       stores: [
                         { name: 'Tasty Food', id: '1' }
-                      ] 
-                    } 
+                      ]
+                    }
                   ]
-                }, { 
+                }, {
                   name: 'Fashionable Clothes',
                   id: '2',
                   deals: [
@@ -649,10 +650,10 @@ describe('JSON API Deserializer', function () {
                       ]
                     }
                   ]
-                }, { 
+                }, {
                   name: 'Readable Books',
                   id: '3'
-                } 
+                }
               ],
               deals: [
                 {
@@ -696,7 +697,7 @@ describe('JSON API Deserializer', function () {
                     }
                   ]
                 }
-              ] 
+              ]
             });
 
             done(null, json);
@@ -1130,6 +1131,29 @@ describe('JSON API Deserializer', function () {
           done(null, json);
         });
       });
+
+      it('Should include relationship object withonly id', function (done){
+        var dataSet = _.cloneDeep(baseDataSet);
+
+        new JSONAPIDeserializer()
+          .deserialize(dataSet, function (err, json) {
+            expect(json).to.be.an('array').with.length(2);
+            expect(json[0]).to.be.eql({
+              id: '54735750e16638ba1eee59cb',
+              'first-name': 'Sandro',
+              'last-name': 'Munda',
+              'address': { id: '54735722e16620ba1eee36af' }
+            });
+            expect(json[1]).to.be.eql({
+              id: '5490143e69e49d0c8f9fc6bc',
+              'first-name': 'Lawrence',
+              'last-name': 'Bennett',
+              'address': { id: '54735697e16624ba1eee36bf' }
+            });
+
+            done(null, json);
+          });
+      })
     });
 
     describe('With empty relationship', function () {
