@@ -478,7 +478,7 @@ describe('JSON API Deserializer', function () {
           .deserialize(dataSet, function (err, json) {
             expect(json).to.be.an('object');
 
-            expect(json).to.have.key('id', 'first-name', 'last-name', 
+            expect(json).to.have.key('id', 'first-name', 'last-name',
               'username', 'images');
 
             expect(json.images).to.be.an('array').with.length(2)
@@ -553,7 +553,7 @@ describe('JSON API Deserializer', function () {
               id: '2',
               type: 'stores',
               attributes: {
-                name: 'Fashionable Clothes' 
+                name: 'Fashionable Clothes'
               },
               relationships: {
                 deals: {
@@ -619,7 +619,7 @@ describe('JSON API Deserializer', function () {
               name: 'Twin Pines Mall',
               id: '1',
               stores: [
-                { 
+                {
                   name: 'Tasty Food',
                   id: '1',
                   deals: [
@@ -634,10 +634,10 @@ describe('JSON API Deserializer', function () {
                       id: '2',
                       stores: [
                         { name: 'Tasty Food', id: '1' }
-                      ] 
-                    } 
+                      ]
+                    }
                   ]
-                }, { 
+                }, {
                   name: 'Fashionable Clothes',
                   id: '2',
                   deals: [
@@ -649,10 +649,10 @@ describe('JSON API Deserializer', function () {
                       ]
                     }
                   ]
-                }, { 
+                }, {
                   name: 'Readable Books',
                   id: '3'
-                } 
+                }
               ],
               deals: [
                 {
@@ -696,7 +696,7 @@ describe('JSON API Deserializer', function () {
                     }
                   ]
                 }
-              ] 
+              ]
             });
 
             done(null, json);
@@ -1180,8 +1180,7 @@ describe('JSON API Deserializer', function () {
             expect(json).eql({
               id: '54735750e16638ba1eee59cb',
               'first-name': 'Sandro',
-              'last-name': 'Munda',
-              'addresses': []
+              'last-name': 'Munda'
             });
             done(null, json);
           });
